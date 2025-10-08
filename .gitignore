@@ -1,0 +1,49 @@
+# Arquivo .gitignore para um projeto Full-Stack (Node.js + Expo)
+
+# Logs de dependências
+npm-debug.log*
+yarn-debug.log*
+yarn-error.log*
+
+# Arquivos de sistema operacional
+.DS_Store
+Thumbs.db
+
+# Arquivos de configuração de editores de código
+.vscode/
+.idea/
+
+# Arquivos de ambiente - NUNCA ENVIE SUAS SENHAS!
+.env
+.env.*
+*.local
+
+# === BACKEND (Node.js / Express) ===
+
+# Pasta de dependências do backend
+/server/node_modules
+
+# Pasta de build do TypeScript do backend
+/server/dist
+
+# === FRONTEND (Expo / React Native) ===
+
+# Pasta de dependências do frontend
+/client/node_modules  # Ou /mobile/node_modules, dependendo do nome da sua pasta
+
+# Arquivos e pastas gerados pelo Expo e Metro Bundler
+/client/.expo/
+/client/.metrobundler-cache-*/
+
+# Build web do Expo
+/client/web-build
+
+# Builds nativos (se você ejetar ou fizer builds locais)
+/client/android/build
+/client/ios/build
+
+# Chaves de assinatura e certificados (segurança)
+*.jks
+*.p8
+*.p12
+*.keystore
