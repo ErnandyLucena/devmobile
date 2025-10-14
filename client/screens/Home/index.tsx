@@ -5,20 +5,17 @@ import { View, Text, StyleSheet, Image, TouchableOpacity } from 'react-native';
 export default function HomeScreen({ navigation }: any) {
   return (
     <View style={styles.container}>
-      {/* Imagem ilustrativa */}
       <Image
         source={require('../../assets/images/doctors.png')} 
         style={styles.image}
         resizeMode="contain"
       />
 
-      {/* Texto descritivo */}
       <Text style={styles.description}>
         Lorem ipsum dolor sit amet, consectetur adipiscing elit, sed do eiusmod
         tempor incididunt ut labore et dolore magna aliqua.
       </Text>
 
-      {/* Botão de Login */}
       <TouchableOpacity
         style={styles.loginButton}
         onPress={() => navigation.navigate('Login')}
@@ -26,7 +23,6 @@ export default function HomeScreen({ navigation }: any) {
         <Text style={styles.loginText}>Login</Text>
       </TouchableOpacity>
 
-      {/* Botão de Registro */}
       <TouchableOpacity
         style={styles.registerButton}
         onPress={() => navigation.navigate('Register')}
