@@ -32,3 +32,9 @@ Thumbs.db
 *.p8
 *.p12
 *.keystore
+
+# Banco de Dados
+*.db
+*.sqlite
+*.sqlite3
+/src/dev.bd
