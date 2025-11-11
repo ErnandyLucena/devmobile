@@ -4,7 +4,7 @@ const initSqlJs: any = require("sql.js");
 import fs from "fs";
 import path from "path";
 
-const DB_FILE = process.env.DATABASE_FILE || path.resolve(__dirname, "dev.db");
+export const DB_FILE = process.env.DATABASE_FILE || path.resolve(__dirname, "dev.db");
 let SQL: any = null;
 let db: Database | null = null;
 
@@ -38,6 +38,40 @@ async function init() {
       updatedAt TEXT
     );
   `);
+
+  // criar tabela de agendamentos (appointments)
+  db.run(`
+    CREATE TABLE IF NOT EXISTS appointments (
+      id INTEGER PRIMARY KEY AUTOINCREMENT,
+      data TEXT NOT NULL,
+      horaInicio TEXT NOT NULL,
+      horaFim TEXT NOT NULL,
+      status TEXT,
+      tipoAgendamento TEXT,
+      observacoes TEXT,
+      pacienteId INTEGER,
+      medicoCdPrestador INTEGER,
+      createdAt TEXT,
+      updatedAt TEXT
+    );
+  `);
+  // Persiste imediatamente para garantir criação do arquivo inicial
+  persist();
+
+  // criar tabela de pacientes
+  db.run(`
+    CREATE TABLE IF NOT EXISTS patients (
+      id INTEGER PRIMARY KEY AUTOINCREMENT,
+      nome TEXT NOT NULL,
+      cpf TEXT UNIQUE NOT NULL,
+      email TEXT UNIQUE NOT NULL,
+      telefone TEXT,
+      createdAt TEXT,
+      updatedAt TEXT
+    );
+  `);
+  // persiste alterações
+  persist();
 
   try {
     const info = db.prepare("PRAGMA table_info(users);");
@@ -149,6 +183,42 @@ async function init() {
     );
   }
 
+  // garantir colunas em appointments (para compatibilidade com versões antigas)
+  try {
+    const infoA = db.prepare("PRAGMA table_info(appointments);");
+    const colsA: string[] = [];
+    while (infoA.step()) {
+      const row = infoA.getAsObject();
+      if (row && row.name) colsA.push(String(row.name));
+    }
+    infoA.free();
+
+    const requiredAppCols: Array<{ name: string; stmt: string }> = [
+      { name: "pacienteNome", stmt: "ALTER TABLE appointments ADD COLUMN pacienteNome TEXT;" },
+      { name: "medicoNome", stmt: "ALTER TABLE appointments ADD COLUMN medicoNome TEXT;" },
+      { name: "especialidade", stmt: "ALTER TABLE appointments ADD COLUMN especialidade TEXT;" },
+    ];
+
+    for (const c of requiredAppCols) {
+      if (!colsA.includes(c.name)) {
+        try {
+          db.run(c.stmt);
+          persist();
+        } catch (err) {
+          console.warn(
+            `Falha ao adicionar coluna ${c.name} em appointments`,
+            err && err.toString ? err.toString() : err
+          );
+        }
+      }
+    }
+  } catch (err) {
+    console.warn(
+      "Erro ao verificar colunas da tabela appointments",
+      err && err.toString ? err.toString() : err
+    );
+  }
+
   return db;
 }
 
@@ -157,8 +227,18 @@ export function persist() {
   const data = db.export();
   const buffer = Buffer.from(data);
   const dir = path.dirname(DB_FILE);
-  if (!fs.existsSync(dir)) fs.mkdirSync(dir, { recursive: true });
-  fs.writeFileSync(DB_FILE, buffer);
+  try {
+    if (!fs.existsSync(dir)) fs.mkdirSync(dir, { recursive: true });
+    fs.writeFileSync(DB_FILE, buffer);
+    try {
+      const size = fs.statSync(DB_FILE).size;
+      console.log(`Persisted DB to ${DB_FILE} (${size} bytes)`);
+    } catch (_) {
+      console.log(`Persisted DB to ${DB_FILE}`);
+    }
+  } catch (err) {
+    console.warn("Falha ao persistir o DB:", err && err.toString ? err.toString() : err);
+  }
 }
 
 export async function run<T = any>(sql: string, params: any[] = []) {
