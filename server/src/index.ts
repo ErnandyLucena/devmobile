@@ -8,13 +8,12 @@ import routes from './routes';
 import { errorMiddleware } from './middleware/error.middleware';
 import { loggingMiddleware } from './middleware/logging.middleware';
 import { testConnection } from './config/db';
-// import { runMigrations } from './database/migrations/migrate'; // 🚨 COMENTADO
+// import { runMigrations } from './database/migrations/migrate'; // COMENTADO
 import { setupSwagger } from './config/swagger';
 
 const app = express();
 const PORT = process.env.PORT ? Number(process.env.PORT) : 3001;
 
-// Middlewares de segurança
 app.use(helmet());
 app.use(cors());
 app.use(rateLimit({
@@ -25,13 +24,10 @@ app.use(rateLimit({
 app.use(express.json());
 app.use(loggingMiddleware);
 
-// Swagger Documentation
 setupSwagger(app);
 
-// Rotas
 app.use('/api', routes);
 
-// Rota básica de teste
 app.get('/', (req, res) => {
   res.json({ 
     message: 'Bem-vindo à API Hospitalar',
@@ -40,10 +36,8 @@ app.get('/', (req, res) => {
   });
 });
 
-// Middleware de erro
 app.use(errorMiddleware);
 
-// Inicialização do servidor
 const startServer = async () => {
   try {
     console.log('🔄 Iniciando servidor...');
@@ -56,19 +50,18 @@ const startServer = async () => {
 
     console.log('✅ Conectado ao PostgreSQL');
     
-    // 🚨 COMENTADO - Migrações não rodam mais automaticamente
     // console.log('🔄 Executando migrações...');
     // await runMigrations();
 
     app.listen(PORT, '0.0.0.0', () => {
-      console.log(`🚀 Servidor rodando em http://localhost:${PORT}`);
-      console.log(`📚 Documentação: http://localhost:${PORT}/api-docs`);
-      console.log(`🏥 API Routes: http://localhost:${PORT}/api`);
-      console.log(`🔐 Health check: http://localhost:${PORT}/`);
-      console.log(`💡 Para executar migrações: npm run migrate`);
+      console.log(`1-Servidor rodando em http://localhost:${PORT}`);
+      console.log(`1-Documentação e testes: http://localhost:${PORT}/api-docs`);
+      console.log(`3-API Routes: http://localhost:${PORT}/api`);
+      console.log(`4-Health check: http://localhost:${PORT}/`);
+      console.log(`5-Para executar migrações: npm run migrate`);
     });
   } catch (error) {
-    console.error('❌ Falha ao iniciar servidor:', error);
+    console.error('Falha ao iniciar servidor:', error);
     process.exit(1);
   }
 };

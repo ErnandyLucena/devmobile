@@ -17,7 +17,6 @@ export const authMiddleware = (req: Request, res: Response, next: NextFunction) 
 
     const decoded = JwtUtil.verify(token) as any;
     
-    // Injeta os dados do usuário na request
     (req as any).userId = decoded.userId;
     (req as any).userEmail = decoded.email;
     (req as any).userType = decoded.tipo;

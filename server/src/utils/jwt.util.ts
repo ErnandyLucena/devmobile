@@ -1,7 +1,7 @@
 import jwt from 'jsonwebtoken';
 
 const JWT_SECRET = process.env.JWT_SECRET || 'seu_jwt_secret_aqui_mudar_em_producao';
-const EXPIRES_IN = '7d'; // Token expira em 7 dias
+const EXPIRES_IN = '7d'; 
 
 export const JwtUtil = {
   sign(payload: object): string {

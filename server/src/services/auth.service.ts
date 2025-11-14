@@ -21,16 +21,15 @@ export const AuthService = {
     convenio?: string;
   }) {
 
-     console.log('🔐 Dados recebidos no AuthService:', data);
-  console.log('🔐 Nome recebido:', data.name);
-  console.log('🔐 Tipo do nome:', typeof data.name);
-    // Verificar se email já existe
+     console.log('Dados recebidos no AuthService:', data);
+  console.log('recebido:', data.name);
+  console.log('Tipo do nome:', typeof data.name);
+    // apagar essa pohaaaa aqui dpss
     const existingUser = await UserService.findByEmail(data.email);
     if (existingUser) {
       throw new Error('Email já cadastrado');
     }
 
-    // Hash da senha
     const passwordHash = await HashUtil.hash(data.password);
 
     // Criar usuário
@@ -47,7 +46,7 @@ export const AuthService = {
       cpf: data.cpf
     });
 
-    // Criar registro específico baseado no tipo
+    // Criar registro específico
     let specificRecord;
     
     if (data.tipo === 'medico' && data.crm && data.especialidade) {
