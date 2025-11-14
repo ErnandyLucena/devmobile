@@ -1,117 +1,153 @@
-import { UserModel } from "../models/user.model";
-import { HashUtil } from "../utils/hash.util";
-import { JwtUtil } from "../utils/jwt.util";
-import db from "../db";
+import { UserService } from './user.service';
+import { ProfileService } from './profile.service';
+import { DoctorService } from './doctor.service';
+import { EmployeeService } from './employee.service';
+import { PatientService } from './patient.service';
+import { HashUtil } from '../utils/hash.util';
+import { JwtUtil } from '../utils/jwt.util';
 
 export const AuthService = {
-  async register({
-    name,
-    email,
-    cpf,
-    isDoctor,
-    sector,
-    idFuncionario,
-    cargo,
-    dataAdmissao,
-    status,
-    cdPrestador,
-    nmPrestador,
-    nmMnemonico,
-    dsCodigoConselho,
-    dsCRM,
-    especialidade,
-    password,
-  }: {
-    name?: string;
+  async register(data: {
     email: string;
-    cpf: string;
-    isDoctor?: boolean;
-    sector?: string | null;
-    idFuncionario?: number | null;
-    cargo?: string | null;
-    dataAdmissao?: string | null;
-    status?: string | null;
-    cdPrestador?: number | null;
-    nmPrestador?: string | null;
-    nmMnemonico?: string | null;
-    dsCodigoConselho?: string | null;
-    dsCRM?: string | null;
-    especialidade?: string | null;
     password: string;
+    name: string;
+    cpf: string;
+    tipo: string;
+    crm?: string;
+    especialidade?: string;
+    setor?: string;
+    cargo?: string;
+    data_admissao?: string;
+    convenio?: string;
   }) {
-    const existingEmail = await UserModel.findByEmail(email);
-    if (existingEmail) throw new Error("E-mail já cadastrado");
-    const existingCpf = await db.runGet(
-      "SELECT id FROM users WHERE cpf = ? LIMIT 1",
-      [cpf]
-    );
-    if (existingCpf) throw new Error("CPF já cadastrado");
 
-    const passwordHash = await HashUtil.hash(password);
-
-    await db.beginTransaction();
-    try {
-      await db.run(
-        `INSERT INTO users (
-          name, cpf, email, passwordHash, role, isDoctor, sector,
-          idFuncionario, cargo, dataAdmissao, status,
-          cdPrestador, nmPrestador, nmMnemonico, dsCodigoConselho, dsCRM, especialidade,
-          emailVerified, createdAt, updatedAt
-        ) VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?)`,
-        [
-          name || null,
-          cpf,
-          email,
-          passwordHash,
-          "user",
-          isDoctor ? 1 : 0,
-          isDoctor ? null : sector || null,
-          idFuncionario || null,
-          cargo || null,
-          dataAdmissao || null,
-          status || null,
-          cdPrestador || null,
-          nmPrestador || null,
-          nmMnemonico || null,
-          dsCodigoConselho || null,
-          dsCRM || null,
-          especialidade || null,
-          0,
-          new Date().toISOString(),
-          new Date().toISOString(),
-        ]
-      );
-      const row = await db.runGet("SELECT last_insert_rowid() as id");
-      const userId = row ? Number((row as any).id) : NaN;
-
-      await db.commitTransaction();
-      const created = await UserModel.findById(userId);
-      return { id: created!.id, name: created!.name, email: created!.email };
-    } catch (err) {
-      try {
-        await db.rollbackTransaction();
-      } catch (_) {}
-      throw err;
+     console.log('🔐 Dados recebidos no AuthService:', data);
+  console.log('🔐 Nome recebido:', data.name);
+  console.log('🔐 Tipo do nome:', typeof data.name);
+    // Verificar se email já existe
+    const existingUser = await UserService.findByEmail(data.email);
+    if (existingUser) {
+      throw new Error('Email já cadastrado');
     }
-  },
 
-  async login({ email, password }: { email: string; password: string }) {
-    const user = await UserModel.findByEmail(email);
-    if (!user) throw new Error("Credenciais inválidas");
-    const match = await HashUtil.compare(password, user.passwordHash);
-    if (!match) throw new Error("Credenciais inválidas");
-    const token = JwtUtil.sign({ sub: String(user.id), email: user.email });
+    // Hash da senha
+    const passwordHash = await HashUtil.hash(data.password);
+
+    // Criar usuário
+    const user = await UserService.create({
+      email: data.email,
+      password_hash: passwordHash,
+      tipo: data.tipo
+    });
+
+    // Criar perfil
+    await ProfileService.create({
+      usuario_id: user.id,
+      nome: data.name,
+      cpf: data.cpf
+    });
+
+    // Criar registro específico baseado no tipo
+    let specificRecord;
+    
+    if (data.tipo === 'medico' && data.crm && data.especialidade) {
+      specificRecord = await DoctorService.create({
+        usuario_id: user.id,
+        crm: data.crm,
+        especialidade: data.especialidade,
+        ativo: true
+      });
+    } else if (data.tipo === 'funcionario' && data.setor && data.cargo && data.data_admissao) {
+      specificRecord = await EmployeeService.create({
+        usuario_id: user.id,
+        setor: data.setor,
+        cargo: data.cargo,
+        data_admissao: new Date(data.data_admissao)
+      });
+    } else if (data.tipo === 'paciente') {
+      specificRecord = await PatientService.create({
+        usuario_id: user.id,
+        convenio: data.convenio,
+      });
+    }
+
     return {
-      token,
-      user: { id: user.id, name: user.name, email: user.email },
+      id: user.id,
+      email: user.email,
+      tipo: user.tipo,
+      name: data.name
     };
   },
 
-  async me(userId: number | string) {
-    const user = await UserModel.findById(
-      typeof userId === "string" ? Number(userId) : userId
-    );
-    if (!user) throw new Error("Usuário não encontrado");
-    return { id: user.id, name: user.name, email: user.email };
+  async login(data: { email: string; password: string }) {
+    // Buscar usuário por email
+    const user = await UserService.findByEmail(data.email);
+    if (!user) {
+      throw new Error('Credenciais inválidas');
+    }
+
+    // Verificar senha
+    const passwordMatch = await HashUtil.compare(data.password, user.password_hash);
+    if (!passwordMatch) {
+      throw new Error('Credenciais inválidas');
+    }
+
+    // Buscar perfil para pegar o nome
+    const profile = await ProfileService.findByUserId(user.id);
+
+    // Gerar token JWT
+    const token = JwtUtil.sign({
+      userId: user.id,
+      email: user.email,
+      tipo: user.tipo
+    });
+
+    return {
+      token,
+      user: {
+        id: user.id,
+        email: user.email,
+        tipo: user.tipo,
+        name: profile?.nome
+      }
+    };
   },
+
+  async getMe(userId: number) {
+    // Buscar usuário
+    const user = await UserService.findById(userId);
+    if (!user) {
+      throw new Error('Usuário não encontrado');
+    }
+
+    // Buscar perfil
+    const profile = await ProfileService.findByUserId(userId);
+
+    // Buscar dados específicos baseado no tipo
+    let specificData = null;
+    
+    if (user.tipo === 'medico') {
+      specificData = await DoctorService.findByUserId(userId);
+    } else if (user.tipo === 'funcionario') {
+      specificData = await EmployeeService.findByUserId(userId);
+    } else if (user.tipo === 'paciente') {
+      specificData = await PatientService.findByUserId(userId);
+    }
+
+    return {
+      user: {
+        id: user.id,
+        email: user.email,
+        tipo: user.tipo,
+        data_criacao: user.data_criacao
+      },
+      profile: {
+        nome: profile?.nome,
+        cpf: profile?.cpf,
+        telefone: profile?.telefone,
+        data_nascimento: profile?.data_nascimento
+      },
+      specific: specificData
+    };
+  }
 };
