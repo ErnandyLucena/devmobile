@@ -3,7 +3,7 @@ import fs from 'fs';
 import path from 'path';
 
 export const runMigrations = async (): Promise<void> => {
-  console.log('🔄 Iniciando migrações...');
+  console.log('Iniciando migrações...');
   
   const isConnected = await testConnection();
   if (!isConnected) {
@@ -16,7 +16,7 @@ export const runMigrations = async (): Promise<void> => {
     
     await query(sql);
     
-    console.log('✅ Tabelas criadas com sucesso!');
+    console.log('Tabelas criadas com sucesso!');
   } catch (error) {
     console.error(' Erro nas migrações:', error);
     throw error;
@@ -26,7 +26,7 @@ export const runMigrations = async (): Promise<void> => {
 if (require.main === module) {
   runMigrations()
     .then(() => {
-      console.log('🎉 Migração concluída!');
+      console.log(' Migração concluída!');
       process.exit(0);
     })
     .catch((error) => {
