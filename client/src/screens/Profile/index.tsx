@@ -1,68 +1,94 @@
-import { View, Text, StyleSheet, TextInput, TouchableOpacity } from "react-native";
+import { View, Text, StyleSheet, TextInput, TouchableOpacity, ScrollView, StatusBar } from "react-native";
 import { Ionicons } from '@expo/vector-icons';
 import { useAuth } from "../../context/AuthContext"; 
+import { Header } from "../../components/Header";
+import { styles } from "./styles";
 
 export function ProfileScreen() {
-  const { logout } = useAuth();
+  const { logout, user } = useAuth();
 
   return (
     <View style={styles.container}>
+      <StatusBar barStyle="dark-content" backgroundColor="#F7FAFC" />
       
-      <Text style={styles.title}>Profile</Text>
+      <ScrollView 
+        style={styles.scrollView}
+        showsVerticalScrollIndicator={false}
+        contentContainerStyle={styles.scrollContent}
+      >
+        <Header />
+        
+        {/* Espaçamento entre Header e conteúdo */}
+        <View style={styles.headerSpacing} />
+        
+        {/* Card do Usuário */}
+        <View style={styles.userCard}>
+          <View style={styles.avatarSection}>
+            <View style={styles.userInfo}>
+              <View style={styles.specialtyBadge}>
+                <Text style={styles.specialtyText}>Ortopedista</Text>
+              </View>
+            </View>
+          </View>
 
-      <View style={styles.userRow}>
-        <Ionicons name="person-circle-outline" size={42} color="#2D3ED6" />
-        <Text style={styles.name}>Dr Gabriela Borba</Text>
-      </View>
+          {/* Informações Profissionais */}
+          <View style={styles.infoSection}>
+            <Text style={styles.sectionTitle}>Informações Profissionais</Text>
+            
+            <View style={styles.infoGroup}>
+              <View style={styles.infoRow}>
+                <Text style={styles.infoLabel}>CRM</Text>
+                <View style={styles.infoValueContainer}>
+                  <Text style={styles.infoValue}>343535</Text>
+                </View>
+              </View>
 
-      <Text style={styles.label}>Especialidade</Text>
-      <View style={styles.box}>
-        <TextInput value="Ortopedista" editable={false} style={styles.input} />
-      </View>
+              <View style={styles.infoRow}>
+                <Text style={styles.infoLabel}>Especialidade</Text>
+                <View style={styles.infoValueContainer}>
+                  <Text style={styles.infoValue}>Ortopedista</Text>
+                </View>
+              </View>
 
-      <Text style={styles.label}>CRM</Text>
-      <View style={styles.box}>
-        <TextInput value="343535" editable={false} style={styles.input} />
-      </View>
+              <View style={styles.infoRow}>
+                <Text style={styles.infoLabel}>Registro</Text>
+                <View style={styles.infoValueContainer}>
+                  <Text style={styles.infoValue}>Ativo</Text>
+                  <View style={[styles.statusDot, styles.statusActive]} />
+                </View>
+              </View>
+            </View>
+          </View>
 
-      <TouchableOpacity style={styles.logoutBtn} onPress={logout}>
-        <Ionicons name="log-out-outline" size={20} color="#333" />
-        <Text style={styles.logoutText}>Sair</Text>
-      </TouchableOpacity>
+          {/* Informações de Contato */}
+          <View style={styles.infoSection}>
+            <Text style={styles.sectionTitle}>Informações de Contato</Text>
+            
+            <View style={styles.infoGroup}>
+              <View style={styles.infoRow}>
+                <Text style={styles.infoLabel}>Email</Text>
+                <View style={styles.infoValueContainer}>
+                  <Text style={styles.infoValue}>gabriela.borba@clinica.com</Text>
+                </View>
+              </View>
 
+              <View style={styles.infoRow}>
+                <Text style={styles.infoLabel}>Telefone</Text>
+                <View style={styles.infoValueContainer}>
+                  <Text style={styles.infoValue}>(11) 99999-9999</Text>
+                </View>
+              </View>
+            </View>
+          </View>
+        </View>
+
+        {/* Botão de Logout */}
+        <TouchableOpacity style={styles.logoutButton} onPress={logout}>
+          <Ionicons name="log-out-outline" size={20} color="#E53E3E" />
+          <Text style={styles.logoutButtonText}>Sair da Conta</Text>
+        </TouchableOpacity>
+      </ScrollView>
     </View>
   );
 }
 
-const styles = StyleSheet.create({
-  container: { flex: 1, padding: 20, backgroundColor: "#fff" },
-
-  title: { fontSize: 22, textAlign: "center", fontWeight: "600", marginVertical: 20 },
-  name: { fontSize: 18, fontWeight: "600", color: "#2D3ED6", marginLeft: 10 },
-
-  userRow: { flexDirection: "row", alignItems: "center", marginBottom: 20 },
-
-  label: { marginTop: 12, marginBottom: 6, fontSize: 14, color: "#333" },
-
-  box: {
-    backgroundColor: "#2D3ED6",
-    borderRadius: 12,
-    paddingHorizontal: 14,
-    paddingVertical: 12,
-  },
-
-  input: { color: "#fff", fontSize: 16 },
-
-  logoutBtn: {
-    marginTop: 40,
-    backgroundColor: "#E5E5E5",
-    padding: 14,
-    borderRadius: 12,
-    alignItems: "center",
-    flexDirection: "row",
-    justifyContent: "center",
-    gap: 8,
-  },
-
-  logoutText: { fontSize: 16, color: "#333" },
-});
