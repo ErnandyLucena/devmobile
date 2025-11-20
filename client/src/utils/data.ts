@@ -8,9 +8,25 @@ export const weekDays = [
 ];
 
 export const todayAppointments = [
-  { hour: "10:00", title: "Atendimento Eletivo", patient: "Emanuelle Luciana" },
-  { hour: "10:00", title: "Atendimento Eletivo", patient: "Emanuelle Luciana" },
+  {
+    id: "1", // Adicione ID
+    hour: "10:00",
+    title: "Atendimento Eletivo",
+    patient: "Emandy Lucena",
+    status: "confirmado"
+  },
+  {
+    id: "2",
+    hour: "10:00", 
+    title: "Atendimento Eletivo",
+    patient: "Emandy Lucena",
+    status: "confirmado"
+  }
 ];
+
+export const getAppointmentById = (id: string) => {
+  return todayAppointments.find(appointment => appointment.id === id) || todayAppointments[0];
+};
 
 export const infoPanels = [
   { value: "12", label: "Agendamento\neste mês" },
