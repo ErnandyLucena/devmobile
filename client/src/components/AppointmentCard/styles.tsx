@@ -1,27 +1,61 @@
+// styles.ts
 import { StyleSheet } from "react-native";
 
 export const styles = StyleSheet.create({
   card: {
-    height: 70,
-    backgroundColor: "#2D3ED6",
-    borderRadius: 12,
+    backgroundColor: "#fff",
+    borderRadius: 8,
     padding: 16,
-    marginVertical: 6,
+    marginVertical: 4,
     flexDirection: "row",
-    justifyContent: "space-between",
+    alignItems: "flex-start",
+    borderLeftWidth: 4,
+    borderLeftColor: "#2D3ED6",
+    shadowColor: "#000",
+    shadowOffset: {
+      width: 0,
+      height: 1,
+    },
+    shadowOpacity: 0.1,
+    shadowRadius: 2,
+    elevation: 2,
+  },
+  timeContainer: {
+    backgroundColor: "#ECF1FF",
+    paddingHorizontal: 8,
+    paddingVertical: 4,
+    borderRadius: 4,
+    marginRight: 12,
+    minWidth: 50,
     alignItems: "center",
   },
-  hourBox: {
-    backgroundColor: "#fff",
-    paddingHorizontal: 8,
-    paddingVertical: 2,
-    borderRadius: 6,
-    marginBottom: 4,
-  },
   hourText: {
-    color: "#000",
-    fontWeight: "700",
+    color: "#2D3ED6",
+    fontWeight: "600",
+    fontSize: 16,
   },
-  title: { color: "#fff", fontWeight: "600" },
-  patient: { color: "#F0F0F0", fontSize: 12 },
+  appointmentInfo: {
+    flex: 1,
+  },
+  title: { 
+    color: "#2D3748", 
+    fontWeight: "600",
+    fontSize: 14,
+    marginBottom: 2,
+  },
+  patient: { 
+    color: "#718096", 
+    fontSize: 12,
+    fontWeight: "400",
+  },
+    arrowContainer: {
+    justifyContent: "center",
+    alignItems: "center",
+    paddingHorizontal: 16,
+  },
+  arrow: {
+    color: "#2260FF",
+    fontSize: 16,
+    fontWeight: "bold",
+  },
 });

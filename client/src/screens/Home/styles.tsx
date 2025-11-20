@@ -21,7 +21,7 @@ export const styles = StyleSheet.create({
   agendaTitle: { 
     fontSize: 16, 
     fontWeight: "600",
-    color: "#000",
+    color: "#4E4E4E",
   },
 
   agendaLink: { 
