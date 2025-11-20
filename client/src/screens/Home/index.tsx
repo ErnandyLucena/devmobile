@@ -12,8 +12,11 @@ export function HomeScreen() {
   return (
     <ScrollView style={styles.container}>
       <Header />
-      {/* Seletor de Dias */}
-      <DaySelector days={weekDays} />
+      
+      {/* Seletor de Dias com espaçamento */}
+      <View style={styles.daySelectorContainer}>
+        <DaySelector days={weekDays} />
+      </View>
 
       {/* Painéis de Informação */}
       <View style={styles.infoPanelsSection}>

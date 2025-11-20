@@ -6,6 +6,11 @@ export const styles = StyleSheet.create({
     backgroundColor: "#fff" 
   },
 
+  daySelectorContainer: {
+    marginTop: 30,
+    paddingHorizontal: 10,
+  },
+
   agendaSection: {
     marginTop: 25,
     paddingHorizontal: 20,
