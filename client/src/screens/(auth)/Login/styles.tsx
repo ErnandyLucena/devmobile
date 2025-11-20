@@ -6,8 +6,8 @@ export const styles = StyleSheet.create({
     flex: 1,
     padding: 32,
     backgroundColor: "#fff",
-    justifyContent: "flex-start", 
-    paddingTop: 150, 
+    justifyContent: "flex-start",
+    paddingTop: 150,
   },
   formContainer: {
     gap: 20,
@@ -42,18 +42,19 @@ export const styles = StyleSheet.create({
   },
   loginButton: {
     backgroundColor: "#2B5BFF",
-    borderRadius: 25, 
+    borderRadius: 25,
     paddingVertical: 12,
     alignItems: "center",
     justifyContent: "center",
     marginTop: 10,
-    height: 50, 
+    height: 50,
+    width: 300,
+    alignSelf: "center",
   },
   loginButtonText: {
     color: "#fff",
     fontSize: 16,
     fontWeight: "600",
-    fontFamily: "sans-serif-condensed",
   },
   divider: {
     textAlign: "center",

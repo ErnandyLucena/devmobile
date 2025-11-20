@@ -53,7 +53,6 @@ export const styles = StyleSheet.create({
     color: "#fff",
     fontSize: 16,
     fontWeight: "600",
-    fontFamily: "sans-serif-condensed"
   },
   loginContainer: {
     flexDirection: "row",
