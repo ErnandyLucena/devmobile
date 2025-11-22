@@ -27,8 +27,7 @@ export const styles = StyleSheet.create({
     paddingVertical: 12,
     fontSize: 16,
     backgroundColor: "#ECF1FF",
-    color: "#809CFF",
-    fontFamily: "sans-serif-condensed"
+    color: "#343434ff",
   },
   forgotPassword: {
     alignSelf: "flex-end",
@@ -78,5 +77,17 @@ export const styles = StyleSheet.create({
     fontSize: 16,
     fontWeight: "500",
     fontFamily: "sans-serif-condensed"
+  },
+  passwordWrapper: {
+    position: "relative",
+    justifyContent: "center",
+  },
+
+  eyeButton: {
+    position: "absolute",
+    right: 12,
+    top: "50%",
+    transform: [{ translateY: -12 }],
+    padding: 4,
   },
 });
