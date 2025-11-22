@@ -95,10 +95,6 @@ export default function LoginScreen({ navigation }: any) {
               </View>
             </View>
 
-            <TouchableOpacity style={styles.forgotPassword}>
-              <Text style={styles.forgotPasswordText}>Esqueci minha senha</Text>
-            </TouchableOpacity>
-
             <TouchableHighlight
               style={styles.loginButton}
               underlayColor="#1a4ae0"
