@@ -5,7 +5,6 @@ export const styles = StyleSheet.create({
     flex: 1, 
     backgroundColor: "#fff" 
   },
-
   daySelectorContainer: {
     marginTop: 30,
     paddingHorizontal: 10,
