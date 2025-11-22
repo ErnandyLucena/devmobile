@@ -7,7 +7,8 @@ import {
   TouchableHighlight,
   KeyboardAvoidingView,
   Platform,
-  ScrollView
+  ScrollView,
+  ActivityIndicator
 } from "react-native";
 import { useAuth } from "../../../context/AuthContext";
 import { styles } from "./styles";
@@ -21,22 +22,25 @@ export default function LoginScreen({ navigation }: any) {
   const [password, setPassword] = useState("");
   const [showPassword, setShowPassword] = useState(false);
 
-  // ESTADOS DO MODAL
+  const [loading, setLoading] = useState(false); // 🔵 CARREGANDO
+
   const [modalVisible, setModalVisible] = useState(false);
   const [modalMessage, setModalMessage] = useState("");
 
   async function handleLogin() {
+    setLoading(true);
     try {
       await login(email, password);
     } catch (e) {
       setModalMessage("Senha ou email inválidos");
       setModalVisible(true);
+    } finally {
+      setLoading(false);
     }
   }
 
   return (
     <>
-      {/* MODAL DE ERRO */}
       <MessageModal
         visible={modalVisible}
         message={modalMessage}
@@ -67,7 +71,6 @@ export default function LoginScreen({ navigation }: any) {
               />
             </View>
 
-            {/* SENHA */}
             <View style={styles.inputContainer}>
               <Text style={styles.inputLabel}>Senha</Text>
 
@@ -96,11 +99,19 @@ export default function LoginScreen({ navigation }: any) {
             </View>
 
             <TouchableHighlight
-              style={styles.loginButton}
+              style={[styles.loginButton, loading && { opacity: 0.7 }]}
               underlayColor="#1a4ae0"
               onPress={handleLogin}
+              disabled={loading}
             >
-              <Text style={styles.loginButtonText}>Entrar</Text>
+              <View style={{ flexDirection: "row", gap: 10, alignItems: "center", justifyContent: "center" }}>
+                {loading && (
+                  <ActivityIndicator size="small" color="#fff" />
+                )}
+                <Text style={styles.loginButtonText}>
+                  {loading ? "Entrando..." : "Entrar"}
+                </Text>
+              </View>
             </TouchableHighlight>
 
             <View style={styles.registerContainer}>

@@ -5,8 +5,8 @@ export const styles = StyleSheet.create({
     flex: 1,
     padding: 32,
     backgroundColor: "#fff",
-    justifyContent: "flex-start", 
-    paddingTop: 80, 
+    justifyContent: "flex-start",
+    paddingTop: 40,
   },
   title: {
     fontSize: 32,
@@ -34,12 +34,11 @@ export const styles = StyleSheet.create({
     paddingVertical: 12,
     fontSize: 16,
     backgroundColor: "#ECF1FF",
-    color: "#809CFF",
-    fontFamily: "sans-serif-condensed"
+    color: "#343434ff",
   },
   registerButton: {
     backgroundColor: "#2B5BFF",
-    borderRadius: 25, 
+    borderRadius: 25,
     paddingVertical: 12,
     alignItems: "center",
     justifyContent: "center",
@@ -69,5 +68,49 @@ export const styles = StyleSheet.create({
     fontSize: 16,
     fontWeight: "500",
     fontFamily: "sans-serif-condensed"
+  },
+  typeButton: {
+    paddingVertical: 8,
+    paddingHorizontal: 12,
+    borderWidth: 1,
+    borderColor: "#666",
+    borderRadius: 8,
+  },
+
+  typeButtonSelected: {
+    backgroundColor: "#2B5BFF",
+    borderColor: "#2B5BFF",
+  },
+
+  typeButtonText: {
+    color: "#333",
+  },
+
+  typeButtonTextSelected: {
+    color: "#fff",
+    fontWeight: "bold",
+  },
+  passwordWrapper: {
+    position: "relative",
+    justifyContent: "center",
+  },
+
+  eyeButton: {
+    position: "absolute",
+    right: 12,
+    top: "50%",
+    transform: [{ translateY: -12 }],
+    padding: 4,
+  },
+  loadingOverlay: {
+    position: "absolute",
+    top: 0,
+    left: 0,
+    right: 0,
+    bottom: 0,
+    backgroundColor: "rgba(0,0,0,0.4)",
+    justifyContent: "center",
+    alignItems: "center",
+    zIndex: 999,
   },
 });
