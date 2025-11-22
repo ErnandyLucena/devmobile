@@ -11,12 +11,11 @@ import {
   ActivityIndicator
 } from "react-native";
 import { styles } from "./styles";
-import { useAuth } from "../../../context/AuthContext";
+import { useAuth } from "../../../context/auth/AuthContext";
 import MessageModal from "../../../components/MessageContext/MessageContext";
 import { Ionicons } from '@expo/vector-icons';
 
 export default function RegisterScreen({ navigation }: any) {
-
   const { register } = useAuth();
 
   const [name, setName] = useState("");
@@ -35,10 +34,59 @@ export default function RegisterScreen({ navigation }: any) {
 
   const [loading, setLoading] = useState(false);
 
+  // Função para formatar CPF
+  const formatCPF = (text: string) => {
+    const numbers = text.replace(/\D/g, '');
+    if (numbers.length <= 11) {
+      return numbers
+        .replace(/(\d{3})(\d)/, '$1.$2')
+        .replace(/(\d{3})(\d)/, '$1.$2')
+        .replace(/(\d{3})(\d{1,2})$/, '$1-$2');
+    }
+    return text;
+  };
+
+  // Função para validar email
+  const isValidEmail = (email: string) => {
+    const emailRegex = /^[^\s@]+@[^\s@]+\.[^\s@]+$/;
+    return emailRegex.test(email);
+  };
+
+  // Função para validar CPF
+  const isValidCPF = (cpf: string) => {
+    const cleanedCPF = cpf.replace(/\D/g, '');
+    return cleanedCPF.length === 11;
+  };
+
   async function handleRegister() {
+    // Validações básicas
     if (!name || !email || !cpf || !password || !repeatPassword || !tipo) {
       setModalType("error");
       setModalMessage("Preencha todos os campos e selecione o tipo.");
+      setModalVisible(true);
+      return;
+    }
+
+    // Validação de email
+    if (!isValidEmail(email)) {
+      setModalType("error");
+      setModalMessage("Por favor, insira um email válido.");
+      setModalVisible(true);
+      return;
+    }
+
+    // Validação de CPF
+    if (!isValidCPF(cpf)) {
+      setModalType("error");
+      setModalMessage("Por favor, insira um CPF válido (11 dígitos).");
+      setModalVisible(true);
+      return;
+    }
+
+    // Validação de senha
+    if (password.length < 6) {
+      setModalType("error");
+      setModalMessage("A senha deve ter pelo menos 6 caracteres.");
       setModalVisible(true);
       return;
     }
@@ -53,25 +101,46 @@ export default function RegisterScreen({ navigation }: any) {
     try {
       setLoading(true);
 
+      // Registrar usuário
       await register({
         nome: name,
-        email,
+        email: email.toLowerCase(),
         senha: password,
-        cpf,
+        cpf: cpf.replace(/\D/g, ''), // Remove formatação do CPF
         tipo: tipo
       });
 
+      // Sucesso - mensagem diferente
       setModalType("success");
-      setModalMessage("Usuário registrado com sucesso!");
+      setModalMessage("Conta criada com sucesso! Fazendo login automaticamente...");
       setModalVisible(true);
 
+      // Navega para a tela principal (login automático já aconteceu)
       setTimeout(() => {
-        navigation.navigate("Login");
-      }, 1500);
+        navigation.reset({
+          index: 0,
+          routes: [{ name: "Home" }], // Altere para o nome da sua tela principal
+        });
+      }, 2000);
 
-    } catch (error) {
+    } catch (error: any) {
+      // Mensagens de erro específicas
       setModalType("error");
-      setModalMessage("Erro ao registrar. Verifique os dados.");
+      
+      if (error.message.includes("CPF não cadastrado")) {
+        setModalMessage("CPF não encontrado no sistema. Contate um funcionário para realizar seu cadastro prévio.");
+      } else if (error.message.includes("Email já cadastrado")) {
+        setModalMessage("Este email já está cadastrado no sistema. Tente fazer login ou use outro email.");
+      } else if (error.message.includes("cadastrado como")) {
+        setModalMessage(error.message);
+      } else if (error.message.includes("auth/email-already-in-use")) {
+        setModalMessage("Este email já está em uso. Tente fazer login ou use outro email.");
+      } else if (error.message.includes("auth/weak-password")) {
+        setModalMessage("A senha é muito fraca. Use pelo menos 6 caracteres.");
+      } else {
+        setModalMessage(error.message || "Erro ao criar conta. Verifique os dados e tente novamente.");
+      }
+      
       setModalVisible(true);
     } finally {
       setLoading(false);
@@ -99,18 +168,19 @@ export default function RegisterScreen({ navigation }: any) {
           <View style={styles.formContainer}>
 
             <View style={styles.inputContainer}>
-              <Text style={styles.inputLabel}>Nome Completo</Text>
+              <Text style={styles.inputLabel}>Nome Completo *</Text>
               <TextInput
                 style={styles.input}
-                placeholder="Seu nome"
+                placeholder="Seu nome completo"
                 placeholderTextColor="#999"
                 value={name}
                 onChangeText={setName}
+                autoCapitalize="words"
               />
             </View>
 
             <View style={styles.inputContainer}>
-              <Text style={styles.inputLabel}>Email</Text>
+              <Text style={styles.inputLabel}>Email *</Text>
               <TextInput
                 style={styles.input}
                 placeholder="seuemail@gmail.com"
@@ -119,24 +189,28 @@ export default function RegisterScreen({ navigation }: any) {
                 onChangeText={setEmail}
                 keyboardType="email-address"
                 autoCapitalize="none"
+                autoComplete="email"
               />
             </View>
 
             <View style={styles.inputContainer}>
-              <Text style={styles.inputLabel}>CPF</Text>
+              <Text style={styles.inputLabel}>CPF *</Text>
               <TextInput
                 style={styles.input}
                 placeholder="123.456.789-00"
                 placeholderTextColor="#999"
-                value={cpf}
-                onChangeText={setCpf}
+                value={formatCPF(cpf)}
+                onChangeText={(text) => setCpf(text.replace(/\D/g, ''))}
                 keyboardType="numeric"
+                maxLength={14}
               />
+              <Text style={styles.helperText}>
+                Seu CPF deve estar pré-cadastrado no sistema
+              </Text>
             </View>
 
             <View style={styles.inputContainer}>
-              <Text style={styles.inputLabel}>Tipo de Cadastro</Text>
-
+              <Text style={styles.inputLabel}>Tipo de Conta *</Text>
               <View style={{ flexDirection: "row", gap: 10 }}>
                 <TouchableOpacity
                   style={[
@@ -172,21 +246,23 @@ export default function RegisterScreen({ navigation }: any) {
                   </Text>
                 </TouchableOpacity>
               </View>
+              <Text style={styles.helperText}>
+                Selecione de acordo com seu cadastro prévio
+              </Text>
             </View>
 
             <View style={styles.inputContainer}>
-              <Text style={styles.inputLabel}>Senha</Text>
-
+              <Text style={styles.inputLabel}>Senha *</Text>
               <View style={styles.passwordWrapper}>
                 <TextInput
                   style={[styles.input, { paddingRight: 45 }]}
-                  placeholder="••••••••"
+                  placeholder="Mínimo 6 caracteres"
                   placeholderTextColor="#999"
                   secureTextEntry={!showPassword}
                   value={password}
                   onChangeText={setPassword}
+                  autoCapitalize="none"
                 />
-
                 <TouchableOpacity
                   style={styles.eyeButton}
                   onPress={() => setShowPassword(!showPassword)}
@@ -201,18 +277,17 @@ export default function RegisterScreen({ navigation }: any) {
             </View>
 
             <View style={styles.inputContainer}>
-              <Text style={styles.inputLabel}>Repetir Senha</Text>
-
+              <Text style={styles.inputLabel}>Repetir Senha *</Text>
               <View style={styles.passwordWrapper}>
                 <TextInput
                   style={[styles.input, { paddingRight: 45 }]}
-                  placeholder="••••••••"
+                  placeholder="Digite a senha novamente"
                   placeholderTextColor="#999"
                   secureTextEntry={!showRepeatPassword}
                   value={repeatPassword}
                   onChangeText={setRepeatPassword}
+                  autoCapitalize="none"
                 />
-
                 <TouchableOpacity
                   style={styles.eyeButton}
                   onPress={() => setShowRepeatPassword(!showRepeatPassword)}
@@ -235,14 +310,14 @@ export default function RegisterScreen({ navigation }: any) {
               {loading ? (
                 <ActivityIndicator size="small" color="#fff" />
               ) : (
-                <Text style={styles.registerButtonText}>Registrar</Text>
+                <Text style={styles.registerButtonText}>Criar Conta</Text>
               )}
             </TouchableHighlight>
 
             <View style={styles.loginContainer}>
               <Text style={styles.loginText}>Já tem uma conta? </Text>
               <TouchableOpacity onPress={() => navigation.navigate("Login")}>
-                <Text style={styles.loginLink}>Login</Text>
+                <Text style={styles.loginLink}>Fazer Login</Text>
               </TouchableOpacity>
             </View>
 

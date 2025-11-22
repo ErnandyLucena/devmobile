@@ -10,7 +10,7 @@ import {
   ScrollView,
   ActivityIndicator
 } from "react-native";
-import { useAuth } from "../../../context/AuthContext";
+import { useAuth } from "../../../context/auth/AuthContext";
 import { styles } from "./styles";
 import { Ionicons } from '@expo/vector-icons';
 import MessageModal from "../../../components/MessageContext/MessageContext"; 

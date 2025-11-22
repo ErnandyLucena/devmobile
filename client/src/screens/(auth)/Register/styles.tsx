@@ -113,4 +113,20 @@ export const styles = StyleSheet.create({
     alignItems: "center",
     zIndex: 999,
   },
+    headerContainer: {
+    marginBottom: 24,
+    alignItems: 'center',
+  },
+  subtitle: {
+    fontSize: 14,
+    color: '#718096',
+    textAlign: 'center',
+    lineHeight: 20,
+  },
+  helperText: {
+    fontSize: 12,
+    color: '#718096',
+    marginTop: 4,
+    fontStyle: 'italic',
+  },
 });
