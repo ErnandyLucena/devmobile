@@ -2,7 +2,7 @@ import { StyleSheet } from "react-native";
 
 export const styles = StyleSheet.create({
   tabBar: {
-    height: 140,
+    height: 80,
     paddingBottom: 8,
     paddingTop: 8,
     backgroundColor: "#fff",

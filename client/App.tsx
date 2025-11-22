@@ -1,4 +1,4 @@
-import { AuthProvider } from './src/context/AuthContext';
+import { AuthProvider } from './src/context/auth/AuthContext';
 import { RootNavigation } from './src/navigation';
 
 export default function App() {

@@ -1,10 +1,9 @@
-// styles.ts (versão simples)
 import { StyleSheet } from "react-native";
 
 export const styles = StyleSheet.create({
   header: {
     paddingHorizontal: 20,
-    paddingTop: 60,
+    paddingTop: 20,
     paddingBottom: 20,
     backgroundColor: "#fff",
     borderBottomWidth: 1,
