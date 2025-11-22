@@ -3,24 +3,21 @@ import { StyleSheet } from "react-native";
 export const styles = StyleSheet.create({
   container: {
     flex: 1,
-    backgroundColor: "#F7FAFC",
+    backgroundColor: "#fff",
   },
   scrollView: {
     flex: 1,
   },
   scrollContent: {
     flexGrow: 1,
-    padding: 16,
     paddingBottom: 40,
-  },
-  // Espaçamento entre Header e conteúdo
-  headerSpacing: {
-    height: 16, // Espaçamento de 16px entre Header e o primeiro card
   },
   userCard: {
     backgroundColor: "#FFFFFF",
     borderRadius: 16,
     padding: 24,
+    marginHorizontal: 20, 
+    marginTop: 30, 
     marginBottom: 20,
     shadowColor: "#000",
     shadowOffset: {
@@ -32,38 +29,6 @@ export const styles = StyleSheet.create({
     elevation: 8,
     borderWidth: 1,
     borderColor: "#F1F5F9",
-  },
-  avatarSection: {
-    flexDirection: "row",
-    alignItems: "center",
-    marginBottom: 24,
-    paddingBottom: 24,
-    borderBottomWidth: 1,
-    borderBottomColor: "#F1F5F9",
-  },
-  avatar: {
-    marginRight: 16,
-  },
-  userInfo: {
-    flex: 1,
-  },
-  name: {
-    fontSize: 20,
-    fontWeight: "700",
-    color: "#2D3748",
-    marginBottom: 8,
-  },
-  specialtyBadge: {
-    alignSelf: "flex-start",
-    backgroundColor: "#EBF2FF",
-    paddingHorizontal: 12,
-    paddingVertical: 6,
-    borderRadius: 8,
-  },
-  specialtyText: {
-    fontSize: 14,
-    fontWeight: "600",
-    color: "#2B5BFF",
   },
   infoSection: {
     marginBottom: 24,
@@ -113,40 +78,6 @@ export const styles = StyleSheet.create({
     borderRadius: 4,
     marginLeft: 8,
   },
-  statusActive: {
-    backgroundColor: "#38A169",
-  },
-  actionsSection: {
-    backgroundColor: "#FFFFFF",
-    borderRadius: 16,
-    padding: 20,
-    marginBottom: 20,
-    shadowColor: "#000",
-    shadowOffset: {
-      width: 0,
-      height: 2,
-    },
-    shadowOpacity: 0.08,
-    shadowRadius: 8,
-    elevation: 3,
-    borderWidth: 1,
-    borderColor: "#F1F5F9",
-  },
-  actionButton: {
-    flexDirection: "row",
-    alignItems: "center",
-    paddingVertical: 16,
-    borderBottomWidth: 1,
-    borderBottomColor: "#F1F5F9",
-  },
-  actionButtonText: {
-    flex: 1,
-    fontSize: 16,
-    fontWeight: "500",
-    color: "#2D3748",
-    marginLeft: 12,
-    marginRight: 8,
-  },
   logoutButton: {
     flexDirection: "row",
     alignItems: "center",
@@ -156,6 +87,7 @@ export const styles = StyleSheet.create({
     borderRadius: 12,
     borderWidth: 1,
     borderColor: "#FED7D7",
+    marginHorizontal: 20, 
     marginBottom: 20,
     shadowColor: "#000",
     shadowOffset: {
@@ -171,14 +103,5 @@ export const styles = StyleSheet.create({
     fontWeight: "600",
     color: "#E53E3E",
     marginLeft: 8,
-  },
-  versionContainer: {
-    alignItems: "center",
-    paddingVertical: 16,
-  },
-  versionText: {
-    fontSize: 12,
-    color: "#A0AEC0",
-    fontWeight: "500",
   },
 });

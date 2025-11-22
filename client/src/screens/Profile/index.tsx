@@ -29,16 +29,15 @@ export function ProfileScreen() {
 
   return (
     <View style={styles.container}>
-      <StatusBar barStyle="dark-content" backgroundColor="#F7FAFC" />
-
+      <StatusBar barStyle="dark-content" backgroundColor="#fff" /> {/* Alterado para branco igual Home */}
+      
       <ScrollView
         style={styles.scrollView}
         showsVerticalScrollIndicator={false}
         contentContainerStyle={styles.scrollContent}
       >
         <Header />
-        <View style={styles.headerSpacing} />
-
+        
         <View style={styles.userCard}>
           <View style={styles.infoSection}>
             <Text style={styles.sectionTitle}>Informações Pessoais</Text>
@@ -146,6 +145,7 @@ export function ProfileScreen() {
             </View>
           </View>
         </View>
+
         <TouchableOpacity style={styles.logoutButton} onPress={logout}>
           <Ionicons name="log-out-outline" size={20} color="#E53E3E" />
           <Text style={styles.logoutButtonText}>Sair da Conta</Text>
