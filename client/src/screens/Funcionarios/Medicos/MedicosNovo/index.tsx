@@ -9,6 +9,7 @@ import {
   Platform,
   StatusBar
 } from "react-native";
+import { Picker } from '@react-native-picker/picker';
 import { useNavigation } from "@react-navigation/native";
 import { styles } from "./styles";
 import { cadastrarMedico } from "../../../../services/medicos.service"; 
@@ -27,6 +28,7 @@ export function MedicoNovoScreen() {
     nmMnemonico: "",
     dsCRM: "",
     dsEmail: "",
+    cpf: "",
     especialidade: "",
     situacao: "Ativo", 
   });
@@ -51,6 +53,43 @@ export function MedicoNovoScreen() {
     }
   };
 
+  // Função para formatar CPF
+  const formatCPF = (text) => {
+    const numbers = text.replace(/\D/g, '');
+    
+    if (numbers.length <= 3) {
+      return numbers;
+    } else if (numbers.length <= 6) {
+      return numbers.replace(/(\d{3})(\d{0,3})/, '$1.$2');
+    } else if (numbers.length <= 9) {
+      return numbers.replace(/(\d{3})(\d{3})(\d{0,3})/, '$1.$2.$3');
+    } else {
+      return numbers.replace(/(\d{3})(\d{3})(\d{3})(\d{0,2})/, '$1.$2.$3-$4');
+    }
+  };
+
+  const handleCPFChange = (text) => {
+    const formattedCPF = formatCPF(text);
+    updateField("cpf", formattedCPF);
+  };
+
+  // Função para validar CPF
+  const validateCPF = (cpf) => {
+    if (!cpf) return true;
+    
+    const cleanCPF = cpf.replace(/\D/g, '');
+    
+    if (cleanCPF.length !== 11) {
+      return false;
+    }
+    
+    if (/^(\d)\1+$/.test(cleanCPF)) {
+      return false;
+    }
+    
+    return true;
+  };
+
   const validateForm = () => {
     const newErrors = {};
 
@@ -59,13 +98,15 @@ export function MedicoNovoScreen() {
     if (!form.dsEmail.trim()) newErrors.dsEmail = "Email é obrigatório";
     if (!form.especialidade.trim()) newErrors.especialidade = "Especialidade é obrigatória";
 
-    // Validação de email
     if (form.dsEmail.trim() && !/\S+@\S+\.\S+/.test(form.dsEmail)) {
       newErrors.dsEmail = "Email inválido";
     }
 
-    setErrors(newErrors);
+    if (form.cpf.trim() && !validateCPF(form.cpf)) {
+      newErrors.cpf = "CPF inválido";
+    }
 
+    setErrors(newErrors);
     return Object.keys(newErrors).length === 0;
   };
 
@@ -101,7 +142,7 @@ export function MedicoNovoScreen() {
   };
 
   const handleCancelar = () => {
-    if (form.nmPrestador.trim() || form.dsCRM.trim() || form.dsEmail.trim()) {
+    if (form.nmPrestador.trim() || form.dsCRM.trim() || form.dsEmail.trim() || form.cpf.trim()) {
       showModal(
         "Tem certeza que deseja cancelar? As informações não salvas serão perdidas.",
         "warning"
@@ -121,7 +162,8 @@ export function MedicoNovoScreen() {
     form.dsCRM.trim() &&
     form.dsEmail.trim() &&
     form.especialidade.trim() &&
-    /\S+@\S+\.\S+/.test(form.dsEmail);
+    /\S+@\S+\.\S+/.test(form.dsEmail) &&
+    (!form.cpf.trim() || validateCPF(form.cpf));
 
   return (
     <>
@@ -159,6 +201,26 @@ export function MedicoNovoScreen() {
                 />
                 {errors.nmPrestador && (
                   <Text style={styles.errorText}>{errors.nmPrestador}</Text>
+                )}
+              </View>
+
+              <View style={styles.inputGroup}>
+                <Text style={styles.inputLabel}>CPF</Text>
+                <TextInput
+                  style={[
+                    styles.textInput,
+                    errors.cpf && styles.inputError
+                  ]}
+                  placeholder="000.000.000-00"
+                  placeholderTextColor="#A0AEC0"
+                  value={form.cpf}
+                  onChangeText={handleCPFChange}
+                  keyboardType="numeric"
+                  maxLength={14}
+                  returnKeyType="next"
+                />
+                {errors.cpf && (
+                  <Text style={styles.errorText}>{errors.cpf}</Text>
                 )}
               </View>
 
@@ -216,7 +278,6 @@ export function MedicoNovoScreen() {
               </View>
             </View>
 
-            {/* Contato e Status */}
             <View style={styles.section}>
               <Text style={styles.sectionTitle}>Contato e Status</Text>
 
@@ -242,19 +303,20 @@ export function MedicoNovoScreen() {
               </View>
 
               <View style={styles.inputGroup}>
-                <Text style={styles.inputLabel}>Situação</Text>
-                <TextInput
-                  style={styles.textInput}
-                  placeholder="Ex: Ativo, Disponível, Ausente"
-                  placeholderTextColor="#A0AEC0"
-                  value={form.situacao}
-                  onChangeText={(text) => updateField("situacao", text)}
-                  returnKeyType="done"
-                />
+                <Text style={styles.inputLabel}>Situação *</Text>
+                <View style={styles.pickerContainer}>
+                  <Picker
+                    selectedValue={form.situacao}
+                    onValueChange={(value) => updateField("situacao", value)}
+                    style={styles.picker}
+                  >
+                    <Picker.Item label="Ativo" value="Ativo" />
+                    <Picker.Item label="Inativo" value="Inativo" />
+                  </Picker>
+                </View>
               </View>
             </View>
 
-            {/* Botões */}
             <View style={styles.actionsContainer}>
               <TouchableOpacity
                 style={[styles.cancelButton, loading && styles.buttonDisabled]}
@@ -284,7 +346,6 @@ export function MedicoNovoScreen() {
         </ScrollView>
       </KeyboardAvoidingView>
 
-      {/* Modal para mensagens de sucesso/erro */}
       <MessageModal
         visible={modalVisible}
         message={modalMessage}
@@ -292,7 +353,6 @@ export function MedicoNovoScreen() {
         onClose={handleModalClose}
       />
 
-      {/* Modal de confirmação para cancelamento (se necessário) */}
       {modalType === "warning" && modalMessage.includes("cancelar") && (
         <MessageModal
           visible={modalVisible}

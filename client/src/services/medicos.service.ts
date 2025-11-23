@@ -1,30 +1,31 @@
 import { db } from "./firebase";
-import { 
+import {
   addDoc,
-  collection, 
-  getDocs, 
+  collection,
+  getDocs,
   getDoc,
   doc,
-  query, 
-  orderBy, 
-  serverTimestamp, 
+  query,
+  orderBy,
+  serverTimestamp,
   updateDoc,
   deleteDoc,
   where
 } from "firebase/firestore";
 
-export async function cadastrarMedico(data) { 
+export async function cadastrarMedico(data) {
   try {
     console.log("Dados recebidos para cadastro:", data);
-    
+
     const medicoData = {
       nmPrestador: data.nmPrestador || "",
       nmMnemonico: data.nmMnemonico || "",
       dsCodigoConselho: data.dsCodigoConselho || "",
       dsCRM: data.dsCRM || "",
       dsEmail: data.dsEmail || "",
+      cpf: data.cpf || "",
       especialidade: data.especialidade || "",
-      situacao: data.situacao || "Ativo", 
+      situacao: data.situacao || "Ativo",
       criadoEm: serverTimestamp(),
     };
 
@@ -36,17 +37,17 @@ export async function cadastrarMedico(data) {
   }
 }
 
-// Função para buscar todos os médicos
 export async function getAllMedicos() {
   try {
     const q = query(collection(db, "medicos"), orderBy("criadoEm", "desc"));
     const snapshot = await getDocs(q);
     const lista = snapshot.docs.map(doc => {
       const data = doc.data();
-      return { 
-        id: doc.id, 
+      return {
+        id: doc.id,
         ...data,
-        situacao: data.situacao || "Ativo" 
+        situacao: data.situacao || "Ativo",
+        cpf: data.cpf || ""
       };
     });
     return lista;
@@ -56,7 +57,6 @@ export async function getAllMedicos() {
   }
 }
 
-// Função para buscar médicos por ID
 export async function getMedicoById(id) {
   try {
     const docRef = doc(db, "medicos", id);
@@ -67,7 +67,8 @@ export async function getMedicoById(id) {
       return { 
         id: docSnap.id, 
         ...data,
-        situacao: data.situacao || "Ativo"
+        situacao: data.situacao || "Ativo",
+        cpf: data.cpf || ""
       };
     } else {
       console.log("Médico não encontrado");
@@ -79,7 +80,6 @@ export async function getMedicoById(id) {
   }
 }
 
-// Função para excluir um médico
 export async function excluirMedico(id) {
   try {
     await deleteDoc(doc(db, "medicos", id));
@@ -90,12 +90,18 @@ export async function excluirMedico(id) {
   }
 }
 
-// Função para atualizar os dados de um médico
 export async function atualizarMedico(id, data) {
   try {
     const docRef = doc(db, "medicos", id);
     await updateDoc(docRef, {
-      ...data,
+      nmPrestador: data.nmPrestador || "",
+      nmMnemonico: data.nmMnemonico || "",
+      dsCodigoConselho: data.dsCodigoConselho || "",
+      dsCRM: data.dsCRM || "",
+      dsEmail: data.dsEmail || "",
+      cpf: data.cpf || "",
+      especialidade: data.especialidade || "",
+      situacao: data.situacao || "Ativo",
       atualizadoEm: serverTimestamp()
     });
     return { success: true };
@@ -105,7 +111,6 @@ export async function atualizarMedico(id, data) {
   }
 }
 
-// Função de busca de médicos com base em um ou mais parâmetros
 export async function searchMedicos(queryParams) {
   try {
     const { searchText } = queryParams;
@@ -124,10 +129,11 @@ export async function searchMedicos(queryParams) {
     const snapshot = await getDocs(q);
     const filteredMedicos = snapshot.docs.map(doc => {
       const data = doc.data();
-      return { 
-        id: doc.id, 
+      return {
+        id: doc.id,
         ...data,
-        situacao: data.situacao || "Ativo"
+        situacao: data.situacao || "Ativo",
+        cpf: data.cpf || ""
       };
     });
 

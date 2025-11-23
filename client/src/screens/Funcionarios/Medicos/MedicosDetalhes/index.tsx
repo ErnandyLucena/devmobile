@@ -7,6 +7,7 @@ import {
   StatusBar,
   ActivityIndicator
 } from "react-native";
+import { Ionicons } from '@expo/vector-icons';
 import { useNavigation, useRoute, useFocusEffect } from "@react-navigation/native";
 
 import MessageModal from "../../../../components/MessageContext/MessageContext"; 
@@ -22,7 +23,7 @@ export default function MedicosDetalhesScreen() {
 
   const [medicoData, setMedicoData] = useState(medico);
   const [loading, setLoading] = useState(true);
-  const [archiving, setArchiving] = useState(false);
+  const [deleting, setDeleting] = useState(false);
 
   const [modalVisible, setModalVisible] = useState(false);
   const [confirmationModalVisible, setConfirmationModalVisible] = useState(false);
@@ -68,10 +69,7 @@ export default function MedicosDetalhesScreen() {
   const getStatusColor = (situacao) => {
     switch (situacao) {
       case "Ativo":
-      case "Disponível":
         return "#38A169";
-      case "Ausente":
-        return "#D69E2E";
       case "Inativo":
         return "#E53E3E";
       default:
@@ -82,10 +80,7 @@ export default function MedicosDetalhesScreen() {
   const getStatusBackground = (situacao) => {
     switch (situacao) {
       case "Ativo":
-      case "Disponível":
         return "#C6F6D5";
-      case "Ausente":
-        return "#FEFCBF";
       case "Inativo":
         return "#FED7D7";
       default:
@@ -93,27 +88,27 @@ export default function MedicosDetalhesScreen() {
     }
   };
 
-  const handleArquivar = () => {
+  const handleExcluir = () => {
     setConfirmationModalVisible(true);
   };
 
-  const handleConfirmArquivar = async () => {
+  const handleConfirmExcluir = async () => {
     setConfirmationModalVisible(false);
-    setArchiving(true);
+    setDeleting(true);
 
     try {
       const result = await excluirMedico(medicoData.id);
       
       if (result.success) {
-        showModal("Médico arquivado com sucesso!", "success");
+        showModal("Médico excluído com sucesso!", "success");
       } else {
-        showModal("Erro ao arquivar médico", "error");
+        showModal("Erro ao excluir médico", "error");
       }
     } catch (error) {
-      console.log("Erro ao arquivar médico", error);
-      showModal("Erro ao arquivar médico", "error");
+      console.log("Erro ao excluir médico", error);
+      showModal("Erro ao excluir médico", "error");
     } finally {
-      setArchiving(false);
+      setDeleting(false);
     }
   };
 
@@ -187,33 +182,54 @@ export default function MedicosDetalhesScreen() {
           </View>
 
           <View style={styles.infoSection}>
-            <Text style={styles.sectionTitle}>Informações Profissionais</Text>
+            <Text style={styles.sectionTitle}>Informações Pessoais</Text>
 
             <View style={styles.infoRow}>
-              <Text style={styles.infoLabel}>CRM</Text>
+              <View style={styles.infoLabelContainer}>
+                <Text style={styles.infoLabel}>Nome Completo</Text>
+              </View>
+              <Text style={styles.infoValue}>
+                {medicoData.nmPrestador || "Não informado"}
+              </Text>
+            </View>
+
+            <View style={styles.infoRow}>
+              <View style={styles.infoLabelContainer}>
+                <Text style={styles.infoLabel}>CPF</Text>
+              </View>
+              <Text style={styles.infoValue}>
+                {medicoData.cpf || "Não informado"}
+              </Text>
+            </View>
+
+            <View style={styles.infoRow}>
+              <View style={styles.infoLabelContainer}>
+                <Text style={styles.infoLabel}>Nome Mnemônico</Text>
+              </View>
+              <Text style={styles.infoValue}>
+                {medicoData.nmMnemonico || "Não informado"}
+              </Text>
+            </View>
+          </View>
+
+          <View style={styles.infoSection}>
+            <Text style={styles.sectionTitle}>Registro Profissional</Text>
+
+            <View style={styles.infoRow}>
+              <View style={styles.infoLabelContainer}>
+                <Text style={styles.infoLabel}>CRM</Text>
+              </View>
               <Text style={styles.infoValue}>
                 {medicoData.dsCRM || "Não informado"}
               </Text>
             </View>
 
             <View style={styles.infoRow}>
-              <Text style={styles.infoLabel}>Especialidade</Text>
+              <View style={styles.infoLabelContainer}>
+                <Text style={styles.infoLabel}>Especialidade</Text>
+              </View>
               <Text style={styles.infoValue}>
                 {medicoData.especialidade || "Não informada"}
-              </Text>
-            </View>
-
-            <View style={styles.infoRow}>
-              <Text style={styles.infoLabel}>Código Conselho</Text>
-              <Text style={styles.infoValue}>
-                {medicoData.dsCodigoConselho || "Não informado"}
-              </Text>
-            </View>
-
-            <View style={styles.infoRow}>
-              <Text style={styles.infoLabel}>Nome Mnemônico</Text>
-              <Text style={styles.infoValue}>
-                {medicoData.nmMnemonico || "Não informado"}
               </Text>
             </View>
           </View>
@@ -222,7 +238,9 @@ export default function MedicosDetalhesScreen() {
             <Text style={styles.sectionTitle}>Contato</Text>
 
             <View style={styles.infoRow}>
-              <Text style={styles.infoLabel}>Email</Text>
+              <View style={styles.infoLabelContainer}>
+                <Text style={styles.infoLabel}>Email</Text>
+              </View>
               <Text style={styles.infoValue}>
                 {medicoData.dsEmail || "Não informado"}
               </Text>
@@ -233,12 +251,16 @@ export default function MedicosDetalhesScreen() {
             <Text style={styles.sectionTitle}>Informações do Sistema</Text>
 
             <View style={styles.infoRow}>
-              <Text style={styles.infoLabel}>ID</Text>
-              <Text style={styles.infoValue}>{medicoData.id}</Text>
+              <View style={styles.infoLabelContainer}>
+                <Text style={styles.infoLabel}>ID</Text>
+              </View>
+              <Text style={[styles.infoValue, styles.idText]}>{medicoData.id}</Text>
             </View>
 
             <View style={styles.infoRow}>
-              <Text style={styles.infoLabel}>Cadastrado em</Text>
+              <View style={styles.infoLabelContainer}>
+                <Text style={styles.infoLabel}>Cadastrado em</Text>
+              </View>
               <Text style={styles.infoValue}>
                 {medicoData.criadoEm ? 
                   new Date(medicoData.criadoEm.seconds * 1000).toLocaleDateString('pt-BR') 
@@ -249,7 +271,9 @@ export default function MedicosDetalhesScreen() {
 
             {medicoData.atualizadoEm && (
               <View style={styles.infoRow}>
-                <Text style={styles.infoLabel}>Atualizado em</Text>
+                <View style={styles.infoLabelContainer}>
+                  <Text style={styles.infoLabel}>Atualizado em</Text>
+                </View>
                 <Text style={styles.infoValue}>
                   {new Date(medicoData.atualizadoEm.seconds * 1000).toLocaleDateString('pt-BR')}
                 </Text>
@@ -262,20 +286,20 @@ export default function MedicosDetalhesScreen() {
           <TouchableOpacity
             style={styles.editButton}
             onPress={handleEditar}
-            disabled={archiving}
+            disabled={deleting}
           >
             <Text style={styles.editButtonText}>
-              {archiving ? "Processando..." : "Editar Médico"}
+              {deleting ? "Processando..." : "Editar Médico"}
             </Text>
           </TouchableOpacity>
 
           <TouchableOpacity
-            style={[styles.archiveButton, archiving && styles.buttonDisabled]}
-            onPress={handleArquivar}
-            disabled={archiving}
+            style={[styles.deleteButton, deleting && styles.buttonDisabled]}
+            onPress={handleExcluir}
+            disabled={deleting}
           >
-            <Text style={styles.archiveButtonText}>
-              {archiving ? "Arquivando..." : "Arquivar Médico"}
+            <Text style={styles.deleteButtonText}>
+              {deleting ? "Excluindo..." : "Excluir Médico"}
             </Text>
           </TouchableOpacity>
         </View>
@@ -284,12 +308,12 @@ export default function MedicosDetalhesScreen() {
 
       <ConfirmationModal
         visible={confirmationModalVisible}
-        title="Arquivar Médico"
-        message={`Tem certeza que deseja arquivar o médico ${medicoData.nmPrestador}?`}
-        confirmText="Sim, Arquivar"
+        title="Excluir Médico"
+        message={`Tem certeza que deseja excluir o médico ${medicoData.nmPrestador}? Esta ação não pode ser desfeita.`}
+        confirmText="Sim, Excluir"
         cancelText="Cancelar"
-        type="warning"
-        onConfirm={handleConfirmArquivar}
+        type="error"
+        onConfirm={handleConfirmExcluir}
         onCancel={() => setConfirmationModalVisible(false)}
       />
 

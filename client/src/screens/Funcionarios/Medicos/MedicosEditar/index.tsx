@@ -10,6 +10,7 @@ import {
   Platform,
   StatusBar
 } from "react-native";
+import { Picker } from '@react-native-picker/picker';
 import { useNavigation, useRoute } from "@react-navigation/native";
 import { styles } from "./styles";
 import { atualizarMedico } from "../../../../services/medicos.service";
@@ -32,6 +33,7 @@ export default function MedicosEditarScreen() {
     nmMnemonico: medico.nmMnemonico || "",
     dsCodigoConselho: medico.dsCodigoConselho || "",
     dsCRM: medico.dsCRM || "",
+    cpf: medico.cpf || "", // NOVO CAMPO CPF
     situacao: medico.situacao || "Ativo"
   });
 
@@ -54,6 +56,43 @@ export default function MedicosEditarScreen() {
     }
   };
 
+  // Função para formatar CPF
+  const formatCPF = (text) => {
+    const numbers = text.replace(/\D/g, '');
+    
+    if (numbers.length <= 3) {
+      return numbers;
+    } else if (numbers.length <= 6) {
+      return numbers.replace(/(\d{3})(\d{0,3})/, '$1.$2');
+    } else if (numbers.length <= 9) {
+      return numbers.replace(/(\d{3})(\d{3})(\d{0,3})/, '$1.$2.$3');
+    } else {
+      return numbers.replace(/(\d{3})(\d{3})(\d{3})(\d{0,2})/, '$1.$2.$3-$4');
+    }
+  };
+
+  const handleCPFChange = (text) => {
+    const formattedCPF = formatCPF(text);
+    updateField("cpf", formattedCPF);
+  };
+
+  // Função para validar CPF
+  const validateCPF = (cpf) => {
+    if (!cpf) return true;
+    
+    const cleanCPF = cpf.replace(/\D/g, '');
+    
+    if (cleanCPF.length !== 11) {
+      return false;
+    }
+    
+    if (/^(\d)\1+$/.test(cleanCPF)) {
+      return false;
+    }
+    
+    return true;
+  };
+
   const validateForm = () => {
     const newErrors = {};
 
@@ -67,6 +106,11 @@ export default function MedicosEditarScreen() {
       newErrors.dsEmail = "Email é obrigatório";
     } else if (!/\S+@\S+\.\S+/.test(formData.dsEmail)) {
       newErrors.dsEmail = "Email inválido";
+    }
+
+    // Validação de CPF (se preenchido)
+    if (formData.cpf.trim() && !validateCPF(formData.cpf)) {
+      newErrors.cpf = "CPF inválido";
     }
 
     setErrors(newErrors);
@@ -106,7 +150,6 @@ export default function MedicosEditarScreen() {
   };
 
   const handleCancelar = () => {
-
     const hasChanges = 
       formData.nmPrestador !== medico.nmPrestador ||
       formData.especialidade !== medico.especialidade ||
@@ -114,6 +157,7 @@ export default function MedicosEditarScreen() {
       formData.nmMnemonico !== medico.nmMnemonico ||
       formData.dsCodigoConselho !== medico.dsCodigoConselho ||
       formData.dsCRM !== medico.dsCRM ||
+      formData.cpf !== medico.cpf || // ADICIONADO CPF
       formData.situacao !== medico.situacao;
 
     if (hasChanges) {
@@ -135,7 +179,8 @@ export default function MedicosEditarScreen() {
     formData.nmPrestador.trim() && 
     formData.especialidade.trim() && 
     formData.dsEmail.trim() &&
-    /\S+@\S+\.\S+/.test(formData.dsEmail);
+    /\S+@\S+\.\S+/.test(formData.dsEmail) &&
+    (!formData.cpf.trim() || validateCPF(formData.cpf));
 
   return (
     <>
@@ -172,6 +217,26 @@ export default function MedicosEditarScreen() {
                 />
                 {errors.nmPrestador && (
                   <Text style={styles.errorText}>{errors.nmPrestador}</Text>
+                )}
+              </View>
+
+              <View style={styles.inputGroup}>
+                <Text style={styles.inputLabel}>CPF</Text>
+                <TextInput
+                  style={[
+                    styles.textInput,
+                    errors.cpf && styles.inputError
+                  ]}
+                  placeholder="000.000.000-00"
+                  placeholderTextColor="#A0AEC0"
+                  value={formData.cpf}
+                  onChangeText={handleCPFChange}
+                  keyboardType="numeric"
+                  maxLength={14}
+                  returnKeyType="next"
+                />
+                {errors.cpf && (
+                  <Text style={styles.errorText}>{errors.cpf}</Text>
                 )}
               </View>
 
@@ -248,15 +313,17 @@ export default function MedicosEditarScreen() {
               </View>
 
               <View style={styles.inputGroup}>
-                <Text style={styles.inputLabel}>Situação</Text>
-                <TextInput
-                  style={styles.textInput}
-                  placeholder="Ex: Ativo, Disponível, Ausente"
-                  placeholderTextColor="#A0AEC0"
-                  value={formData.situacao}
-                  onChangeText={(text) => updateField("situacao", text)}
-                  returnKeyType="done"
-                />
+                <Text style={styles.inputLabel}>Situação *</Text>
+                <View style={styles.pickerContainer}>
+                  <Picker
+                    selectedValue={formData.situacao}
+                    onValueChange={(value) => updateField("situacao", value)}
+                    style={styles.picker}
+                  >
+                    <Picker.Item label="Ativo" value="Ativo" />
+                    <Picker.Item label="Inativo" value="Inativo" />
+                  </Picker>
+                </View>
               </View>
             </View>
 
