@@ -12,7 +12,7 @@ export const styles = StyleSheet.create({
   scrollContent: {
     flexGrow: 1,
     padding: 16,
-    paddingBottom: 110, 
+    paddingBottom: 110,
   },
   form: {
     flex: 1,
@@ -103,5 +103,19 @@ export const styles = StyleSheet.create({
     fontSize: 16,
     fontWeight: "600",
     textAlign: "center",
+  },
+  pickerContainer: {
+    borderWidth: 1,
+    borderColor: '#E2E8F0',
+    borderRadius: 8,
+    backgroundColor: '#FFFFFF',
+    overflow: 'hidden',
+    marginTop: 4,
+  },
+  picker: {
+    height: 50,
+  },
+  buttonDisabled: {
+    opacity: 0.6,
   },
 });
