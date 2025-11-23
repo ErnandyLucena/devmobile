@@ -1,6 +1,7 @@
 import { StyleSheet } from "react-native";
 
-export const styles = StyleSheet.create({  container: {
+export const styles = StyleSheet.create({
+  container: {
     flex: 1,
     backgroundColor: "#F7FAFC",
   },
@@ -10,7 +11,7 @@ export const styles = StyleSheet.create({  container: {
   scrollContent: {
     flexGrow: 1,
     padding: 16,
-    paddingBottom: 110, 
+    paddingBottom: 110,
   },
   header: {
     marginBottom: 24,
@@ -126,5 +127,19 @@ export const styles = StyleSheet.create({  container: {
     fontSize: 16,
     fontWeight: "600",
     textAlign: "center",
+  },
+  pickerContainer: {
+    borderWidth: 1,
+    borderColor: '#E2E8F0',
+    borderRadius: 8,
+    backgroundColor: '#FFFFFF',
+    overflow: 'hidden',
+    marginTop: 4,
+  },
+  picker: {
+    height: 50,
+  },
+  buttonDisabled: {
+    opacity: 0.6,
   },
 });

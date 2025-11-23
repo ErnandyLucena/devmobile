@@ -1,4 +1,3 @@
-// services/funcionariosService.ts
 
 import { db } from "./firebase";
 import {
@@ -15,9 +14,6 @@ import {
   where,
 } from "firebase/firestore";
 
-// -----------------------------------------
-// Cadastrar Funcionário
-// -----------------------------------------
 export async function cadastrarFuncionario(data) {
   try {
     console.log("📌 Dados recebidos para cadastro:", data);
@@ -45,9 +41,6 @@ export async function cadastrarFuncionario(data) {
   }
 }
 
-// -----------------------------------------
-// Buscar todos os funcionários
-// -----------------------------------------
 export async function getAllFuncionarios() {
   try {
     const q = query(collection(db, "funcionarios"), orderBy("criadoEm", "desc"));
@@ -65,9 +58,6 @@ export async function getAllFuncionarios() {
   }
 }
 
-// -----------------------------------------
-// Buscar funcionário por ID
-// -----------------------------------------
 export async function getFuncionarioById(id) {
   try {
     const ref = doc(db, "funcionarios", id);
@@ -86,9 +76,6 @@ export async function getFuncionarioById(id) {
   }
 }
 
-// -----------------------------------------
-// Deletar Funcionário
-// -----------------------------------------
 export async function excluirFuncionario(id) {
   try {
     await deleteDoc(doc(db, "funcionarios", id));
@@ -100,9 +87,6 @@ export async function excluirFuncionario(id) {
   }
 }
 
-// -----------------------------------------
-// Atualizar Funcionário
-// -----------------------------------------
 export async function updateFuncionario(id, data) {
   try {
     await updateDoc(doc(db, "funcionarios", id), data);
@@ -113,9 +97,6 @@ export async function updateFuncionario(id, data) {
   }
 }
 
-// -----------------------------------------
-// Busca por nome, email, cargo, setor, etc.
-// -----------------------------------------
 export async function searchFuncionarios({ searchText }) {
   try {
     if (!searchText) {
