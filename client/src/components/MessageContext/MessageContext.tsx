@@ -1,5 +1,6 @@
 import React from "react";
 import { Modal, View, Text, TouchableOpacity } from "react-native";
+import { Ionicons } from '@expo/vector-icons';
 import { styles } from "./styles"; 
 
 interface MessageModalProps {
@@ -18,10 +19,10 @@ export default function MessageModal({
   
   const getIcon = () => {
     switch (type) {
-      case "success": return "✅";
-      case "error": return "❌";
-      case "warning": return "⚠️";
-      default: return "ℹ️";
+      case "success": return "checkmark-circle";
+      case "error": return "close-circle";
+      case "warning": return "warning";
+      default: return "information-circle";
     }
   };
 
@@ -43,12 +44,11 @@ export default function MessageModal({
     >
       <View style={styles.overlay}>
         <View style={styles.modal}>
-          {/* Ícone do tipo */}
+
           <View style={[styles.iconContainer, { backgroundColor: getColor() }]}>
-            <Text style={styles.icon}>{getIcon()}</Text>
+            <Ionicons name={getIcon()} size={32} color="#FFFFFF" />
           </View>
 
-          {/* Mensagem */}
           <Text style={styles.title}>
             {type === "success" && "Sucesso!"}
             {type === "error" && "Erro!"}
@@ -58,7 +58,6 @@ export default function MessageModal({
           
           <Text style={styles.message}>{message}</Text>
 
-          {/* Botão */}
           <TouchableOpacity 
             style={[styles.button, { backgroundColor: getColor() }]} 
             onPress={onClose}

@@ -9,7 +9,6 @@ import {
 } from "react-native";
 import { useNavigation } from "@react-navigation/native";
 import { styles } from "./styles";
-import { getAllMedicos } from "../../../../services/medicos.service"; // Importação corrigida
 
 export default function EquipeScreen({ navigation }: any) {
   const [selectedFilter, setSelectedFilter] = useState<"medicos" | "funcionarios">("medicos");

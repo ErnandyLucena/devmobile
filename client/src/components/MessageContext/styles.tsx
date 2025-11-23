@@ -11,7 +11,7 @@ export const styles = StyleSheet.create({
   modal: {
     width: "100%",
     maxWidth: 320,
-    backgroundColor: "#fff", // ✅ FUNDO BRANCO
+    backgroundColor: "#fff",
     borderRadius: 16,
     padding: 24,
     alignItems: "center",
@@ -25,15 +25,12 @@ export const styles = StyleSheet.create({
     elevation: 8,
   },
   iconContainer: {
-    width: 60,
-    height: 60,
-    borderRadius: 30,
+    width: 70,
+    height: 70,
+    borderRadius: 35,
     justifyContent: "center",
     alignItems: "center",
     marginBottom: 16,
-  },
-  icon: {
-    fontSize: 24,
   },
   title: {
     fontSize: 20,
