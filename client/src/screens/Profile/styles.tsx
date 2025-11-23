@@ -16,8 +16,8 @@ export const styles = StyleSheet.create({
     backgroundColor: "#FFFFFF",
     borderRadius: 16,
     padding: 24,
-    marginHorizontal: 20, 
-    marginTop: 30, 
+    marginHorizontal: 20,
+    marginTop: 30,
     marginBottom: 20,
     shadowColor: "#000",
     shadowOffset: {
@@ -87,7 +87,7 @@ export const styles = StyleSheet.create({
     borderRadius: 12,
     borderWidth: 1,
     borderColor: "#FED7D7",
-    marginHorizontal: 20, 
+    marginHorizontal: 20,
     marginBottom: 20,
     shadowColor: "#000",
     shadowOffset: {
@@ -103,5 +103,10 @@ export const styles = StyleSheet.create({
     fontWeight: "600",
     color: "#E53E3E",
     marginLeft: 8,
+  },
+  statusContainer: {
+    flexDirection: 'row',
+    alignItems: 'center',
+    gap: 8,
   },
 });

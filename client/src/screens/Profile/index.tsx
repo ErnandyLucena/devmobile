@@ -29,7 +29,7 @@ export function ProfileScreen() {
 
   return (
     <View style={styles.container}>
-      <StatusBar barStyle="dark-content" backgroundColor="#fff" /> {/* Alterado para branco igual Home */}
+      <StatusBar barStyle="dark-content" backgroundColor="#fff" />
       
       <ScrollView
         style={styles.scrollView}
@@ -130,9 +130,10 @@ export function ProfileScreen() {
                 </View>
               </View>
 
+              {/* CORREÇÃO: Separar o texto e o dot em containers diferentes */}
               <View style={styles.infoRow}>
                 <Text style={styles.infoLabel}>Status</Text>
-                <View style={styles.infoValueContainer}>
+                <View style={[styles.infoValueContainer, styles.statusContainer]}>
                   <Text style={styles.infoValue}>{status}</Text>
                   <View
                     style={[
