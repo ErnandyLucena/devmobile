@@ -1,20 +1,21 @@
 import React, { useState } from "react";
-import { 
-  View, 
-  Text, 
-  TextInput, 
-  TouchableOpacity, 
+import {
+  View,
+  Text,
+  TextInput,
+  TouchableOpacity,
   ScrollView,
   KeyboardAvoidingView,
-  Platform 
+  Platform
 } from "react-native";
 import { useNavigation, useRoute } from "@react-navigation/native";
 import { styles } from "./styles";
+import { updateFuncionario } from "../../../../services/funcionario.service";
 
 export default function FuncEditarScreen() {
   const navigation = useNavigation();
   const route = useRoute();
-  
+
   const { funcionario } = route.params as {
     funcionario: {
       idFuncionario: number;
@@ -38,11 +39,18 @@ export default function FuncEditarScreen() {
     cpf: funcionario.cpf || ""
   });
 
-  const handleSalvar = () => {
-    // Aqui você implementaria a lógica de atualização na API
-    console.log("Dados atualizados:", formData);
-    alert("Dados atualizados com sucesso!");
-    navigation.goBack();
+  const handleSalvar = async () => {
+    const result = await updateFuncionario(funcionario.idFuncionario, formData);
+
+    if (!result.success) {
+      alert("Erro ao salvar");
+      return;
+    }
+
+    alert("Atualizado com sucesso!");
+
+    // Dispara atualização para a tela anterior (FuncDetalhes ou FuncList)
+    navigation.navigate("FuncList", { updated: true });
   };
 
   const handleCancelar = () => {
@@ -55,12 +63,12 @@ export default function FuncEditarScreen() {
   };
 
   return (
-    <KeyboardAvoidingView 
+    <KeyboardAvoidingView
       style={styles.container}
       behavior={Platform.OS === "ios" ? "padding" : "height"}
       keyboardVerticalOffset={Platform.OS === "ios" ? 90 : 0}
     >
-      <ScrollView 
+      <ScrollView
         style={styles.scrollView}
         showsVerticalScrollIndicator={false}
         contentContainerStyle={styles.scrollContent}
@@ -71,7 +79,7 @@ export default function FuncEditarScreen() {
           {/* Informações Básicas */}
           <View style={styles.section}>
             <Text style={styles.sectionTitle}>Informações Básicas</Text>
-            
+
             <View style={styles.inputGroup}>
               <Text style={styles.inputLabel}>Nome Completo *</Text>
               <TextInput
@@ -124,7 +132,7 @@ export default function FuncEditarScreen() {
           {/* Informações de Contato */}
           <View style={styles.section}>
             <Text style={styles.sectionTitle}>Informações de Contato</Text>
-            
+
             <View style={styles.inputGroup}>
               <Text style={styles.inputLabel}>Email</Text>
               <TextInput
@@ -168,26 +176,20 @@ export default function FuncEditarScreen() {
 
           {/* Botões de Ação */}
           <View style={styles.actionsContainer}>
-            <TouchableOpacity 
+            <TouchableOpacity
               style={styles.cancelButton}
               onPress={handleCancelar}
             >
               <Text style={styles.cancelButtonText}>Cancelar</Text>
             </TouchableOpacity>
 
-            <TouchableOpacity 
-              style={[
-                styles.saveButton,
-                (!formData.nome || !formData.cargo || !formData.setor || !formData.status) && 
-                styles.saveButtonDisabled
-              ]} 
+            <TouchableOpacity
+              style={[styles.saveButton, !formData.nome || !formData.cargo || !formData.setor || !formData.status && styles.saveButtonDisabled]}
               onPress={handleSalvar}
               disabled={!formData.nome || !formData.cargo || !formData.setor || !formData.status}
             >
               <Text style={styles.saveButtonText}>
-                {(!formData.nome || !formData.cargo || !formData.setor || !formData.status) 
-                  ? "Preencha os campos obrigatórios" 
-                  : "Salvar Alterações"}
+                {(!formData.nome || !formData.cargo || !formData.setor || !formData.status) ? "Preencha os campos obrigatórios" : "Salvar Alterações"}
               </Text>
             </TouchableOpacity>
           </View>

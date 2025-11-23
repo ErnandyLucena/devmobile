@@ -1,47 +1,34 @@
-// screens/Funcionarios/FuncList.tsx
-import React from "react";
-import { 
-  View, 
-  Text, 
-  FlatList, 
-  TouchableOpacity, 
-  ScrollView 
-} from "react-native";
-import { useNavigation } from "@react-navigation/native";
+import React, { useEffect, useState } from "react";
+import { View, Text, FlatList, TouchableOpacity, ScrollView } from "react-native";
+import { useNavigation, useRoute } from "@react-navigation/native";
 import { styles } from "./styles";
+import { getAllFuncionarios } from "../../../../services/funcionario.service";
 
 export default function FuncListScreen() {
   const navigation = useNavigation();
+  const [funcionarios, setFuncionarios] = useState([]);
+  const route = useRoute();
 
-  const funcionarios = [
-    {
-      idFuncionario: 501,
-      nome: "Carla Menezes",
-      cargo: "Atendente",
-      setor: "Recepção",
-      status: "Ativo",
-      email: "carla.menezes@clinica.com",
-      telefone: "(11) 98877-6655"
-    },
-    {
-      idFuncionario: 502,
-      nome: "João Silva",
-      cargo: "Enfermeiro",
-      setor: "Enfermaria",
-      status: "Ativo",
-      email: "joao.silva@clinica.com",
-      telefone: "(11) 97766-5544"
-    },
-    {
-      idFuncionario: 503,
-      nome: "Maria Santos",
-      cargo: "Administradora",
-      setor: "Administração",
-      status: "Inativo",
-      email: "maria.santos@clinica.com",
-      telefone: "(11) 96655-4433"
+  useEffect(() => {
+    async function load() {
+      const data = await getAllFuncionarios();
+
+      // Formatar os dados para a tela
+      const formatado = data.map(f => ({
+        idFuncionario: f.id,
+        nome: f.nomeCompleto,
+        cargo: f.cargo,
+        setor: f.setor,
+        status: f.situacao?.[0] ?? "Ativo",
+        email: f.email,
+        telefone: f.tel,
+      }));
+
+      setFuncionarios(formatado);
     }
-  ];
+
+    load();
+  }, [route.params?.updated]); // Recarrega quando a tela de edição indica que houve uma atualização
 
   const getStatusColor = (status: string) => {
     return status === "Ativo" ? "#38A169" : "#E53E3E";
@@ -53,8 +40,7 @@ export default function FuncListScreen() {
 
   return (
     <View style={styles.container}>
-
-      <ScrollView 
+      <ScrollView
         style={styles.scrollView}
         showsVerticalScrollIndicator={false}
         contentContainerStyle={styles.scrollContent}

@@ -1,17 +1,22 @@
 import React, { useState } from "react";
-import { 
-  View, 
-  Text, 
-  TextInput, 
-  TouchableOpacity, 
+import {
+  View,
+  Text,
+  TextInput,
+  TouchableOpacity,
   ScrollView,
   KeyboardAvoidingView,
-  Platform
+  Platform,
+  Alert
 } from "react-native";
 import { useNavigation } from "@react-navigation/native";
-import { styles } from "./styles"; 
+import { styles } from "./styles";
+
+// 🔥 Importa o service
+import { cadastrarFuncionario } from "../../../../services/funcionario.service";
 
 export default function FuncNovoScreen({ navigation }) {
+
   const [formData, setFormData] = useState({
     nome: "",
     cpf: "",
@@ -24,8 +29,19 @@ export default function FuncNovoScreen({ navigation }) {
 
   const [errors, setErrors] = useState({});
 
-  const handleSalvar = () => {
-    // Validação básica
+  // Atualiza campo
+  const updateField = (field, value) => {
+    setFormData(prev => ({ ...prev, [field]: value }));
+    if (errors[field]) {
+      setErrors(prev => ({ ...prev, [field]: "" }));
+    }
+  };
+
+  // ------------------------------
+  // SALVAR NO FIRESTORE
+  // ------------------------------
+  const handleSalvar = async () => {
+
     const newErrors = {};
     if (!formData.nome.trim()) newErrors.nome = "Nome é obrigatório";
     if (!formData.cargo.trim()) newErrors.cargo = "Cargo é obrigatório";
@@ -37,31 +53,60 @@ export default function FuncNovoScreen({ navigation }) {
     }
 
     setErrors({});
-    alert("Funcionário cadastrado com sucesso!");
-    navigation.goBack();
+
+    // Converte AAAA-MM-DD para Date sem quebrar
+    const parseDate = (value) => {
+      if (!value || value.length !== 10) return null;
+      const [year, month, day] = value.split("-");
+      const date = new Date(`${year}-${month}-${day}T00:00:00`);
+      return isNaN(date.getTime()) ? null : date;
+    };
+
+    try {
+
+      const dataToSend = {
+        nomeCompleto: formData.nome,
+        cpf: formData.cpf,
+        cargo: formData.cargo,
+        setor: formData.setor,
+        email: formData.email,
+        tel: formData.telefone,
+        situacao: ["Ativo"], // padrão igual ao Firestore
+        dataAdmissao: parseDate(formData.dataAdmissao),
+
+      };
+
+      const result = await cadastrarFuncionario(dataToSend);
+
+      if (result.success) {
+        Alert.alert("Sucesso", "Funcionário cadastrado com sucesso!");
+        navigation.goBack();
+      } else {
+        Alert.alert("Erro", "Falha ao cadastrar funcionário.");
+      }
+
+    } catch (err) {
+      console.log("Erro ao cadastrar funcionário:", err);
+      Alert.alert("Erro", "Ocorreu um erro ao salvar.");
+    }
   };
 
   const handleCancelar = () => {
     navigation.goBack();
   };
 
-  const updateField = (field: string, value: string) => {
-    setFormData(prev => ({ ...prev, [field]: value }));
-    // Limpa o erro do campo quando o usuário começa a digitar
-    if (errors[field]) {
-      setErrors(prev => ({ ...prev, [field]: "" }));
-    }
-  };
-
-  const isFormValid = formData.nome.trim() && formData.cargo.trim() && formData.setor.trim();
+  const isFormValid =
+    formData.nome.trim() &&
+    formData.cargo.trim() &&
+    formData.setor.trim();
 
   return (
-    <KeyboardAvoidingView 
+    <KeyboardAvoidingView
       style={styles.container}
       behavior={Platform.OS === "ios" ? "padding" : "height"}
       keyboardVerticalOffset={Platform.OS === "ios" ? 90 : 0}
     >
-      <ScrollView 
+      <ScrollView
         style={styles.scrollView}
         showsVerticalScrollIndicator={false}
         contentContainerStyle={styles.scrollContent}
@@ -69,10 +114,11 @@ export default function FuncNovoScreen({ navigation }) {
 
         {/* Formulário */}
         <View style={styles.form}>
-          {/* Seção de Informações Pessoais */}
+
+          {/* Seção Info Pessoais */}
           <View style={styles.section}>
             <Text style={styles.sectionTitle}>Informações Pessoais</Text>
-            
+
             <View style={styles.inputGroup}>
               <Text style={styles.inputLabel}>Nome Completo *</Text>
               <TextInput
@@ -80,11 +126,7 @@ export default function FuncNovoScreen({ navigation }) {
                 placeholderTextColor="#A0AEC0"
                 value={formData.nome}
                 onChangeText={(text) => updateField("nome", text)}
-                style={[
-                  styles.textInput,
-                  errors.nome && styles.inputError
-                ]}
-                returnKeyType="next"
+                style={[styles.textInput, errors.nome && styles.inputError]}
               />
               {errors.nome && <Text style={styles.errorText}>{errors.nome}</Text>}
             </View>
@@ -98,15 +140,14 @@ export default function FuncNovoScreen({ navigation }) {
                 onChangeText={(text) => updateField("cpf", text)}
                 style={styles.textInput}
                 keyboardType="numeric"
-                returnKeyType="next"
               />
             </View>
           </View>
 
-          {/* Seção de Dados Profissionais */}
+          {/* Seção Profissional */}
           <View style={styles.section}>
             <Text style={styles.sectionTitle}>Dados Profissionais</Text>
-            
+
             <View style={styles.inputGroup}>
               <Text style={styles.inputLabel}>Cargo *</Text>
               <TextInput
@@ -114,11 +155,7 @@ export default function FuncNovoScreen({ navigation }) {
                 placeholderTextColor="#A0AEC0"
                 value={formData.cargo}
                 onChangeText={(text) => updateField("cargo", text)}
-                style={[
-                  styles.textInput,
-                  errors.cargo && styles.inputError
-                ]}
-                returnKeyType="next"
+                style={[styles.textInput, errors.cargo && styles.inputError]}
               />
               {errors.cargo && <Text style={styles.errorText}>{errors.cargo}</Text>}
             </View>
@@ -130,11 +167,7 @@ export default function FuncNovoScreen({ navigation }) {
                 placeholderTextColor="#A0AEC0"
                 value={formData.setor}
                 onChangeText={(text) => updateField("setor", text)}
-                style={[
-                  styles.textInput,
-                  errors.setor && styles.inputError
-                ]}
-                returnKeyType="next"
+                style={[styles.textInput, errors.setor && styles.inputError]}
               />
               {errors.setor && <Text style={styles.errorText}>{errors.setor}</Text>}
             </View>
@@ -147,16 +180,14 @@ export default function FuncNovoScreen({ navigation }) {
                 value={formData.dataAdmissao}
                 onChangeText={(text) => updateField("dataAdmissao", text)}
                 style={styles.textInput}
-                keyboardType="numbers-and-punctuation"
-                returnKeyType="next"
               />
             </View>
           </View>
 
-          {/* Seção de Contato */}
+          {/* Contato */}
           <View style={styles.section}>
             <Text style={styles.sectionTitle}>Informações de Contato</Text>
-            
+
             <View style={styles.inputGroup}>
               <Text style={styles.inputLabel}>E-mail</Text>
               <TextInput
@@ -166,8 +197,6 @@ export default function FuncNovoScreen({ navigation }) {
                 onChangeText={(text) => updateField("email", text)}
                 style={styles.textInput}
                 keyboardType="email-address"
-                autoCapitalize="none"
-                returnKeyType="next"
               />
             </View>
 
@@ -180,25 +209,25 @@ export default function FuncNovoScreen({ navigation }) {
                 onChangeText={(text) => updateField("telefone", text)}
                 style={styles.textInput}
                 keyboardType="phone-pad"
-                returnKeyType="done"
               />
             </View>
           </View>
 
-          {/* Botões de Ação */}
+          {/* Botões */}
           <View style={styles.actionsContainer}>
-            <TouchableOpacity 
+
+            <TouchableOpacity
               style={styles.cancelButton}
               onPress={handleCancelar}
             >
               <Text style={styles.cancelButtonText}>Cancelar</Text>
             </TouchableOpacity>
 
-            <TouchableOpacity 
+            <TouchableOpacity
               style={[
                 styles.saveButton,
                 !isFormValid && styles.saveButtonDisabled
-              ]} 
+              ]}
               onPress={handleSalvar}
               disabled={!isFormValid}
             >
@@ -206,10 +235,12 @@ export default function FuncNovoScreen({ navigation }) {
                 {!isFormValid ? "Preencha os campos" : "Cadastrar Funcionário"}
               </Text>
             </TouchableOpacity>
+
           </View>
+
         </View>
+
       </ScrollView>
     </KeyboardAvoidingView>
   );
 }
-
