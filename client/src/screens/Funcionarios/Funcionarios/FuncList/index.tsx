@@ -1,131 +1,273 @@
 import React, { useEffect, useState } from "react";
-import { View, Text, FlatList, TouchableOpacity, ScrollView } from "react-native";
-import { useNavigation, useRoute } from "@react-navigation/native";
+import {
+  View,
+  Text,
+  FlatList,
+  TouchableOpacity,
+  StatusBar,
+  ActivityIndicator,
+  RefreshControl,
+  Alert,
+  TextInput
+} from "react-native";
+import { useFocusEffect } from "@react-navigation/native";
+import { Ionicons } from '@expo/vector-icons';
 import { styles } from "./styles";
 import { getAllFuncionarios } from "../../../../services/funcionario.service";
 
-export default function FuncListScreen() {
-  const navigation = useNavigation();
+export default function FuncListScreen({ navigation }) {
   const [funcionarios, setFuncionarios] = useState([]);
-  const route = useRoute();
+  const [funcionariosFiltrados, setFuncionariosFiltrados] = useState([]);
+  const [loading, setLoading] = useState(true);
+  const [refreshing, setRefreshing] = useState(false);
+  const [searchText, setSearchText] = useState("");
 
-  useEffect(() => {
-    async function load() {
+  // Funções de carregamento e busca
+  const loadFuncionarios = async () => {
+    try {
       const data = await getAllFuncionarios();
-
-      // Formatar os dados para a tela
-      const formatado = data.map(f => ({
-        idFuncionario: f.id,
-        nome: f.nomeCompleto,
-        cargo: f.cargo,
-        setor: f.setor,
-        status: f.situacao?.[0] ?? "Ativo",
-        email: f.email,
-        telefone: f.tel,
+      
+      const funcionariosComSituacao = data.map(funcionario => ({
+        ...funcionario,
+        situacao: funcionario.situacao?.[0] || "Ativo",
       }));
 
-      setFuncionarios(formatado);
+      const funcionariosOrdenados = funcionariosComSituacao.sort((a, b) => {
+        const ordem = { "Ativo": 1, "Inativo": 2 };
+        return ordem[a.situacao] - ordem[b.situacao];
+      });
+
+      setFuncionarios(funcionariosOrdenados);
+      setFuncionariosFiltrados(funcionariosOrdenados);
+    } catch (error) {
+      console.log("Erro ao carregar funcionários:", error);
+      Alert.alert("Erro", "Não foi possível carregar a lista de funcionários");
+    } finally {
+      setLoading(false);
+      setRefreshing(false);
     }
-
-    load();
-  }, [route.params?.updated]); // Recarrega quando a tela de edição indica que houve uma atualização
-
-  const getStatusColor = (status: string) => {
-    return status === "Ativo" ? "#38A169" : "#E53E3E";
   };
 
-  const getStatusBackground = (status: string) => {
-    return status === "Ativo" ? "#C6F6D5" : "#FED7D7";
+  const filtrarFuncionarios = (texto) => {
+    setSearchText(texto);
+    
+    if (texto === "") {
+      setFuncionariosFiltrados(funcionarios);
+    } else {
+      const textoLower = texto.toLowerCase();
+      const filtrados = funcionarios.filter(funcionario => 
+        funcionario.nomeCompleto?.toLowerCase().includes(textoLower) ||
+        funcionario.cargo?.toLowerCase().includes(textoLower) ||
+        funcionario.setor?.toLowerCase().includes(textoLower) ||
+        funcionario.email?.toLowerCase().includes(textoLower)
+      );
+      setFuncionariosFiltrados(filtrados);
+    }
   };
+
+  const limparBusca = () => {
+    setSearchText("");
+    setFuncionariosFiltrados(funcionarios);
+  };
+
+  useFocusEffect(
+    React.useCallback(() => {
+      loadFuncionarios();
+    }, [])
+  );
+
+  const onRefresh = () => {
+    setRefreshing(true);
+    loadFuncionarios();
+  };
+
+  const getStatusText = (situacao) => {
+    switch(situacao) {
+      case "Ativo": return "Ativo";
+      case "Inativo": return "Inativo";
+      default: return "Ativo";
+    }
+  };
+
+  const getStatusColor = (situacao) => {
+    switch(situacao) {
+      case "Ativo": return "#38A169";
+      case "Inativo": return "#D69E2E";
+      default: return "#38A169";
+    }
+  };
+
+  const getStatusBackground = (situacao) => {
+    switch(situacao) {
+      case "Ativo": return "#C6F6D5";
+      case "Inativo": return "#FEFCBF";
+      case "Arquivado": return "#EDF2F7";
+      default: return "#C6F6D5";
+    }
+  };
+
+  const getCardStyle = (situacao) => {
+    if (situacao === "Arquivado") {
+      return [styles.card, styles.cardArquivado];
+    }
+    return situacao === "Inativo" ? [styles.card, styles.cardInactive] : styles.card;
+  };
+
+  // Componentes de renderização
+  const renderFuncionarioCard = ({ item }) => (
+    <TouchableOpacity
+      style={getCardStyle(item.situacao)}
+      onPress={() => navigation.navigate("FuncDetalhes", { funcionario: item })}
+      activeOpacity={0.7}
+    >
+      <View style={styles.cardHeader}>
+        <View style={[
+          styles.avatar, 
+          item.situacao === "Inativo" && styles.avatarInactive,
+        ]}>
+          <Text style={[
+            styles.avatarText, 
+            item.situacao === "Inativo" && styles.avatarTextInactive,
+          ]}>
+            {item.nomeCompleto
+              ?.split(" ")
+              .map(n => n[0])
+              .join("")
+              .substring(0, 2)
+              .toUpperCase()}
+          </Text>
+        </View>
+
+        <View style={styles.cardInfo}>
+          <Text style={[
+            styles.name, 
+            item.situacao === "Inativo" && styles.textInactive,
+          ]} numberOfLines={1}>
+            {item.nomeCompleto || "Nome não informado"}
+          </Text>
+
+          <Text style={[
+            styles.especialidade, 
+            item.situacao === "Inativo" && styles.textInactive,
+          ]}>
+            {item.cargo || "Cargo não informado"}
+          </Text>
+        </View>
+      </View>
+
+      <View style={styles.cardFooter}>
+        <View style={[styles.statusBadge, { backgroundColor: getStatusBackground(item.situacao) }]}>
+          <Text style={[styles.statusText, { color: getStatusColor(item.situacao) }]}>
+            {getStatusText(item.situacao)}
+          </Text>
+        </View>
+
+        <Text style={[
+          styles.idText, 
+          item.situacao === "Inativo" && styles.textInactive,
+        ]}>
+          Setor: {item.setor || "Não informado"}
+        </Text>
+      </View>
+    </TouchableOpacity>
+  );
+
+  const renderEmptyState = () => (
+    <View style={styles.emptyState}>
+      <Text style={styles.emptyStateTitle}>
+        {searchText ? "Nenhum funcionário encontrado" : "Nenhum funcionário cadastrado"}
+      </Text>
+      <Text style={styles.emptyStateText}>
+        {searchText 
+          ? "Tente ajustar os termos da busca."
+          : "Clique no botão 'Novo Funcionário' para adicionar o primeiro funcionário ao sistema."
+        }
+      </Text>
+      {searchText && (
+        <TouchableOpacity style={styles.clearSearchButton} onPress={limparBusca}>
+          <Text style={styles.clearSearchText}>Limpar Busca</Text>
+        </TouchableOpacity>
+      )}
+    </View>
+  );
+
+  const renderLoadingState = () => (
+    <View style={styles.loadingContainer}>
+      <ActivityIndicator size="large" color="#3182CE" />
+      <Text style={styles.loadingText}>Carregando funcionários...</Text>
+    </View>
+  );
+
+  const funcionariosAtivos = funcionariosFiltrados.filter(m => m.situacao === "Ativo").length;
+  const funcionariosInativos = funcionariosFiltrados.filter(m => m.situacao === "Inativo").length;
+
+  if (loading && funcionarios.length === 0) {
+    return renderLoadingState();
+  }
 
   return (
     <View style={styles.container}>
-      <ScrollView
-        style={styles.scrollView}
-        showsVerticalScrollIndicator={false}
-        contentContainerStyle={styles.scrollContent}
-      >
-        {/* Cabeçalho com contador e botão Novo */}
-        <View style={styles.headerRow}>
-          <Text style={styles.counterText}>
-            {funcionarios.length} funcionário{funcionarios.length !== 1 ? 's' : ''} encontrado{funcionarios.length !== 1 ? 's' : ''}
+      <StatusBar barStyle="dark-content" backgroundColor="#F7FAFC" />
+
+      <View style={styles.searchContainer}>
+        <View style={styles.searchInputContainer}>
+          <TextInput
+            style={styles.searchInput}
+            placeholder="Buscar por nome, cargo, setor ou email..."
+            value={searchText}
+            onChangeText={filtrarFuncionarios}
+            placeholderTextColor="#A0AEC0"
+          />
+          {searchText ? (
+            <TouchableOpacity style={styles.clearButton} onPress={limparBusca}>
+              <Ionicons name="close-circle" size={20} color="#A0AEC0" />
+            </TouchableOpacity>
+          ) : (
+            <Ionicons name="search" size={20} color="#A0AEC0" />
+          )}
+        </View>
+      </View>
+
+      <View style={styles.header}>
+        <View style={styles.headerLeft}>
+          <Text style={styles.subtitle}>
+            {funcionariosFiltrados.length} funcionário{funcionariosFiltrados.length !== 1 ? 's' : ''} {searchText ? 'encontrado' : 'cadastrado'}{funcionariosFiltrados.length !== 1 ? 's' : ''}
           </Text>
-          <TouchableOpacity
-            style={styles.smallNewButton}
-            onPress={() => navigation.navigate("FuncNovo")}
-          >
-            <Text style={styles.smallNewButtonText}>+ Novo</Text>
-          </TouchableOpacity>
+          <View style={styles.statusCount}>
+            <Text style={styles.activeCount}>
+              {funcionariosAtivos} ativo{funcionariosAtivos !== 1 ? 's' : ''}
+            </Text>
+            <Text style={styles.inactiveCount}>
+              {funcionariosInativos} inativo{funcionariosInativos !== 1 ? 's' : ''}
+            </Text>
+          </View>
         </View>
 
-        {/* Lista de Funcionários */}
-        <FlatList
-          data={funcionarios}
-          scrollEnabled={false}
-          keyExtractor={(item) => item.idFuncionario.toString()}
-          renderItem={({ item }) => (
-            <TouchableOpacity
-              style={styles.card}
-              onPress={() => navigation.navigate("FuncDetalhes", { funcionario: item })}
-            >
-              <View style={styles.cardHeader}>
-                <View style={styles.userInfo}>
-                  <View style={styles.avatar}>
-                    <Text style={styles.avatarText}>
-                      {item.nome.split(' ').map(n => n[0]).join('').toUpperCase()}
-                    </Text>
-                  </View>
-                  <View style={styles.nameContainer}>
-                    <Text style={styles.name}>{item.nome}</Text>
-                    <Text style={styles.email}>{item.email}</Text>
-                  </View>
-                </View>
-                <View style={[
-                  styles.statusBadge,
-                  { backgroundColor: getStatusBackground(item.status) }
-                ]}>
-                  <Text style={[
-                    styles.statusText,
-                    { color: getStatusColor(item.status) }
-                  ]}>
-                    {item.status}
-                  </Text>
-                </View>
-              </View>
+        <TouchableOpacity
+          style={styles.novoBtn}
+          onPress={() => navigation.navigate("FuncNovo")}
+          activeOpacity={0.8}
+        >
+          <Text style={styles.novoTxt}> + Novo Funcionário</Text>
+        </TouchableOpacity>
+      </View>
 
-              <View style={styles.cardDetails}>
-                <View style={styles.detailRow}>
-                  <Text style={styles.detailLabel}>Cargo:</Text>
-                  <Text style={styles.detailValue}>{item.cargo}</Text>
-                </View>
-                <View style={styles.detailRow}>
-                  <Text style={styles.detailLabel}>Setor:</Text>
-                  <Text style={styles.detailValue}>{item.setor}</Text>
-                </View>
-                <View style={styles.detailRow}>
-                  <Text style={styles.detailLabel}>Telefone:</Text>
-                  <Text style={styles.detailValue}>{item.telefone}</Text>
-                </View>
-              </View>
-
-              <View style={styles.cardFooter}>
-                <Text style={styles.arrow}>{">"}</Text>
-              </View>
-            </TouchableOpacity>
-          )}
-          ListEmptyComponent={
-            <View style={styles.emptyState}>
-              <Text style={styles.emptyStateText}>Nenhum funcionário encontrado</Text>
-              <TouchableOpacity
-                style={styles.emptyStateButton}
-                onPress={() => navigation.navigate("FuncNovo")}
-              >
-                <Text style={styles.emptyStateButtonText}>Cadastrar primeiro funcionário</Text>
-              </TouchableOpacity>
-            </View>
-          }
-        />
-      </ScrollView>
+      <FlatList
+        data={funcionariosFiltrados}
+        keyExtractor={(item) => item.id}
+        renderItem={renderFuncionarioCard}
+        ListEmptyComponent={renderEmptyState}
+        showsVerticalScrollIndicator={false}
+        contentContainerStyle={[styles.listContent, funcionariosFiltrados.length === 0 && styles.emptyListContent]}
+        refreshControl={
+          <RefreshControl 
+            refreshing={refreshing} 
+            onRefresh={onRefresh} 
+            colors={["#3182CE"]} 
+            tintColor="#3182CE" 
+          />
+        }
+      />
     </View>
   );
 }
