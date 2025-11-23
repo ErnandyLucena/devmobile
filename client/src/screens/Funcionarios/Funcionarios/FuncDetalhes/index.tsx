@@ -129,10 +129,6 @@ export default function FuncDetalhesScreen() {
               </View>
             )}
 
-            <View style={styles.infoRow}>
-              <Text style={styles.infoLabel}>ID</Text>
-              <Text style={styles.infoValue}>{funcionario.idFuncionario}</Text>
-            </View>
           </View>
         </View>
 
@@ -147,7 +143,7 @@ export default function FuncDetalhesScreen() {
 
           <TouchableOpacity
             style={styles.archiveButton}
-            onPress={handleOpenConfirmation} // Agora abre o modal de confirmação
+            onPress={handleOpenConfirmation} 
           >
             <Text style={styles.archiveButtonText}>Arquivar Funcionário</Text>
           </TouchableOpacity>
