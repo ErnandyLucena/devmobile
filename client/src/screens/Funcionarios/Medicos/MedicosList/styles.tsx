@@ -227,4 +227,229 @@ export const styles = StyleSheet.create({
     fontSize: 14,
     fontWeight: '500',
   },
+   sectionHeader: {
+    paddingHorizontal: 16,
+    paddingVertical: 12,
+    backgroundColor: "#F7FAFC",
+    borderBottomWidth: 1,
+    borderBottomColor: "#E2E8F0",
+    marginTop: 16,
+  },
+  sectionTitle: {
+    fontSize: 18,
+    fontWeight: "700",
+    color: "#2D3748",
+  },
+
+  cardArquivado: {
+    backgroundColor: '#F7FAFC',
+    borderColor: '#E2E8F0',
+    opacity: 0.7,
+  },
+  avatarArquivado: {
+    backgroundColor: '#CBD5E0',
+  },
+  avatarTextArquivado: {
+    color: '#718096',
+  },
+  textArquivado: {
+    color: '#718096',
+  },
+  arquivadoCount: {
+    fontSize: 14,
+    color: '#718096',
+  },
+  arquivadosSection: {
+    marginTop: 24,
+    padding: 16,
+    backgroundColor: '#F7FAFC',
+    borderRadius: 12,
+    borderLeftWidth: 4,
+    borderLeftColor: '#718096',
+  },
+  arquivadosTitle: {
+    fontSize: 18,
+    fontWeight: "700",
+    color: "#718096",
+    marginBottom: 12,
+    textAlign: "center",
+  },
+  container: {
+    flex: 1,
+    backgroundColor: "#F7FAFC",
+  },
+  // Campo de Busca
+  searchContainer: {
+    paddingHorizontal: 20,
+    paddingTop: 16,
+    paddingBottom: 8,
+    backgroundColor: '#F7FAFC',
+  },
+  searchInputContainer: {
+    flexDirection: 'row',
+    alignItems: 'center',
+    backgroundColor: '#FFFFFF',
+    borderRadius: 12,
+    paddingHorizontal: 16,
+    paddingVertical: 12,
+    borderWidth: 1,
+    borderColor: '#E2E8F0',
+    shadowColor: '#000',
+    shadowOffset: {
+      width: 0,
+      height: 2,
+    },
+    shadowOpacity: 0.1,
+    shadowRadius: 4,
+    elevation: 3,
+  },
+  searchInput: {
+    flex: 1,
+    fontSize: 16,
+    color: '#2D3748',
+    padding: 0,
+  },
+  searchIcon: {
+    fontSize: 16,
+    color: '#A0AEC0',
+  },
+  clearButton: {
+    padding: 4,
+    marginLeft: 8,
+  },
+  clearButtonText: {
+    fontSize: 16,
+    color: '#A0AEC0',
+    fontWeight: 'bold',
+  },
+  // Header ajustado
+  header: {
+    flexDirection: "row",
+    justifyContent: "space-between",
+    alignItems: "center",
+    paddingHorizontal: 20,
+    paddingTop: 8,
+    paddingBottom: 16,
+    backgroundColor: "#F7FAFC",
+  },
+  // ... outros estilos permanecem iguais ...
+  statusCount: {
+    flexDirection: 'row',
+    gap: 12,
+    marginTop: 4,
+    flexWrap: 'wrap',
+  },
+  activeCount: {
+    fontSize: 14,
+    color: '#38A169',
+    fontWeight: '500',
+  },
+  inactiveCount: {
+    fontSize: 14,
+    color: '#D69E2E',
+    fontWeight: '500',
+  },
+  arquivadoCount: {
+    fontSize: 14,
+    color: '#718096',
+    fontWeight: '500',
+  },
+  clearSearchButton: {
+    marginTop: 12,
+    paddingVertical: 10,
+    paddingHorizontal: 20,
+    backgroundColor: '#3182CE',
+    borderRadius: 8,
+  },
+  clearSearchText: {
+    color: '#FFFFFF',
+    fontSize: 14,
+    fontWeight: '600',
+  },
+  // ... outros estilos existentes ...
+  container: {
+    flex: 1,
+    backgroundColor: "#F7FAFC",
+  },
+  // Campo de Busca
+  searchContainer: {
+    paddingHorizontal: 20,
+    paddingTop: 16,
+    paddingBottom: 8,
+    backgroundColor: '#F7FAFC',
+  },
+  searchInputContainer: {
+    flexDirection: 'row',
+    alignItems: 'center',
+    backgroundColor: '#FFFFFF',
+    borderRadius: 12,
+    paddingHorizontal: 16,
+    paddingVertical: 12,
+    borderWidth: 1,
+    borderColor: '#E2E8F0',
+    shadowColor: '#000',
+    shadowOffset: {
+      width: 0,
+      height: 2,
+    },
+    shadowOpacity: 0.1,
+    shadowRadius: 4,
+    elevation: 3,
+  },
+  searchInput: {
+    flex: 1,
+    fontSize: 16,
+    color: '#2D3748',
+    padding: 0,
+    marginRight: 8,
+  },
+  clearButton: {
+    padding: 2,
+  },
+  // Header ajustado
+  header: {
+    flexDirection: "row",
+    justifyContent: "space-between",
+    alignItems: "center",
+    paddingHorizontal: 20,
+    paddingTop: 8,
+    paddingBottom: 16,
+    backgroundColor: "#F7FAFC",
+  },
+  // ... outros estilos permanecem iguais ...
+  statusCount: {
+    flexDirection: 'row',
+    gap: 12,
+    marginTop: 4,
+    flexWrap: 'wrap',
+  },
+  activeCount: {
+    fontSize: 14,
+    color: '#38A169',
+    fontWeight: '500',
+  },
+  inactiveCount: {
+    fontSize: 14,
+    color: '#D69E2E',
+    fontWeight: '500',
+  },
+  arquivadoCount: {
+    fontSize: 14,
+    color: '#718096',
+    fontWeight: '500',
+  },
+  clearSearchButton: {
+    marginTop: 12,
+    paddingVertical: 10,
+    paddingHorizontal: 20,
+    backgroundColor: '#3182CE',
+    borderRadius: 8,
+  },
+  clearSearchText: {
+    color: '#FFFFFF',
+    fontSize: 14,
+    fontWeight: '600',
+  },
+  // ... outros estilos existentes ...
+
 });

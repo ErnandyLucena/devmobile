@@ -13,18 +13,10 @@ import {
   where
 } from "firebase/firestore";
 
-// Função para cadastrar médicos
 export async function cadastrarMedico(data) { 
   try {
     console.log("Dados recebidos para cadastro:", data);
     
-    let situacao;
-    if (typeof data.situacao === 'string') {
-      situacao = data.situacao === "Ativo" || data.situacao === "true";
-    } else {
-      situacao = Boolean(data.situacao);
-    }
-
     const medicoData = {
       nmPrestador: data.nmPrestador || "",
       nmMnemonico: data.nmMnemonico || "",
@@ -32,7 +24,7 @@ export async function cadastrarMedico(data) {
       dsCRM: data.dsCRM || "",
       dsEmail: data.dsEmail || "",
       especialidade: data.especialidade || "",
-      situacao: situacao,
+      situacao: data.situacao || "Ativo", 
       criadoEm: serverTimestamp(),
     };
 
@@ -51,7 +43,11 @@ export async function getAllMedicos() {
     const snapshot = await getDocs(q);
     const lista = snapshot.docs.map(doc => {
       const data = doc.data();
-      return { id: doc.id, ...data };
+      return { 
+        id: doc.id, 
+        ...data,
+        situacao: data.situacao || "Ativo" 
+      };
     });
     return lista;
   } catch (error) {
@@ -67,7 +63,12 @@ export async function getMedicoById(id) {
     const docSnap = await getDoc(docRef);
     
     if (docSnap.exists()) {
-      return { id: docSnap.id, ...docSnap.data() };
+      const data = docSnap.data();
+      return { 
+        id: docSnap.id, 
+        ...data,
+        situacao: data.situacao || "Ativo"
+      };
     } else {
       console.log("Médico não encontrado");
       return null;
@@ -111,20 +112,23 @@ export async function searchMedicos(queryParams) {
 
     let q = query(collection(db, "medicos"));
 
-    // Filtros de busca, conforme o que foi fornecido
     if (searchText) {
       const lowerSearchText = searchText.toLowerCase();
       q = query(
         collection(db, "medicos"),
         where("nmPrestador", ">=", lowerSearchText),
-        where("nmPrestador", "<=", lowerSearchText + '\uf8ff') // Filtro de prefixo
+        where("nmPrestador", "<=", lowerSearchText + '\uf8ff')
       );
     }
 
     const snapshot = await getDocs(q);
     const filteredMedicos = snapshot.docs.map(doc => {
       const data = doc.data();
-      return { id: doc.id, ...data };
+      return { 
+        id: doc.id, 
+        ...data,
+        situacao: data.situacao || "Ativo"
+      };
     });
 
     return filteredMedicos;
