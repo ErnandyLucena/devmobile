@@ -7,28 +7,24 @@ import {
   StatusBar,
   ActivityIndicator,
   RefreshControl,
-  TextInput,
   Alert
 } from "react-native";
 import { useFocusEffect } from "@react-navigation/native";
 import { styles } from "./styles";
-import { getAllMedicos } from "../../../../services/medicos.service";
+import { getAllMedicos } from "../../../../services/medicos.service"; 
 
 export default function MedicosListScreen({ navigation }) {
   const [medicos, setMedicos] = useState([]);
-  const [medicosFiltrados, setMedicosFiltrados] = useState([]);
   const [loading, setLoading] = useState(true);
   const [refreshing, setRefreshing] = useState(false);
-  const [searchText, setSearchText] = useState("");
 
   const loadMedicos = async () => {
     try {
       const data = await getAllMedicos();
-
-      // Garantir que a situação seja convertida corretamente
+      
       const medicosComSituacao = data.map(medico => ({
         ...medico,
-        situacao: medico.situacao;
+        situacao: medico.situacao,
       }));
 
       // Ordenar: ativos primeiro, depois inativos
@@ -38,7 +34,6 @@ export default function MedicosListScreen({ navigation }) {
       });
 
       setMedicos(medicosOrdenados);
-      setMedicosFiltrados(medicosOrdenados);
     } catch (error) {
       console.log("Erro ao carregar médicos:", error);
       Alert.alert("Erro", "Não foi possível carregar a lista de médicos");
@@ -57,37 +52,6 @@ export default function MedicosListScreen({ navigation }) {
   const onRefresh = () => {
     setRefreshing(true);
     loadMedicos();
-  };
-
-  const handleSearch = (text) => {
-    setSearchText(text);
-
-    if (text.trim() === "") {
-      setMedicosFiltrados(medicos);
-    } else {
-      const filtered = medicos.filter(medico =>
-        (medico.nmPrestador?.toLowerCase().includes(text.toLowerCase()) ||
-          medico.especialidade?.toLowerCase().includes(text.toLowerCase()) ||
-          medico.dsCRM?.toLowerCase().includes(text.toLowerCase()) ||
-          medico.dsEmail?.toLowerCase().includes(text.toLowerCase()) ||
-          // Adiciona filtro para a situação também
-          getStatusText(medico.situacao).toLowerCase().includes(text.toLowerCase())
-        )
-      );
-
-      // Ordenar a lista filtrada: ativos primeiro, depois inativos
-      const medicosOrdenados = filtered.sort((a, b) => {
-        if (a.situacao === b.situacao) return 0;
-        return a.situacao ? -1 : 1;
-      });
-
-      setMedicosFiltrados(medicosOrdenados);
-    }
-  };
-
-  const clearSearch = () => {
-    setSearchText("");
-    setMedicosFiltrados(medicos);
   };
 
   const getStatusText = (situacao) => {
@@ -152,19 +116,11 @@ export default function MedicosListScreen({ navigation }) {
   const renderEmptyState = () => (
     <View style={styles.emptyState}>
       <Text style={styles.emptyStateTitle}>
-        {searchText ? "Nenhum médico encontrado" : "Nenhum médico cadastrado"}
+        Nenhum médico cadastrado
       </Text>
       <Text style={styles.emptyStateText}>
-        {searchText 
-          ? "Tente ajustar os termos da busca."
-          : "Clique no botão 'Novo Médico' para adicionar o primeiro médico ao sistema."
-        }
+        Clique no botão 'Novo Médico' para adicionar o primeiro médico ao sistema.
       </Text>
-      {searchText && (
-        <TouchableOpacity style={styles.clearSearchButton} onPress={clearSearch}>
-          <Text style={styles.clearSearchText}>Limpar busca</Text>
-        </TouchableOpacity>
-      )}
     </View>
   );
 
@@ -211,34 +167,13 @@ export default function MedicosListScreen({ navigation }) {
         </TouchableOpacity>
       </View>
 
-      {/* Barra de busca */}
-      <View style={styles.searchContainer}>
-        <View style={styles.searchInputContainer}>
-          <TextInput
-            style={styles.searchInput}
-            placeholder="Buscar por nome, especialidade, CRM..."
-            placeholderTextColor="#A0AEC0"
-            value={searchText}
-            onChangeText={handleSearch}
-            returnKeyType="search"
-          />
-          {searchText ? (
-            <TouchableOpacity onPress={clearSearch} style={styles.clearButton}>
-              <Text style={styles.clearButtonText}>✕</Text>
-            </TouchableOpacity>
-          ) : (
-            <Text style={styles.searchIcon}>🔍</Text>
-          )}
-        </View>
-      </View>
-
       <FlatList
-        data={medicosFiltrados}
+        data={medicos}
         keyExtractor={(item) => item.id}
         renderItem={renderMedicoCard}
         ListEmptyComponent={renderEmptyState}
         showsVerticalScrollIndicator={false}
-        contentContainerStyle={[styles.listContent, medicosFiltrados.length === 0 && styles.emptyListContent]}
+        contentContainerStyle={[styles.listContent, medicos.length === 0 && styles.emptyListContent]}
         refreshControl={<RefreshControl refreshing={refreshing} onRefresh={onRefresh} colors={["#3182CE"]} tintColor="#3182CE" />}
       />
     </View>
