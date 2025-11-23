@@ -1,4 +1,3 @@
-// screens/EquipeScreen.tsx
 import React, { useState } from "react";
 import { 
   View, 
@@ -7,23 +6,46 @@ import {
   ScrollView, 
   TextInput,
   KeyboardAvoidingView,
-  Platform 
+  Platform,
+  Alert
 } from "react-native";
 import { useNavigation } from "@react-navigation/native";
 import { styles } from "./styles";
+import { getAllMedicos, getAllFuncionarios }  // Aqui, você também pode implementar o serviço de funcionários
 
 export default function EquipeScreen({ navigation }: any) {
   const [selectedFilter, setSelectedFilter] = useState<"medicos" | "funcionarios">("medicos");
   const [searchQuery, setSearchQuery] = useState("");
+  const [searchResults, setSearchResults] = useState([]);
+  const [loading, setLoading] = useState(false);
 
   const handleFilterSelect = (filter: "medicos" | "funcionarios") => {
     setSelectedFilter(filter);
     setSearchQuery(""); 
+    setSearchResults([]); // Clear previous search results when switching filters
   };
 
-  const handleSearch = () => {
-    // Aqui você implementaria a lógica de busca
-    console.log("Buscando:", searchQuery, "em", selectedFilter);
+  const handleSearch = async () => {
+    if (searchQuery.trim() === "") {
+      setSearchResults([]); // Reset results if no search text
+      return;
+    }
+
+    setLoading(true);
+    try {
+      if (selectedFilter === "medicos") {
+        const result = await getAllMedicos(searchQuery); // Pass search query to your service
+        setSearchResults(result);
+      } else {
+        const result = await getAllFuncionarios(searchQuery); // Implement this in your service
+        setSearchResults(result);
+      }
+    } catch (error) {
+      console.log("Erro ao buscar:", error);
+      Alert.alert("Erro", "Não foi possível realizar a busca.");
+    } finally {
+      setLoading(false);
+    }
   };
 
   return (
@@ -70,13 +92,13 @@ export default function EquipeScreen({ navigation }: any) {
             </TouchableOpacity>
 
             <TouchableOpacity
-              style={[
+              style={[ 
                 styles.filterButton,
                 selectedFilter === "funcionarios" && styles.filterButtonActive
               ]}
               onPress={() => handleFilterSelect("funcionarios")}
             >
-              <Text style={[
+              <Text style={[ 
                 styles.filterButtonText,
                 selectedFilter === "funcionarios" && styles.filterButtonTextActive
               ]}>
@@ -104,7 +126,10 @@ export default function EquipeScreen({ navigation }: any) {
             {searchQuery.length > 0 && (
               <TouchableOpacity 
                 style={styles.clearButton}
-                onPress={() => setSearchQuery("")}
+                onPress={() => {
+                  setSearchQuery("");
+                  setSearchResults([]); // Clear search results
+                }}
               >
                 <Text style={styles.clearButtonText}>×</Text>
               </TouchableOpacity>
@@ -112,10 +137,28 @@ export default function EquipeScreen({ navigation }: any) {
           </View>
         </View>
 
+        {/* Results */}
+        {loading ? (
+          <Text>Carregando...</Text>
+        ) : (
+          <View>
+            {searchResults.length === 0 ? (
+              <Text>Nenhum {selectedFilter === "medicos" ? "médico" : "funcionário"} encontrado.</Text>
+            ) : (
+              searchResults.map((item, index) => (
+                <View key={index}>
+                  <Text>{item.nmPrestador || item.nome}</Text>
+                  <Text>{item.especialidade || item.cargo}</Text>
+                </View>
+              ))
+            )}
+          </View>
+        )}
+
         {/* Botões de Ação */}
         <View style={styles.actionsSection}>
           <Text style={styles.sectionTitle}>Ações Rápidas</Text>
-          
+
           <TouchableOpacity
             style={styles.actionButton}
             onPress={() => navigation.navigate("MedicosList")}
@@ -142,25 +185,6 @@ export default function EquipeScreen({ navigation }: any) {
               + Novo {selectedFilter === "medicos" ? "Médico" : "Funcionário"}
             </Text>
           </TouchableOpacity>
-        </View>
-
-        {/* Estatísticas (Opcional) */}
-        <View style={styles.statsSection}>
-          <Text style={styles.sectionTitle}>Resumo</Text>
-          <View style={styles.statsContainer}>
-            <View style={styles.statCard}>
-              <Text style={styles.statNumber}>12</Text>
-              <Text style={styles.statLabel}>Médicos</Text>
-            </View>
-            <View style={styles.statCard}>
-              <Text style={styles.statNumber}>8</Text>
-              <Text style={styles.statLabel}>Funcionários</Text>
-            </View>
-            <View style={styles.statCard}>
-              <Text style={styles.statNumber}>20</Text>
-              <Text style={styles.statLabel}>Total</Text>
-            </View>
-          </View>
         </View>
       </ScrollView>
     </KeyboardAvoidingView>

@@ -8,16 +8,22 @@ import {
   ScrollView,
   KeyboardAvoidingView,
   Platform,
-  StatusBar,
-  Alert
+  StatusBar
 } from "react-native";
 import { useNavigation, useRoute } from "@react-navigation/native";
 import { styles } from "./styles";
+import { atualizarMedico } from "../../../../services/medicos.service";
+import MessageModal from "../../../../components/MessageContext/MessageContext"; 
 
 export default function MedicosEditarScreen() {
   const navigation = useNavigation();
-  const  route  = useRoute();
+  const route = useRoute();
   const { medico } = route.params;
+
+  const [loading, setLoading] = useState(false);
+  const [modalVisible, setModalVisible] = useState(false);
+  const [modalMessage, setModalMessage] = useState("");
+  const [modalType, setModalType] = useState("info");
 
   const [formData, setFormData] = useState({
     nmPrestador: medico.nmPrestador || "",
@@ -31,202 +37,276 @@ export default function MedicosEditarScreen() {
 
   const [errors, setErrors] = useState({});
 
+  const showModal = (message, type = "info") => {
+    setModalMessage(message);
+    setModalType(type);
+    setModalVisible(true);
+  };
+
+  const hideModal = () => {
+    setModalVisible(false);
+  };
+
   const updateField = (field, value) => {
     setFormData(prev => ({ ...prev, [field]: value }));
-    // Limpa o erro do campo quando o usuário começa a digitar
     if (errors[field]) {
       setErrors(prev => ({ ...prev, [field]: "" }));
     }
   };
 
-  const handleSalvar = () => {
+  const validateForm = () => {
     const newErrors = {};
-    if (!formData.nmPrestador.trim()) newErrors.nmPrestador = "Nome é obrigatório";
-    if (!formData.especialidade.trim()) newErrors.especialidade = "Especialidade é obrigatória";
-    if (!formData.dsEmail.trim()) newErrors.dsEmail = "Email é obrigatório";
 
-    if (Object.keys(newErrors).length > 0) {
-      setErrors(newErrors);
-      Alert.alert("Atenção", "Preencha os campos obrigatórios!");
+    if (!formData.nmPrestador.trim()) {
+      newErrors.nmPrestador = "Nome é obrigatório";
+    }
+    if (!formData.especialidade.trim()) {
+      newErrors.especialidade = "Especialidade é obrigatória";
+    }
+    if (!formData.dsEmail.trim()) {
+      newErrors.dsEmail = "Email é obrigatório";
+    } else if (!/\S+@\S+\.\S+/.test(formData.dsEmail)) {
+      newErrors.dsEmail = "Email inválido";
+    }
+
+    setErrors(newErrors);
+    return Object.keys(newErrors).length === 0;
+  };
+
+  const handleSalvar = async () => {
+    if (!validateForm()) {
+      showModal("Preencha os campos obrigatórios corretamente!", "warning");
       return;
     }
 
-    // Aqui você implementaria a lógica de atualização na API
-    console.log("Dados atualizados:", formData);
-    Alert.alert("Sucesso", "Médico atualizado com sucesso!");
-    navigation.goBack();
+    setLoading(true);
+
+    try {
+      const result = await atualizarMedico(medico.id, formData);
+
+      if (result.success) {
+        showModal("Médico atualizado com sucesso!", "success");
+      } else {
+        showModal("Não foi possível atualizar o médico.", "error");
+      }
+    } catch (error) {
+      console.log("Erro ao atualizar médico:", error);
+      showModal("Ocorreu um erro ao atualizar o médico.", "error");
+    } finally {
+      setLoading(false);
+    }
+  };
+
+  const handleModalClose = () => {
+    hideModal();
+   
+    if (modalType === "success") {
+      navigation.goBack();
+    }
   };
 
   const handleCancelar = () => {
+
+    const hasChanges = 
+      formData.nmPrestador !== medico.nmPrestador ||
+      formData.especialidade !== medico.especialidade ||
+      formData.dsEmail !== medico.dsEmail ||
+      formData.nmMnemonico !== medico.nmMnemonico ||
+      formData.dsCodigoConselho !== medico.dsCodigoConselho ||
+      formData.dsCRM !== medico.dsCRM ||
+      formData.situacao !== medico.situacao;
+
+    if (hasChanges) {
+      showModal(
+        "Tem certeza que deseja cancelar? As alterações não salvas serão perdidas.",
+        "warning"
+      );
+    } else {
+      navigation.goBack();
+    }
+  };
+
+  const handleConfirmCancel = () => {
+    hideModal();
     navigation.goBack();
   };
 
-  const isFormValid = formData.nmPrestador.trim() && 
-                     formData.especialidade.trim() && 
-                     formData.dsEmail.trim();
+  const isFormValid = 
+    formData.nmPrestador.trim() && 
+    formData.especialidade.trim() && 
+    formData.dsEmail.trim() &&
+    /\S+@\S+\.\S+/.test(formData.dsEmail);
 
   return (
-    <KeyboardAvoidingView 
-      style={styles.container}
-      behavior={Platform.OS === "ios" ? "padding" : "height"}
-      keyboardVerticalOffset={Platform.OS === "ios" ? 90 : 0}
-    >
-      <StatusBar barStyle="dark-content" backgroundColor="#F7FAFC" />
-      
-      <ScrollView 
-        style={styles.scrollView}
-        showsVerticalScrollIndicator={false}
-        contentContainerStyle={styles.scrollContent}
-        keyboardShouldPersistTaps="handled"
+    <>
+      <KeyboardAvoidingView 
+        style={styles.container}
+        behavior={Platform.OS === "ios" ? "padding" : "height"}
+        keyboardVerticalOffset={Platform.OS === "ios" ? 90 : 0}
       >
-        {/* Formulário */}
-        <View style={styles.form}>
-          {/* Seção de Informações Pessoais */}
-          <View style={styles.section}>
-            <Text style={styles.sectionTitle}>Informações Pessoais</Text>
-            
-            <View style={styles.inputGroup}>
-              <Text style={styles.inputLabel}>Nome Completo *</Text>
-              <TextInput
+        <StatusBar barStyle="dark-content" backgroundColor="#F7FAFC" />
+        
+        <ScrollView 
+          style={styles.scrollView}
+          showsVerticalScrollIndicator={false}
+          contentContainerStyle={styles.scrollContent}
+          keyboardShouldPersistTaps="handled"
+        >
+          <View style={styles.form}>
+
+            <View style={styles.section}>
+              <Text style={styles.sectionTitle}>Informações Pessoais</Text>
+              
+              <View style={styles.inputGroup}>
+                <Text style={styles.inputLabel}>Nome Completo *</Text>
+                <TextInput
+                  style={[
+                    styles.textInput,
+                    errors.nmPrestador && styles.inputError
+                  ]}
+                  placeholder="Digite o nome completo"
+                  placeholderTextColor="#A0AEC0"
+                  value={formData.nmPrestador}
+                  onChangeText={(text) => updateField("nmPrestador", text)}
+                  returnKeyType="next"
+                />
+                {errors.nmPrestador && (
+                  <Text style={styles.errorText}>{errors.nmPrestador}</Text>
+                )}
+              </View>
+
+              <View style={styles.inputGroup}>
+                <Text style={styles.inputLabel}>Nome Abreviado</Text>
+                <TextInput
+                  style={styles.textInput}
+                  placeholder="Digite o nome abreviado"
+                  placeholderTextColor="#A0AEC0"
+                  value={formData.nmMnemonico}
+                  onChangeText={(text) => updateField("nmMnemonico", text)}
+                  returnKeyType="next"
+                />
+              </View>
+            </View>
+
+            <View style={styles.section}>
+              <Text style={styles.sectionTitle}>Registro Profissional</Text>
+              
+              <View style={styles.inputGroup}>
+                <Text style={styles.inputLabel}>Especialidade *</Text>
+                <TextInput
+                  style={[
+                    styles.textInput,
+                    errors.especialidade && styles.inputError
+                  ]}
+                  placeholder="Digite a especialidade"
+                  placeholderTextColor="#A0AEC0"
+                  value={formData.especialidade}
+                  onChangeText={(text) => updateField("especialidade", text)}
+                  returnKeyType="next"
+                />
+                {errors.especialidade && (
+                  <Text style={styles.errorText}>{errors.especialidade}</Text>
+                )}
+              </View>
+
+              <View style={styles.inputGroup}>
+                <Text style={styles.inputLabel}>CRM</Text>
+                <TextInput
+                  style={styles.textInput}
+                  placeholder="Digite o número do CRM"
+                  placeholderTextColor="#A0AEC0"
+                  value={formData.dsCRM}
+                  onChangeText={(text) => updateField("dsCRM", text)}
+                  keyboardType="numeric"
+                  returnKeyType="next"
+                />
+              </View>
+            </View>
+
+            <View style={styles.section}>
+              <Text style={styles.sectionTitle}>Contato e Status</Text>
+              
+              <View style={styles.inputGroup}>
+                <Text style={styles.inputLabel}>Email *</Text>
+                <TextInput
+                  style={[
+                    styles.textInput,
+                    errors.dsEmail && styles.inputError
+                  ]}
+                  placeholder="Digite o email"
+                  placeholderTextColor="#A0AEC0"
+                  value={formData.dsEmail}
+                  onChangeText={(text) => updateField("dsEmail", text)}
+                  keyboardType="email-address"
+                  autoCapitalize="none"
+                  autoComplete="email"
+                  returnKeyType="next"
+                />
+                {errors.dsEmail && (
+                  <Text style={styles.errorText}>{errors.dsEmail}</Text>
+                )}
+              </View>
+
+              <View style={styles.inputGroup}>
+                <Text style={styles.inputLabel}>Situação</Text>
+                <TextInput
+                  style={styles.textInput}
+                  placeholder="Ex: Ativo, Disponível, Ausente"
+                  placeholderTextColor="#A0AEC0"
+                  value={formData.situacao}
+                  onChangeText={(text) => updateField("situacao", text)}
+                  returnKeyType="done"
+                />
+              </View>
+            </View>
+
+            <View style={styles.actionsContainer}>
+              <TouchableOpacity
+                style={[styles.cancelButton, loading && styles.buttonDisabled]}
+                onPress={handleCancelar}
+                disabled={loading}
+              >
+                <Text style={styles.cancelButtonText}>
+                  {loading ? "Cancelando..." : "Cancelar"}
+                </Text>
+              </TouchableOpacity>
+
+              <TouchableOpacity 
                 style={[
-                  styles.textInput,
-                  errors.nmPrestador && styles.inputError
-                ]}
-                placeholder="Digite o nome completo"
-                placeholderTextColor="#A0AEC0"
-                value={formData.nmPrestador}
-                onChangeText={(text) => updateField("nmPrestador", text)}
-                returnKeyType="next"
-              />
-              {errors.nmPrestador && (
-                <Text style={styles.errorText}>{errors.nmPrestador}</Text>
-              )}
-            </View>
-
-            <View style={styles.inputGroup}>
-              <Text style={styles.inputLabel}>Nome Abreviado</Text>
-              <TextInput
-                style={styles.textInput}
-                placeholder="Digite o nome abreviado"
-                placeholderTextColor="#A0AEC0"
-                value={formData.nmMnemonico}
-                onChangeText={(text) => updateField("nmMnemonico", text)}
-                returnKeyType="next"
-              />
+                  styles.saveButton,
+                  (!isFormValid || loading) && styles.saveButtonDisabled
+                ]} 
+                onPress={handleSalvar}
+                disabled={!isFormValid || loading}
+              >
+                <Text style={styles.saveButtonText}>
+                  {loading ? "Salvando..." : "Salvar Alterações"}
+                </Text>
+              </TouchableOpacity>
             </View>
           </View>
+        </ScrollView>
+      </KeyboardAvoidingView>
 
-          {/* Seção de Registro Profissional */}
-          <View style={styles.section}>
-            <Text style={styles.sectionTitle}>Registro Profissional</Text>
-            
-            <View style={styles.inputGroup}>
-              <Text style={styles.inputLabel}>Especialidade *</Text>
-              <TextInput
-                style={[
-                  styles.textInput,
-                  errors.especialidade && styles.inputError
-                ]}
-                placeholder="Digite a especialidade"
-                placeholderTextColor="#A0AEC0"
-                value={formData.especialidade}
-                onChangeText={(text) => updateField("especialidade", text)}
-                returnKeyType="next"
-              />
-              {errors.especialidade && (
-                <Text style={styles.errorText}>{errors.especialidade}</Text>
-              )}
-            </View>
+      <MessageModal
+        visible={modalVisible}
+        message={modalMessage}
+        type={modalType}
+        onClose={handleModalClose}
+      />
 
-            <View style={styles.inputGroup}>
-              <Text style={styles.inputLabel}>CRM</Text>
-              <TextInput
-                style={styles.textInput}
-                placeholder="Digite o número do CRM"
-                placeholderTextColor="#A0AEC0"
-                value={formData.dsCRM}
-                onChangeText={(text) => updateField("dsCRM", text)}
-                keyboardType="numeric"
-                returnKeyType="next"
-              />
-            </View>
-
-            <View style={styles.inputGroup}>
-              <Text style={styles.inputLabel}>Código Conselho</Text>
-              <TextInput
-                style={styles.textInput}
-                placeholder="Digite o código do conselho"
-                placeholderTextColor="#A0AEC0"
-                value={formData.dsCodigoConselho}
-                onChangeText={(text) => updateField("dsCodigoConselho", text)}
-                keyboardType="numeric"
-                returnKeyType="next"
-              />
-            </View>
-          </View>
-
-          {/* Seção de Contato e Status */}
-          <View style={styles.section}>
-            <Text style={styles.sectionTitle}>Contato e Status</Text>
-            
-            <View style={styles.inputGroup}>
-              <Text style={styles.inputLabel}>Email *</Text>
-              <TextInput
-                style={[
-                  styles.textInput,
-                  errors.dsEmail && styles.inputError
-                ]}
-                placeholder="Digite o email"
-                placeholderTextColor="#A0AEC0"
-                value={formData.dsEmail}
-                onChangeText={(text) => updateField("dsEmail", text)}
-                keyboardType="email-address"
-                autoCapitalize="none"
-                returnKeyType="next"
-              />
-              {errors.dsEmail && (
-                <Text style={styles.errorText}>{errors.dsEmail}</Text>
-              )}
-            </View>
-
-            <View style={styles.inputGroup}>
-              <Text style={styles.inputLabel}>Situação</Text>
-              <TextInput
-                style={styles.textInput}
-                placeholder="Ex: Ativo, Disponível, etc."
-                placeholderTextColor="#A0AEC0"
-                value={formData.situacao}
-                onChangeText={(text) => updateField("situacao", text)}
-                returnKeyType="done"
-              />
-            </View>
-          </View>
-
-          {/* Botões de Ação */}
-          <View style={styles.actionsContainer}>
-            <TouchableOpacity
-              style={styles.cancelButton}
-              onPress={handleCancelar}
-            >
-              <Text style={styles.cancelButtonText}>Cancelar</Text>
-            </TouchableOpacity>
-
-            <TouchableOpacity 
-              style={[
-                styles.saveButton,
-                !isFormValid && styles.saveButtonDisabled
-              ]} 
-              onPress={handleSalvar}
-              disabled={!isFormValid}
-            >
-              <Text style={styles.saveButtonText}>
-                {!isFormValid ? "Preencha os campos" : "Salvar Alterações"}
-              </Text>
-            </TouchableOpacity>
-          </View>
-        </View>
-      </ScrollView>
-    </KeyboardAvoidingView>
+      {modalType === "warning" && modalMessage.includes("cancelar") && (
+        <MessageModal
+          visible={modalVisible}
+          message={modalMessage}
+          type={modalType}
+          onClose={hideModal}
+          showConfirmButton={true}
+          onConfirm={handleConfirmCancel}
+          confirmText="Sim, Cancelar"
+          cancelText="Continuar Editando"
+        />
+      )}
+    </>
   );
 }
-

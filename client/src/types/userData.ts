@@ -5,15 +5,13 @@ export interface UserData {
   email: string;
   cpf?: string;
   tel?: string;
-  situacao?: string[];
+  situacao?: boolean;
   dataCriacao?: any;
   
-  // Campos médicos
   codigoConselho?: string;
   especialidade?: string;
   tipo?: boolean;
-  
-  // Campos funcionários
+
   cargo?: string;
   setor?: string;
   dataAdmissao?: any;

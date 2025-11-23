@@ -15,13 +15,6 @@ export function Header() {
       return "Usuário";
     }
 
-    console.log("✅ Header: Usuário encontrado", {
-      tipo: user.tipo,
-      nomeCompleto: user.nomeCompleto,
-      nomeAbreviado: user.nomeAbreviado,
-      nomeComplete: user.nomeComplete 
-    });
-
     if (user.tipo === "medico") {
       return user.nomeAbreviado || user.nomeCompleto || user.nomeComplete || "Médico";
     }
@@ -43,7 +36,6 @@ export function Header() {
       if (words.length === 0) return "US";
       if (words.length === 1) return words[0].substring(0, 2).toUpperCase();
       
-      // Pega primeira e última letra
       return (words[0][0] + words[words.length - 1][0]).toUpperCase();
     } catch (error) {
       return "US";

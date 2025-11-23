@@ -8,9 +8,9 @@ export const styles = StyleSheet.create({
   header: {
     flexDirection: "row",
     justifyContent: "space-between",
-    alignItems: "center", 
+    alignItems: "center",
     paddingHorizontal: 20,
-    paddingTop: 40,
+    paddingTop: 20,
     paddingBottom: 16,
     backgroundColor: "#F7FAFC",
   },
@@ -54,7 +54,7 @@ export const styles = StyleSheet.create({
   },
   listContent: {
     paddingHorizontal: 16,
-    paddingBottom: 20,
+    paddingBottom: 40,
   },
   card: {
     backgroundColor: "#FFFFFF",
@@ -143,5 +143,88 @@ export const styles = StyleSheet.create({
     color: "#718096",
     textAlign: "center",
     lineHeight: 20,
+  },
+
+  searchContainer: {
+    paddingHorizontal: 20,
+    paddingBottom: 15,
+    backgroundColor: '#F7FAFC',
+  },
+  searchInputContainer: {
+    flexDirection: 'row',
+    alignItems: 'center',
+    backgroundColor: '#FFFFFF',
+    borderRadius: 12,
+    paddingHorizontal: 15,
+    paddingVertical: 12,
+    borderWidth: 1,
+    borderColor: '#E2E8F0',
+    shadowColor: '#000',
+    shadowOffset: {
+      width: 0,
+      height: 1,
+    },
+    shadowOpacity: 0.1,
+    shadowRadius: 3,
+    elevation: 2,
+  },
+  searchInput: {
+    flex: 1,
+    fontSize: 16,
+    color: '#2D3748',
+  },
+  searchIcon: {
+    fontSize: 16,
+    color: '#A0AEC0',
+    marginLeft: 8,
+  },
+  clearButton: {
+    padding: 4,
+    marginLeft: 8,
+  },
+  clearButtonText: {
+    fontSize: 16,
+    color: '#A0AEC0',
+    fontWeight: 'bold',
+  },
+  cardInactive: {
+    backgroundColor: '#F7FAFC',
+    borderColor: '#E2E8F0',
+    opacity: 0.8,
+  },
+  avatarInactive: {
+    backgroundColor: '#CBD5E0',
+  },
+  avatarTextInactive: {
+    color: '#718096',
+  },
+  textInactive: {
+    color: '#718096',
+  },
+  statusCount: {
+    flexDirection: 'row',
+    gap: 12,
+    marginTop: 4,
+  },
+  activeCount: {
+    fontSize: 14,
+    color: '#38A169',
+    fontWeight: '500',
+  },
+  inactiveCount: {
+    fontSize: 14,
+    color: '#718096',
+  },
+  clearSearchButton: {
+    marginTop: 12,
+    paddingVertical: 8,
+    paddingHorizontal: 16,
+    backgroundColor: '#3182CE',
+    borderRadius: 8,
+  },
+  clearSearchText: {
+    color: '#FFFFFF',
+    fontSize: 14,
+    fontWeight: '500',
   },
 });
