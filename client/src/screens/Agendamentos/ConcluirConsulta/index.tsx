@@ -1,68 +1,126 @@
-import React, { useState } from "react";
-import { 
-  View, 
-  Text, 
-  TouchableOpacity, 
-  ScrollView, 
+import React, { useState, useEffect } from "react";
+import {
+  View,
+  Text,
+  TouchableOpacity,
+  ScrollView,
   TextInput,
   KeyboardAvoidingView,
-  Platform 
+  Platform,
+  Alert,
+  ActivityIndicator
 } from "react-native";
 import { useNavigation, useRoute } from "@react-navigation/native";
 import { styles } from "./styles";
 
+import { consultaService } from "../../../services/consulta.service";
+import { concluirAgendamento } from "../../../services/agendamentos.service"; 
+
 export function ConcluirConsultaScreen() {
   const navigation = useNavigation();
   const route = useRoute();
-  
-  const { consulta } = route.params as {
-    consulta: {
-      id: number;
-      paciente: string;
-      data: string;
-      horaInicio: string;
-      horaFim: string;
-      status: string;
-      tipo: string;
-      observacoes: string;
-    };
-  };
+  const { consulta } = route.params;
+
+  const [loading, setLoading] = useState(false);
 
   const [formData, setFormData] = useState({
     diagnostico: "",
     examesSolicitados: "",
-    medicacao: "",
+    medicacaoPrescrita: "",
     observacoesMedicas: "",
-    procedimentos: "",
-    dataConclusao: new Date().toISOString().split('T')[0],
-    medicoResponsavel: "Dr. Gabriela Borba"
+    procedimentoRealizado: "",
+    dataConclusao: new Date().toISOString(),
+    medicoResponsavel: "Dra. Gabriela Borba"
   });
 
-  const handleSave = () => {
-    console.log("Dados da consulta salvos:", formData);
-    
-    navigation.navigate("DetalhesConsulta", { 
-      consulta: {
-        ...consulta,
-        status: "Concluída",
-        informacoesConsulta: formData
+  useEffect(() => {
+    if (consulta?.informacoesConsulta) {
+      const info = consulta.informacoesConsulta;
+      setFormData({
+        diagnostico: info.diagnostico || "",
+        examesSolicitados: info.examesSolicitados || "",
+        medicacaoPrescrita: info.medicacaoPrescrita || "",
+        observacoesMedicas: info.observacoesMedicas || "",
+        procedimentoRealizado: info.procedimentoRealizado || "",
+        dataConclusao: info.dataConclusao || new Date().toISOString(),
+        medicoResponsavel: info.medicoResponsavel || "Dra. Gabriela Borba"
+      });
+    }
+  }, [consulta]);
+
+  const handleSave = async () => {
+    if (!formData.diagnostico) {
+      Alert.alert("Atenção", "Por favor, preencha o diagnóstico.");
+      return;
+    }
+
+    setLoading(true);
+
+    try {
+      const consultaData = {
+        cpfPaciente: consulta.cpf || "",
+        nomePaciente: consulta.paciente || "",
+        agendamentoId: consulta.id || "",
+        tipo: consulta.tipo || "Consulta",
+        dataConsulta: consulta.data || "",
+        horaInicio: consulta.horaInicio || "",
+        horaFim: consulta.horaFim || "",
+        medicoId: consulta.medicoId || "3xNYnVrFLiSeicunqkH",
+        nomeMedico: formData.medicoResponsavel || "",
+        diagnostico: formData.diagnostico,
+        examesSolicitados: formData.examesSolicitados || "",
+        medicacaoPrescrita: formData.medicacaoPrescrita || "",
+        observacoesMedicas: formData.observacoesMedicas || "",
+        procedimentoRealizado: formData.procedimentoRealizado || "",
+        status: "Concluido",
+        criadoEm: new Date().toISOString(),
+        dataConclusao: formData.dataConclusao,
+        pacienteId: consulta.pacienteId || "", // 
+      };
+
+      // 🔹 Salva a consulta concluída
+      await consultaService.concluirConsulta(consultaData);
+
+      // 🔹 Atualiza o agendamento para concluído
+      if (consulta.id) {
+        await concluirAgendamento(consulta.id);
       }
-    });
+
+      Alert.alert(
+        "Sucesso",
+        "Consulta concluída e agendamento atualizado!",
+        [
+          {
+            text: "OK",
+            onPress: () => {
+              navigation.navigate("Tabs", {
+                screen: "Agendamentos"
+              });
+            }
+          }
+        ]
+      );
+
+    } catch (error) {
+      console.error("Erro ao salvar consulta:", error);
+      Alert.alert("Erro", "Não foi possível salvar a consulta.");
+    } finally {
+      setLoading(false);
+    }
   };
 
   return (
-    <KeyboardAvoidingView 
+    <KeyboardAvoidingView
       style={styles.container}
       behavior={Platform.OS === "ios" ? "padding" : "height"}
       keyboardVerticalOffset={Platform.OS === "ios" ? 90 : 0}
     >
-      <ScrollView 
+      <ScrollView
         style={styles.scrollView}
         showsVerticalScrollIndicator={false}
         contentContainerStyle={styles.scrollContent}
         keyboardShouldPersistTaps="handled"
       >
-        {/* Informações do Paciente */}
         <View style={styles.patientCard}>
           <Text style={styles.patientName}>{consulta.paciente}</Text>
           <Text style={styles.consultInfo}>
@@ -71,9 +129,7 @@ export function ConcluirConsultaScreen() {
           <Text style={styles.consultType}>{consulta.tipo}</Text>
         </View>
 
-        {/* Formulário de Conclusão */}
         <View style={styles.form}>
-          {/* Diagnóstico */}
           <View style={styles.inputGroup}>
             <Text style={styles.inputLabel}>Diagnóstico *</Text>
             <TextInput
@@ -81,85 +137,75 @@ export function ConcluirConsultaScreen() {
               placeholder="Descreva o diagnóstico principal..."
               placeholderTextColor="#A0AEC0"
               value={formData.diagnostico}
-              onChangeText={(text) => setFormData({...formData, diagnostico: text})}
+              onChangeText={(t) => setFormData({ ...formData, diagnostico: t })}
               multiline
               numberOfLines={4}
               textAlignVertical="top"
-              returnKeyType="next"
             />
           </View>
 
-          {/* Exames Solicitados */}
           <View style={styles.inputGroup}>
             <Text style={styles.inputLabel}>Exames Solicitados</Text>
             <TextInput
               style={[styles.textInput, styles.textArea]}
-              placeholder="Liste os exames solicitados (separados por vírgula)..."
+              placeholder="Liste os exames solicitados..."
               placeholderTextColor="#A0AEC0"
               value={formData.examesSolicitados}
-              onChangeText={(text) => setFormData({...formData, examesSolicitados: text})}
+              onChangeText={(t) => setFormData({ ...formData, examesSolicitados: t })}
               multiline
-              numberOfLines={3}
               textAlignVertical="top"
-              returnKeyType="next"
             />
           </View>
 
-          {/* Medicação */}
           <View style={styles.inputGroup}>
             <Text style={styles.inputLabel}>Medicação Prescrita</Text>
             <TextInput
               style={[styles.textInput, styles.textArea]}
-              placeholder="Descreva a medicação prescrita (nome, dosagem, frequência)..."
+              placeholder="Nome, dosagem e frequência..."
               placeholderTextColor="#A0AEC0"
-              value={formData.medicacao}
-              onChangeText={(text) => setFormData({...formData, medicacao: text})}
+              value={formData.medicacaoPrescrita}
+              onChangeText={(t) => setFormData({ ...formData, medicacaoPrescrita: t })}
               multiline
-              numberOfLines={3}
               textAlignVertical="top"
-              returnKeyType="next"
             />
           </View>
 
-          {/* Procedimentos */}
           <View style={styles.inputGroup}>
             <Text style={styles.inputLabel}>Procedimentos Realizados</Text>
             <TextInput
               style={[styles.textInput, styles.textArea]}
-              placeholder="Descreva os procedimentos realizados durante a consulta..."
+              placeholder="Descreva os procedimentos..."
               placeholderTextColor="#A0AEC0"
-              value={formData.procedimentos}
-              onChangeText={(text) => setFormData({...formData, procedimentos: text})}
+              value={formData.procedimentoRealizado}
+              onChangeText={(t) => setFormData({ ...formData, procedimentoRealizado: t })}
               multiline
-              numberOfLines={3}
               textAlignVertical="top"
-              returnKeyType="next"
             />
           </View>
 
-          {/* Observações Médicas */}
           <View style={styles.inputGroup}>
             <Text style={styles.inputLabel}>Observações Médicas</Text>
             <TextInput
               style={[styles.textInput, styles.textArea]}
-              placeholder="Observações adicionais, recomendações, orientações ao paciente..."
-              placeholderTextColor="#A0AEC0"
+              placeholder="Observações e recomendações..."
+              placeholderTextColor="#a0aec04f"
               value={formData.observacoesMedicas}
-              onChangeText={(text) => setFormData({...formData, observacoesMedicas: text})}
+              onChangeText={(t) => setFormData({ ...formData, observacoesMedicas: t })}
               multiline
-              numberOfLines={4}
               textAlignVertical="top"
-              returnKeyType="done"
             />
           </View>
 
-          {/* Informações Automáticas */}
           <View style={styles.autoInfoSection}>
             <Text style={styles.autoInfoTitle}>Informações Automáticas</Text>
+
             <View style={styles.autoInfoRow}>
               <Text style={styles.autoInfoLabel}>Data de Conclusão:</Text>
-              <Text style={styles.autoInfoValue}>{formData.dataConclusao}</Text>
+              <Text style={styles.autoInfoValue}>
+                {new Date(formData.dataConclusao).toLocaleDateString("pt-BR")}
+              </Text>
             </View>
+
             <View style={styles.autoInfoRow}>
               <Text style={styles.autoInfoLabel}>Médico Responsável:</Text>
               <Text style={styles.autoInfoValue}>{formData.medicoResponsavel}</Text>
@@ -167,18 +213,19 @@ export function ConcluirConsultaScreen() {
           </View>
         </View>
 
-        {/* Botão Salvar */}
-        <TouchableOpacity 
+        <TouchableOpacity
           style={[
             styles.saveButton,
-            !formData.diagnostico && styles.saveButtonDisabled
-          ]} 
+            (!formData.diagnostico || loading) && styles.saveButtonDisabled
+          ]}
           onPress={handleSave}
-          disabled={!formData.diagnostico}
+          disabled={!formData.diagnostico || loading}
         >
-          <Text style={styles.saveButtonText}>
-            {formData.diagnostico ? "Salvar Conclusão" : "Preencha o diagnóstico"}
-          </Text>
+          {loading ? (
+            <ActivityIndicator color="#fff" />
+          ) : (
+            <Text style={styles.saveButtonText}>Salvar Conclusão</Text>
+          )}
         </TouchableOpacity>
       </ScrollView>
     </KeyboardAvoidingView>

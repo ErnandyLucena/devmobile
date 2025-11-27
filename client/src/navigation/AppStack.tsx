@@ -12,6 +12,11 @@ import { MedicoNovoScreen } from "../screens/Funcionarios/Medicos/MedicosNovo";
 import MedicosDetalhesScreen from "../screens/Funcionarios/Medicos/MedicosDetalhes";
 import MedicosEditarScreen from "../screens/Funcionarios/Medicos/MedicosEditar";
 import { ConcluirConsultaScreen } from "../screens/Agendamentos/ConcluirConsulta";
+import PacientesListScreen from "../screens/Pacientes/PacienteList";
+import PacientesNovoScreen from "../screens/Pacientes/PacienteNovo";
+import DetalhesPacienteScreen from "../screens/Pacientes/PacientesDetalhes";
+import EditarPacienteScreen from "../screens/Pacientes/PacienteEdit";
+import HistoricoPacienteScreen from "../screens/Pacientes/PacienteHistorico";
 
 
 const Stack = createNativeStackNavigator();
@@ -103,6 +108,35 @@ export function AppStack() {
         name="MedicosEditar"
         component={MedicosEditarScreen}
         options={{ title: "Editar Médico" }}
+      />
+
+      {/* ROTAS DE PACIENTES */}
+      <Stack.Screen
+        name="PacientesList"
+        component={PacientesListScreen}
+        options={{ title: "Pacientes" }}
+      />
+      <Stack.Screen
+        name="PacientesNovo"
+        component={PacientesNovoScreen}
+        options={{ title: "Novo Paciente" }}
+      />
+
+      <Stack.Screen
+        name="DetalhesPaciente"
+        component={DetalhesPacienteScreen}
+        options={{ title: "Detalhes do Paciente" }}
+      />
+      <Stack.Screen
+        name="PacientesEditar"
+        component={EditarPacienteScreen}
+        options={{ title: "Editar Paciente" }} 
+      />
+
+      <Stack.Screen
+        name="HistoricoPaciente"
+        component={HistoricoPacienteScreen}
+        options={{ title: "Histórico do Paciente" }} 
       />
     </Stack.Navigator>
   );

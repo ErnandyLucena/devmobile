@@ -5,6 +5,7 @@ import { HomeScreen } from "../../screens/Home";
 import { styles } from "./styles";
 import { AgendamentosScreen } from "../../screens/Agendamentos/AgendamentosList";
 import EquipeScreen from "../../screens/Funcionarios";
+import PacientesListScreen from "../../screens/Pacientes/PacienteList";
 
 const Tab = createBottomTabNavigator();
 
@@ -25,25 +26,62 @@ export function Tabs() {
         options={{
           tabBarLabel: "Início",
           tabBarIcon: ({ focused, color, size }) => (
-            <Ionicons 
-              name={focused ? "home" : "home-outline"} 
-              size={size} 
-              color={color} 
+            <Ionicons
+              name={focused ? "home" : "home-outline"}
+              size={size}
+              color={color}
             />
           ),
         }}
       />
-      
+
       <Tab.Screen
         name="Agendamentos"
         component={AgendamentosScreen}
         options={{
           tabBarLabel: "Agendamentos",
+          headerShown: true,
+          headerTitle: "Agendamentos",
+          headerTitleAlign: "center",
+          headerTitleStyle: {
+            fontWeight: "600",
+            fontSize: 18,
+          },
+          headerStyle: {
+            backgroundColor: "#fff",
+          },
+          headerTintColor: "#2B5BFF",
           tabBarIcon: ({ focused, color, size }) => (
-            <Ionicons 
-              name={focused ? "calendar" : "calendar-outline"} 
-              size={size} 
-              color={color} 
+            <Ionicons
+              name={focused ? "calendar" : "calendar-outline"}
+              size={size}
+              color={color}
+            />
+          ),
+        }}
+      />
+
+      <Tab.Screen
+        name="Pacientes"
+        component={PacientesListScreen}
+        options={{
+          tabBarLabel: "Pacientes",
+          headerShown: true,
+          headerTitle: "Pacientes",
+          headerTitleAlign: "center",
+          headerTitleStyle: {
+            fontWeight: "600",
+            fontSize: 18,
+          },
+          headerStyle: {
+            backgroundColor: "#fff",
+          },
+          headerTintColor: "#2B5BFF",
+          tabBarIcon: ({ focused, color, size }) => (
+            <Ionicons
+              name={focused ? "accessibility" : "accessibility-outline"}
+              size={size}
+              color={color}
             />
           ),
         }}
@@ -54,11 +92,22 @@ export function Tabs() {
         component={EquipeScreen}
         options={{
           tabBarLabel: "Equipe",
+          headerShown: true,
+          headerTitle: "Equipe",
+          headerTitleAlign: "center",
+          headerTitleStyle: {
+            fontWeight: "600",
+            fontSize: 18,
+          },
+          headerStyle: {
+            backgroundColor: "#fff",
+          },
+          headerTintColor: "#2B5BFF",
           tabBarIcon: ({ focused, color, size }) => (
-            <Ionicons 
-              name={focused ? "people" : "people-outline"} 
-              size={size} 
-              color={color} 
+            <Ionicons
+              name={focused ? "people" : "people-outline"}
+              size={size}
+              color={color}
             />
           ),
         }}
@@ -70,10 +119,10 @@ export function Tabs() {
         options={{
           tabBarLabel: "Perfil",
           tabBarIcon: ({ focused, color, size }) => (
-            <Ionicons 
-              name={focused ? "person" : "person-outline"} 
-              size={size} 
-              color={color} 
+            <Ionicons
+              name={focused ? "person" : "person-outline"}
+              size={size}
+              color={color}
             />
           ),
         }}
