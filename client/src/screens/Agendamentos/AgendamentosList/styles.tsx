@@ -38,6 +38,21 @@ export const styles = StyleSheet.create({
   content: {
     padding: 20,
   },
+  
+  // Estados de carregamento
+  loadingContainer: {
+    flex: 1,
+    justifyContent: 'center',
+    alignItems: 'center',
+    backgroundColor: "#f8f9fa",
+  },
+  loadingText: {
+    marginTop: 12,
+    fontSize: 16,
+    color: '#4A5568',
+    fontWeight: '500',
+  },
+
   // Nova linha para título e botão lado a lado
   headerRow: {
     flexDirection: "row",
@@ -58,19 +73,17 @@ export const styles = StyleSheet.create({
     borderRadius: 8,
     alignItems: "center",
     justifyContent: "center",
+    flexDirection: 'row',
   },
   smallNewButtonText: {
     color: "#fff",
     fontSize: 14,
     fontWeight: "600",
   },
-  // Remove o botão grande anterior
-  // newButton: { ... },
-  // newButtonText: { ... },
 
   card: {
     backgroundColor: "#fff",
-    borderRadius: 8,
+    borderRadius: 12,
     padding: 16,
     marginBottom: 12,
     borderLeftWidth: 4,
@@ -78,11 +91,11 @@ export const styles = StyleSheet.create({
     shadowColor: "#000",
     shadowOffset: {
       width: 0,
-      height: 1,
+      height: 2,
     },
     shadowOpacity: 0.1,
-    shadowRadius: 2,
-    elevation: 2,
+    shadowRadius: 4,
+    elevation: 3,
   },
   cardHeader: {
     flexDirection: "row",
@@ -109,6 +122,12 @@ export const styles = StyleSheet.create({
   },
   statusPending: {
     backgroundColor: "#FEEBC8",
+  },
+  statusCanceled: {
+    backgroundColor: "#FED7D7",
+  },
+  statusCompleted: {
+    backgroundColor: "#BEE3F8",
   },
   statusText: {
     fontSize: 12,
@@ -160,8 +179,15 @@ export const styles = StyleSheet.create({
   },
   emptyStateText: {
     fontSize: 16,
+    color: "#2D3748",
+    marginBottom: 8,
+    textAlign: "center",
+    fontWeight: '600',
+  },
+  emptyStateSubtext: {
+    fontSize: 14,
     color: "#718096",
-    marginBottom: 16,
+    marginBottom: 20,
     textAlign: "center",
   },
   emptyStateButton: {
