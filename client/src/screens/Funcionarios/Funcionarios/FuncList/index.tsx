@@ -22,23 +22,30 @@ export default function FuncListScreen({ navigation }) {
   const [refreshing, setRefreshing] = useState(false);
   const [searchText, setSearchText] = useState("");
 
-  // Funções de carregamento e busca
+  // ---------------------------
+  // 🔥 Carregar Funcionários
+  // ---------------------------
   const loadFuncionarios = async () => {
     try {
       const data = await getAllFuncionarios();
-      
+
+      // 🔥 CORREÇÃO: Normalizar situação para string
       const funcionariosComSituacao = data.map(funcionario => ({
         ...funcionario,
-        situacao: funcionario.situacao?.[0] || "Ativo",
+        situacao: Array.isArray(funcionario.situacao)
+          ? funcionario.situacao[0] || "Ativo"
+          : funcionario.situacao || "Ativo",
       }));
 
+      // 🔥 CORREÇÃO: Considerar Arquivado na ordenação
       const funcionariosOrdenados = funcionariosComSituacao.sort((a, b) => {
-        const ordem = { "Ativo": 1, "Inativo": 2 };
+        const ordem = { "Ativo": 1, "Inativo": 2, "Arquivado": 3 };
         return ordem[a.situacao] - ordem[b.situacao];
       });
 
       setFuncionarios(funcionariosOrdenados);
       setFuncionariosFiltrados(funcionariosOrdenados);
+
     } catch (error) {
       console.log("Erro ao carregar funcionários:", error);
       Alert.alert("Erro", "Não foi possível carregar a lista de funcionários");
@@ -48,21 +55,27 @@ export default function FuncListScreen({ navigation }) {
     }
   };
 
+  // ---------------------------
+  // 🔎 Filtro de pesquisa
+  // ---------------------------
   const filtrarFuncionarios = (texto) => {
     setSearchText(texto);
-    
+
     if (texto === "") {
       setFuncionariosFiltrados(funcionarios);
-    } else {
-      const textoLower = texto.toLowerCase();
-      const filtrados = funcionarios.filter(funcionario => 
-        funcionario.nomeCompleto?.toLowerCase().includes(textoLower) ||
-        funcionario.cargo?.toLowerCase().includes(textoLower) ||
-        funcionario.setor?.toLowerCase().includes(textoLower) ||
-        funcionario.email?.toLowerCase().includes(textoLower)
-      );
-      setFuncionariosFiltrados(filtrados);
+      return;
     }
+
+    const textoLower = texto.toLowerCase();
+
+    const filtrados = funcionarios.filter(funcionario =>
+      funcionario.nomeCompleto?.toLowerCase().includes(textoLower) ||
+      funcionario.cargo?.toLowerCase().includes(textoLower) ||
+      funcionario.setor?.toLowerCase().includes(textoLower) ||
+      funcionario.email?.toLowerCase().includes(textoLower)
+    );
+
+    setFuncionariosFiltrados(filtrados);
   };
 
   const limparBusca = () => {
@@ -70,10 +83,11 @@ export default function FuncListScreen({ navigation }) {
     setFuncionariosFiltrados(funcionarios);
   };
 
+  // Atualiza ao retornar para tela
   useFocusEffect(
     React.useCallback(() => {
       loadFuncionarios();
-    }, [])
+    }, [navigation])
   );
 
   const onRefresh = () => {
@@ -81,24 +95,29 @@ export default function FuncListScreen({ navigation }) {
     loadFuncionarios();
   };
 
+  // ---------------------------
+  // Helpers de Status
+  // ---------------------------
   const getStatusText = (situacao) => {
-    switch(situacao) {
+    switch (situacao) {
       case "Ativo": return "Ativo";
       case "Inativo": return "Inativo";
+      case "Arquivado": return "Arquivado";
       default: return "Ativo";
     }
   };
 
   const getStatusColor = (situacao) => {
-    switch(situacao) {
+    switch (situacao) {
       case "Ativo": return "#38A169";
       case "Inativo": return "#D69E2E";
+      case "Arquivado": return "#718096";
       default: return "#38A169";
     }
   };
 
   const getStatusBackground = (situacao) => {
-    switch(situacao) {
+    switch (situacao) {
       case "Ativo": return "#C6F6D5";
       case "Inativo": return "#FEFCBF";
       case "Arquivado": return "#EDF2F7";
@@ -110,23 +129,27 @@ export default function FuncListScreen({ navigation }) {
     if (situacao === "Arquivado") {
       return [styles.card, styles.cardArquivado];
     }
-    return situacao === "Inativo" ? [styles.card, styles.cardInactive] : styles.card;
+    return situacao === "Inativo"
+      ? [styles.card, styles.cardInactive]
+      : styles.card;
   };
 
-  // Componentes de renderização
+  // ---------------------------
+  // 🔥 Renderização dos Cards
+  // ---------------------------
   const renderFuncionarioCard = ({ item }) => (
     <TouchableOpacity
       style={getCardStyle(item.situacao)}
-      onPress={() => navigation.navigate("FuncDetalhes", { funcionario: item })}
+      onPress={() => navigation.navigate("FuncDetalhes", { funcionarioId: item.id })}
       activeOpacity={0.7}
     >
       <View style={styles.cardHeader}>
         <View style={[
-          styles.avatar, 
+          styles.avatar,
           item.situacao === "Inativo" && styles.avatarInactive,
         ]}>
           <Text style={[
-            styles.avatarText, 
+            styles.avatarText,
             item.situacao === "Inativo" && styles.avatarTextInactive,
           ]}>
             {item.nomeCompleto
@@ -140,14 +163,14 @@ export default function FuncListScreen({ navigation }) {
 
         <View style={styles.cardInfo}>
           <Text style={[
-            styles.name, 
+            styles.name,
             item.situacao === "Inativo" && styles.textInactive,
           ]} numberOfLines={1}>
             {item.nomeCompleto || "Nome não informado"}
           </Text>
 
           <Text style={[
-            styles.especialidade, 
+            styles.especialidade,
             item.situacao === "Inativo" && styles.textInactive,
           ]}>
             {item.cargo || "Cargo não informado"}
@@ -163,7 +186,7 @@ export default function FuncListScreen({ navigation }) {
         </View>
 
         <Text style={[
-          styles.idText, 
+          styles.idText,
           item.situacao === "Inativo" && styles.textInactive,
         ]}>
           Setor: {item.setor || "Não informado"}
@@ -172,13 +195,16 @@ export default function FuncListScreen({ navigation }) {
     </TouchableOpacity>
   );
 
+  // ---------------------------
+  // Estados
+  // ---------------------------
   const renderEmptyState = () => (
     <View style={styles.emptyState}>
       <Text style={styles.emptyStateTitle}>
         {searchText ? "Nenhum funcionário encontrado" : "Nenhum funcionário cadastrado"}
       </Text>
       <Text style={styles.emptyStateText}>
-        {searchText 
+        {searchText
           ? "Tente ajustar os termos da busca."
           : "Clique no botão 'Novo Funcionário' para adicionar o primeiro funcionário ao sistema."
         }
@@ -205,6 +231,9 @@ export default function FuncListScreen({ navigation }) {
     return renderLoadingState();
   }
 
+  // ---------------------------
+  // UI Principal
+  // ---------------------------
   return (
     <View style={styles.container}>
       <StatusBar barStyle="dark-content" backgroundColor="#F7FAFC" />
@@ -260,11 +289,11 @@ export default function FuncListScreen({ navigation }) {
         showsVerticalScrollIndicator={false}
         contentContainerStyle={[styles.listContent, funcionariosFiltrados.length === 0 && styles.emptyListContent]}
         refreshControl={
-          <RefreshControl 
-            refreshing={refreshing} 
-            onRefresh={onRefresh} 
-            colors={["#3182CE"]} 
-            tintColor="#3182CE" 
+          <RefreshControl
+            refreshing={refreshing}
+            onRefresh={onRefresh}
+            colors={["#3182CE"]}
+            tintColor="#3182CE"
           />
         }
       />

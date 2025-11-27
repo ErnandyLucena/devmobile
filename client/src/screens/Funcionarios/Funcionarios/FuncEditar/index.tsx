@@ -1,4 +1,4 @@
-import React, { useState } from "react";
+import React, { useState } from "react";  
 import {
   View,
   Text,
@@ -12,13 +12,29 @@ import {
 import { Picker } from '@react-native-picker/picker';
 import { useNavigation, useRoute } from "@react-navigation/native";
 import { styles } from "./styles";
-import { updateFuncionario } from "../../../../services/funcionario.service";
+import { atualizarFuncionario } from "../../../../services/funcionario.service";
 import MessageModal from "../../../../components/MessageContext/MessageContext";
 
 export default function FuncEditarScreen() {
   const navigation = useNavigation();
   const route = useRoute();
-  const { funcionario } = route.params;
+
+  // NORMALIZAÇÃO DOS DADOS RECEBIDOS
+  const funcionarioRaw = route.params.funcionario;
+
+  const funcionario = {
+    id: funcionarioRaw.id ?? funcionarioRaw.idFuncionario,
+    nomeCompleto: funcionarioRaw.nomeCompleto ?? funcionarioRaw.nome ?? "",
+    cargo: funcionarioRaw.cargo ?? "",
+    setor: funcionarioRaw.setor ?? "",
+    situacao: Array.isArray(funcionarioRaw.situacao)
+      ? funcionarioRaw.situacao[0]
+      : (funcionarioRaw.situacao ?? "Ativo"),
+    email: funcionarioRaw.email ?? "",
+    tel: funcionarioRaw.tel ?? funcionarioRaw.telefone ?? "",
+    cpf: funcionarioRaw.cpf ?? "",
+    dataAdmissao: funcionarioRaw.dataAdmissao ?? ""
+  };
 
   const [loading, setLoading] = useState(false);
   const [modalVisible, setModalVisible] = useState(false);
@@ -26,14 +42,14 @@ export default function FuncEditarScreen() {
   const [modalType, setModalType] = useState("info");
 
   const [formData, setFormData] = useState({
-    nome: funcionario.nomeCompleto || "", 
-    cargo: funcionario.cargo || "",
-    setor: funcionario.setor || "",
-    situacao: Array.isArray(funcionario.situacao) ? funcionario.situacao[0] : (funcionario.situacao || "Ativo"), 
-    email: funcionario.email || "",
-    telefone: funcionario.tel || "", 
-    cpf: funcionario.cpf || "",
-    dataAdmissao: funcionario.dataAdmissao || ""
+    nome: funcionario.nomeCompleto,
+    cargo: funcionario.cargo,
+    setor: funcionario.setor,
+    situacao: funcionario.situacao,
+    email: funcionario.email,
+    telefone: funcionario.tel,
+    cpf: funcionario.cpf,
+    dataAdmissao: funcionario.dataAdmissao
   });
 
   const [errors, setErrors] = useState({});
@@ -55,75 +71,54 @@ export default function FuncEditarScreen() {
     }
   };
 
+  // ========================
+  // FORMATADORES
+  // ========================
 
   const formatCPF = (text) => {
     const numbers = text.replace(/\D/g, '');
-    
-    if (numbers.length <= 3) {
-      return numbers;
-    } else if (numbers.length <= 6) {
-      return numbers.replace(/(\d{3})(\d{0,3})/, '$1.$2');
-    } else if (numbers.length <= 9) {
-      return numbers.replace(/(\d{3})(\d{3})(\d{0,3})/, '$1.$2.$3');
-    } else {
-      return numbers.replace(/(\d{3})(\d{3})(\d{3})(\d{0,2})/, '$1.$2.$3-$4');
-    }
+    if (numbers.length <= 3) return numbers;
+    if (numbers.length <= 6) return numbers.replace(/(\d{3})(\d{0,3})/, '$1.$2');
+    if (numbers.length <= 9) return numbers.replace(/(\d{3})(\d{3})(\d{0,3})/, '$1.$2.$3');
+    return numbers.replace(/(\d{3})(\d{3})(\d{3})(\d{0,2})/, '$1.$2.$3-$4');
   };
 
   const handleCPFChange = (text) => {
-    const formattedCPF = formatCPF(text);
-    updateField("cpf", formattedCPF);
+    updateField("cpf", formatCPF(text));
   };
 
   const formatTelefone = (text) => {
     const numbers = text.replace(/\D/g, '');
-    
-    if (numbers.length <= 2) {
-      return numbers;
-    } else if (numbers.length <= 6) {
-      return numbers.replace(/(\d{2})(\d{0,4})/, '($1) $2');
-    } else if (numbers.length <= 10) {
-      return numbers.replace(/(\d{2})(\d{4})(\d{0,4})/, '($1) $2-$3');
-    } else {
-      return numbers.replace(/(\d{2})(\d{5})(\d{0,4})/, '($1) $2-$3');
-    }
+    if (numbers.length <= 2) return numbers;
+    if (numbers.length <= 6) return numbers.replace(/(\d{2})(\d{0,4})/, '($1) $2');
+    if (numbers.length <= 10) return numbers.replace(/(\d{2})(\d{4})(\d{0,4})/, '($1) $2-$3');
+    return numbers.replace(/(\d{2})(\d{5})(\d{0,4})/, '($1) $2-$3');
   };
 
   const handleTelefoneChange = (text) => {
-    const formattedTelefone = formatTelefone(text);
-    updateField("telefone", formattedTelefone);
+    updateField("telefone", formatTelefone(text));
   };
 
   const formatData = (text) => {
-    const numbers = text.replace(/\D/g, '');
-    
-    if (numbers.length <= 4) {
-      return numbers;
-    } else if (numbers.length <= 6) {
-      return numbers.replace(/(\d{4})(\d{0,2})/, '$1-$2');
-    } else {
-      return numbers.replace(/(\d{4})(\d{2})(\d{0,2})/, '$1-$2-$3');
-    }
+    const numbers = text.replace(/\D/g, "");
+    if (numbers.length <= 4) return numbers;
+    if (numbers.length <= 6) return numbers.replace(/(\d{4})(\d{0,2})/, "$1-$2");
+    return numbers.replace(/(\d{4})(\d{2})(\d{0,2})/, "$1-$2-$3");
   };
 
   const handleDataChange = (text) => {
-    const formattedData = formatData(text);
-    updateField("dataAdmissao", formattedData);
+    updateField("dataAdmissao", formatData(text));
   };
+
+  // ========================
+  // VALIDAÇÕES
+  // ========================
 
   const validateCPF = (cpf) => {
     if (!cpf) return true;
-    
     const cleanCPF = cpf.replace(/\D/g, '');
-    
-    if (cleanCPF.length !== 11) {
-      return false;
-    }
-    
-    if (/^(\d)\1+$/.test(cleanCPF)) {
-      return false;
-    }
-    
+    if (cleanCPF.length !== 11) return false;
+    if (/^(\d)\1+$/.test(cleanCPF)) return false;
     return true;
   };
 
@@ -139,17 +134,19 @@ export default function FuncEditarScreen() {
     if (!formData.cargo.trim()) newErrors.cargo = "Cargo é obrigatório";
     if (!formData.setor.trim()) newErrors.setor = "Setor é obrigatório";
 
-    if (formData.cpf.trim() && !validateCPF(formData.cpf)) {
+    if (formData.cpf.trim() && !validateCPF(formData.cpf))
       newErrors.cpf = "CPF inválido";
-    }
 
-    if (formData.email.trim() && !validateEmail(formData.email)) {
+    if (formData.email.trim() && !validateEmail(formData.email))
       newErrors.email = "Email inválido";
-    }
 
     setErrors(newErrors);
     return Object.keys(newErrors).length === 0;
   };
+
+  // ========================
+  // SALVAR
+  // ========================
 
   const handleSalvar = async () => {
     if (!validateForm()) {
@@ -160,82 +157,56 @@ export default function FuncEditarScreen() {
     setLoading(true);
 
     try {
-      console.log("📌 Dados recebidos do funcionário:", funcionario);
-      console.log("📌 FormData atual:", formData);
-
- 
       const parseDate = (value) => {
         if (!value || value.length !== 10) return null;
-        
-  
-        if (value && typeof value.toDate === 'function') {
-          return value;
-        }
-      
         const [year, month, day] = value.split("-");
-        if (year && month && day) {
-          const date = new Date(parseInt(year), parseInt(month) - 1, parseInt(day));
-          return isNaN(date.getTime()) ? null : date;
-        }
-        
-        return null;
+        const date = new Date(parseInt(year), parseInt(month) - 1, parseInt(day));
+        return isNaN(date.getTime()) ? null : date;
       };
 
       const dataToSend = {
         nomeCompleto: formData.nome.trim(),
         cargo: formData.cargo.trim(),
         setor: formData.setor.trim(),
-        situacao: [formData.situacao], 
+        situacao: [formData.situacao],
         email: formData.email.trim(),
-        tel: formData.telefone, 
+        tel: formData.telefone,
         cpf: formData.cpf,
-        dataAdmissao: formData.dataAdmissao ? parseDate(formData.dataAdmissao) : null,
+        dataAdmissao: formData.dataAdmissao
+          ? parseDate(formData.dataAdmissao)
+          : null,
       };
 
-      console.log("📌 Dados enviados para atualização:", dataToSend);
+      const funcionarioId = funcionario.id;
 
-      const funcionarioId = funcionario.id || funcionario.idFuncionario;
-      console.log("📌 ID do funcionário:", funcionarioId);
-
-      if (!funcionarioId) {
-        showModal("ID do funcionário não encontrado!", "error");
-        setLoading(false);
-        return;
-      }
-
-      const result = await updateFuncionario(funcionarioId, dataToSend);
+      const result = await atualizarFuncionario(funcionarioId, dataToSend);
 
       if (result.success) {
         showModal("Funcionário atualizado com sucesso!", "success");
       } else {
-        console.log("❌ Erro do serviço:", result.error);
         showModal("Não foi possível atualizar o funcionário.", "error");
       }
     } catch (error) {
-      console.log("❌ Erro ao atualizar funcionário:", error);
       showModal("Ocorreu um erro ao atualizar o funcionário.", "error");
     } finally {
       setLoading(false);
     }
   };
 
-  const handleModalClose = () => {
-    hideModal();
-    if (modalType === "success") {
-      navigation.navigate("FuncList", { updated: true });
-    }
-  };
+  // ========================
+  // CANCELAR
+  // ========================
 
   const handleCancelar = () => {
-    const hasChanges = 
-      formData.nome !== (funcionario.nomeCompleto || "") ||
-      formData.cargo !== (funcionario.cargo || "") ||
-      formData.setor !== (funcionario.setor || "") ||
-      formData.situacao !== (Array.isArray(funcionario.situacao) ? funcionario.situacao[0] : (funcionario.situacao || "Ativo")) ||
-      formData.email !== (funcionario.email || "") ||
-      formData.telefone !== (funcionario.tel || "") || 
-      formData.cpf !== (funcionario.cpf || "") ||
-      formData.dataAdmissao !== (funcionario.dataAdmissao || "");
+    const hasChanges =
+      formData.nome !== funcionario.nomeCompleto ||
+      formData.cargo !== funcionario.cargo ||
+      formData.setor !== funcionario.setor ||
+      formData.situacao !== funcionario.situacao ||
+      formData.email !== funcionario.email ||
+      formData.telefone !== funcionario.tel ||
+      formData.cpf !== funcionario.cpf ||
+      formData.dataAdmissao !== funcionario.dataAdmissao;
 
     if (hasChanges) {
       showModal(
@@ -252,12 +223,16 @@ export default function FuncEditarScreen() {
     navigation.goBack();
   };
 
-  const isFormValid = 
-    formData.nome.trim() && 
-    formData.cargo.trim() && 
+  const isFormValid =
+    formData.nome.trim() &&
+    formData.cargo.trim() &&
     formData.setor.trim() &&
     (!formData.cpf.trim() || validateCPF(formData.cpf)) &&
     (!formData.email.trim() || validateEmail(formData.email));
+
+  // ========================
+  // UI
+  // ========================
 
   return (
     <>
@@ -267,7 +242,7 @@ export default function FuncEditarScreen() {
         keyboardVerticalOffset={Platform.OS === "ios" ? 90 : 0}
       >
         <StatusBar barStyle="dark-content" backgroundColor="#F7FAFC" />
-        
+
         <ScrollView
           style={styles.scrollView}
           showsVerticalScrollIndicator={false}
@@ -276,7 +251,7 @@ export default function FuncEditarScreen() {
         >
 
           <View style={styles.form}>
-
+            {/* INFORMAÇÕES PESSOAIS */}
             <View style={styles.section}>
               <Text style={styles.sectionTitle}>Informações Pessoais</Text>
 
@@ -288,7 +263,6 @@ export default function FuncEditarScreen() {
                   value={formData.nome}
                   onChangeText={(text) => updateField("nome", text)}
                   style={[styles.textInput, errors.nome && styles.inputError]}
-                  returnKeyType="next"
                 />
                 {errors.nome && <Text style={styles.errorText}>{errors.nome}</Text>}
               </View>
@@ -303,12 +277,12 @@ export default function FuncEditarScreen() {
                   style={[styles.textInput, errors.cpf && styles.inputError]}
                   keyboardType="numeric"
                   maxLength={14}
-                  returnKeyType="next"
                 />
                 {errors.cpf && <Text style={styles.errorText}>{errors.cpf}</Text>}
               </View>
             </View>
 
+            {/* DADOS PROFISSIONAIS */}
             <View style={styles.section}>
               <Text style={styles.sectionTitle}>Dados Profissionais</Text>
 
@@ -320,7 +294,6 @@ export default function FuncEditarScreen() {
                   value={formData.cargo}
                   onChangeText={(text) => updateField("cargo", text)}
                   style={[styles.textInput, errors.cargo && styles.inputError]}
-                  returnKeyType="next"
                 />
                 {errors.cargo && <Text style={styles.errorText}>{errors.cargo}</Text>}
               </View>
@@ -333,7 +306,6 @@ export default function FuncEditarScreen() {
                   value={formData.setor}
                   onChangeText={(text) => updateField("setor", text)}
                   style={[styles.textInput, errors.setor && styles.inputError]}
-                  returnKeyType="next"
                 />
                 {errors.setor && <Text style={styles.errorText}>{errors.setor}</Text>}
               </View>
@@ -348,11 +320,10 @@ export default function FuncEditarScreen() {
                   style={styles.textInput}
                   keyboardType="numeric"
                   maxLength={10}
-                  returnKeyType="next"
                 />
               </View>
 
-              {/* CAMPO - SITUAÇÃO */}
+              {/* SITUAÇÃO */}
               <View style={styles.inputGroup}>
                 <Text style={styles.inputLabel}>Situação *</Text>
                 <View style={styles.pickerContainer}>
@@ -368,6 +339,7 @@ export default function FuncEditarScreen() {
               </View>
             </View>
 
+            {/* CONTATO */}
             <View style={styles.section}>
               <Text style={styles.sectionTitle}>Informações de Contato</Text>
 
@@ -382,7 +354,6 @@ export default function FuncEditarScreen() {
                   keyboardType="email-address"
                   autoCapitalize="none"
                   autoComplete="email"
-                  returnKeyType="next"
                 />
                 {errors.email && <Text style={styles.errorText}>{errors.email}</Text>}
               </View>
@@ -397,11 +368,11 @@ export default function FuncEditarScreen() {
                   style={styles.textInput}
                   keyboardType="phone-pad"
                   maxLength={15}
-                  returnKeyType="done"
                 />
               </View>
             </View>
 
+            {/* AÇÕES */}
             <View style={styles.actionsContainer}>
 
               <TouchableOpacity
@@ -434,25 +405,25 @@ export default function FuncEditarScreen() {
         </ScrollView>
       </KeyboardAvoidingView>
 
+      {/* ÚNICO MODAL — AGORA CORRETO */}
       <MessageModal
         visible={modalVisible}
         message={modalMessage}
         type={modalType}
-        onClose={handleModalClose}
+        onClose={hideModal}
+        showConfirmButton={
+          modalType === "warning" &&
+          modalMessage.includes("cancelar")
+        }
+        onConfirm={
+          modalType === "warning" &&
+          modalMessage.includes("cancelar")
+            ? handleConfirmCancel
+            : null
+        }
+        confirmText="Sim, Cancelar"
+        cancelText="Continuar Editando"
       />
-
-      {modalType === "warning" && modalMessage.includes("cancelar") && (
-        <MessageModal
-          visible={modalVisible}
-          message={modalMessage}
-          type={modalType}
-          onClose={hideModal}
-          showConfirmButton={true}
-          onConfirm={handleConfirmCancel}
-          confirmText="Sim, Cancelar"
-          cancelText="Continuar Editando"
-        />
-      )}
     </>
   );
 }
