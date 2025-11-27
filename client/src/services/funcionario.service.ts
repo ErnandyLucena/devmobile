@@ -1,5 +1,5 @@
-
-import { db } from "./firebase";
+// services/funcionario.service.js
+import { db } from "./firebase"; 
 import {
   addDoc,
   collection,
@@ -26,13 +26,12 @@ export async function cadastrarFuncionario(data) {
       tel: data.tel || "",
       email: data.email || "",
       tipo: "funcionario",
-      situacao: data.situacao || ["Ativo"], 
+      situacao: data.situacao || "Ativo", // MUDANÇA: String em vez de array
       dataAdmissao: data.dataAdmissao || serverTimestamp(),
       criadoEm: serverTimestamp(),
     };
 
     const ref = await addDoc(collection(db, "funcionarios"), funcionarioData);
-
     return { success: true, id: ref.id };
 
   } catch (error) {
@@ -49,6 +48,7 @@ export async function getAllFuncionarios() {
     const lista = snapshot.docs.map(doc => ({
       id: doc.id,
       ...doc.data(),
+      situacao: doc.data().situacao || "Ativo" // Garantir que sempre tenha situacao
     }));
 
     return lista;
@@ -64,7 +64,12 @@ export async function getFuncionarioById(id) {
     const snap = await getDoc(ref);
 
     if (snap.exists()) {
-      return { id: snap.id, ...snap.data() };
+      const data = snap.data();
+      return { 
+        id: snap.id, 
+        ...data,
+        situacao: data.situacao || "Ativo" // Garantir situacao
+      };
     }
 
     console.log("⚠ Funcionário não encontrado");
@@ -87,12 +92,16 @@ export async function excluirFuncionario(id) {
   }
 }
 
-export async function updateFuncionario(id, data) {
+export async function atualizarFuncionario(id, data) {
   try {
-    await updateDoc(doc(db, "funcionarios", id), data);
+    const docRef = doc(db, "funcionarios", id);
+    await updateDoc(docRef, {
+      ...data,
+      atualizadoEm: serverTimestamp()
+    });
     return { success: true };
   } catch (error) {
-    console.log("Erro ao atualizar funcionário:", error);
+    console.log("❌ Erro ao atualizar funcionário:", error);
     return { success: false, error };
   }
 }
@@ -116,6 +125,7 @@ export async function searchFuncionarios({ searchText }) {
     return snapshot.docs.map(doc => ({
       id: doc.id,
       ...doc.data(),
+      situacao: doc.data().situacao || "Ativo"
     }));
 
   } catch (error) {
