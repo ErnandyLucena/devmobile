@@ -23,17 +23,6 @@ export default function EquipeScreen({ navigation }: any) {
       behavior={Platform.OS === "ios" ? "padding" : "height"}
       keyboardVerticalOffset={Platform.OS === "ios" ? 90 : 0}
     >
-      {/* Header */}
-      <View style={styles.header}>
-        <TouchableOpacity 
-          style={styles.backButton}
-          onPress={() => navigation.goBack()}
-        >
-          <Text style={styles.backButtonText}>{"<"}</Text>
-        </TouchableOpacity>
-        <Text style={styles.headerTitle}>Equipe Clínica</Text>
-        <View style={styles.headerRight} />
-      </View>
 
       <ScrollView 
         style={styles.scrollView}
