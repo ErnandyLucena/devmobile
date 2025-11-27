@@ -12,6 +12,41 @@ export const styles = StyleSheet.create({
     padding: 20,
     paddingBottom: 40, 
   },
+
+  // Estados de carregamento
+  loadingContainer: {
+    flex: 1,
+    justifyContent: 'center',
+    alignItems: 'center',
+    backgroundColor: "#f8f9fa",
+    padding: 20,
+  },
+  loadingText: {
+    marginTop: 12,
+    fontSize: 16,
+    color: '#4A5568',
+    fontWeight: '500',
+  },
+  errorText: {
+    marginTop: 12,
+    fontSize: 16,
+    color: '#E53E3E',
+    fontWeight: '500',
+    textAlign: 'center',
+  },
+  backButton: {
+    backgroundColor: "#2B5BFF",
+    paddingHorizontal: 24,
+    paddingVertical: 12,
+    borderRadius: 8,
+    marginTop: 20,
+  },
+  backButtonText: {
+    color: "#FFFFFF",
+    fontSize: 14,
+    fontWeight: "600",
+  },
+
   card: {
     backgroundColor: "#fff",
     borderRadius: 12,
@@ -57,6 +92,9 @@ export const styles = StyleSheet.create({
   },
   statusCanceled: {
     backgroundColor: "#FED7D7",
+  },
+  statusCompleted: {
+    backgroundColor: "#BEE3F8",
   },
   statusText: {
     fontSize: 12,
@@ -113,6 +151,9 @@ export const styles = StyleSheet.create({
     borderColor: "#E53E3E",
     alignItems: "center",
     backgroundColor: "#fff",
+    flexDirection: 'row',
+    justifyContent: 'center',
+    gap: 8,
   },
   cancelButtonText: {
     color: "#E53E3E",
@@ -141,7 +182,7 @@ export const styles = StyleSheet.create({
   },
   concludeSection: {
     alignItems: "center",
-    marginBottom: 20,
+    marginBottom: 16,
   },
   concludeButton: {
     backgroundColor: "#38A169",
@@ -164,5 +205,27 @@ export const styles = StyleSheet.create({
     color: "#fff",
     fontSize: 16,
     fontWeight: "700",
+  },
+  dangerSection: {
+    alignItems: "center",
+  },
+  deleteButton: {
+    backgroundColor: "#E53E3E",
+    paddingVertical: 14,
+    paddingHorizontal: 20,
+    borderRadius: 8,
+    alignItems: "center",
+    justifyContent: "center",
+    flexDirection: 'row',
+    gap: 8,
+    width: "100%",
+  },
+  deleteButtonText: {
+    color: "#fff",
+    fontSize: 14,
+    fontWeight: "600",
+  },
+  buttonDisabled: {
+    opacity: 0.6,
   },
 });

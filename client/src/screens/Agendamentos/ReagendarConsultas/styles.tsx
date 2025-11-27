@@ -15,6 +15,22 @@ export const styles = StyleSheet.create({
     padding: 20,
     gap: 20,
   },
+
+  // Estados de carregamento
+  loadingContainer: {
+    flex: 1,
+    justifyContent: 'center',
+    alignItems: 'center',
+    backgroundColor: "#f8f9fa",
+    padding: 20,
+  },
+  loadingText: {
+    marginTop: 12,
+    fontSize: 16,
+    color: '#4A5568',
+    fontWeight: '500',
+  },
+
   patientCard: {
     backgroundColor: "#fff",
     borderRadius: 12,
@@ -28,18 +44,29 @@ export const styles = StyleSheet.create({
     shadowOpacity: 0.1,
     shadowRadius: 3.84,
     elevation: 5,
+    borderLeftWidth: 4,
+    borderLeftColor: "#2B5BFF",
   },
   patientName: {
     fontSize: 18,
     fontWeight: "700",
     color: "#2D3748",
-    marginBottom: 4,
+    marginBottom: 8,
   },
   consultInfo: {
     fontSize: 14,
     color: "#718096",
-    fontStyle: "italic",
+    marginBottom: 4,
+    flexDirection: 'row',
+    alignItems: 'center',
   },
+  consultType: {
+    fontSize: 14,
+    color: "#718096",
+    flexDirection: 'row',
+    alignItems: 'center',
+  },
+
   // Inputs
   inputGroup: {
     gap: 8,
@@ -71,6 +98,13 @@ export const styles = StyleSheet.create({
     minHeight: 100,
     textAlignVertical: "top",
   },
+  helperText: {
+    fontSize: 12,
+    color: "#718096",
+    fontStyle: 'italic',
+    marginTop: 4,
+  },
+
   // Botões
   buttonsContainer: {
     flexDirection: "row",
@@ -105,6 +139,9 @@ export const styles = StyleSheet.create({
     shadowOpacity: 0.2,
     shadowRadius: 4,
     elevation: 3,
+    flexDirection: 'row',
+    justifyContent: 'center',
+    gap: 8,
   },
   saveButtonDisabled: {
     backgroundColor: "#A0AEC0",
