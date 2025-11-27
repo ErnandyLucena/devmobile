@@ -7,13 +7,18 @@ import {
   ScrollView,
   KeyboardAvoidingView,
   Platform,
-  StatusBar
+  StatusBar,
+  Modal,
+  TouchableWithoutFeedback
 } from "react-native";
 import { Picker } from '@react-native-picker/picker';
 import { useNavigation } from "@react-navigation/native";
 import { styles } from "./styles";
 import { cadastrarFuncionario } from "../../../../services/funcionario.service";
 import MessageModal from "../../../../components/MessageContext/MessageContext";
+import DateTimePicker from '@react-native-community/datetimepicker';
+import { Ionicons } from '@expo/vector-icons';
+
 
 export default function FuncNovoScreen({ navigation }) {
   const [loading, setLoading] = useState(false);
@@ -21,6 +26,7 @@ export default function FuncNovoScreen({ navigation }) {
   const [modalMessage, setModalMessage] = useState("");
   const [modalType, setModalType] = useState("info");
   const [confirmationModalVisible, setConfirmationModalVisible] = useState(false);
+  const [showDatePicker, setShowDatePicker] = useState(false);
 
   const [formData, setFormData] = useState({
     nome: "",
@@ -54,7 +60,7 @@ export default function FuncNovoScreen({ navigation }) {
 
   const formatCPF = (text) => {
     const numbers = text.replace(/\D/g, '');
-    
+
     if (numbers.length <= 3) {
       return numbers;
     } else if (numbers.length <= 6) {
@@ -73,7 +79,7 @@ export default function FuncNovoScreen({ navigation }) {
 
   const formatTelefone = (text) => {
     const numbers = text.replace(/\D/g, '');
-    
+
     if (numbers.length <= 2) {
       return numbers;
     } else if (numbers.length <= 6) {
@@ -90,45 +96,92 @@ export default function FuncNovoScreen({ navigation }) {
     updateField("telefone", formattedTelefone);
   };
 
-  const formatData = (text) => {
+  // Nova formatação para data no formato brasileiro (DD/MM/AAAA)
+  const formatDataBR = (text) => {
     const numbers = text.replace(/\D/g, '');
-    
-    if (numbers.length <= 4) {
+
+    if (numbers.length <= 2) {
       return numbers;
-    } else if (numbers.length <= 6) {
-      return numbers.replace(/(\d{4})(\d{0,2})/, '$1-$2');
+    } else if (numbers.length <= 4) {
+      return numbers.replace(/(\d{2})(\d{0,2})/, '$1/$2');
     } else {
-      return numbers.replace(/(\d{4})(\d{2})(\d{0,2})/, '$1-$2-$3');
+      return numbers.replace(/(\d{2})(\d{2})(\d{0,4})/, '$1/$2/$3');
     }
   };
 
   const handleDataChange = (text) => {
-    const formattedData = formatData(text);
+    const formattedData = formatDataBR(text);
     updateField("dataAdmissao", formattedData);
+  };
+
+  // Função para converter data BR para formato ISO (AAAA-MM-DD)
+  const convertBRToISO = (dataBR) => {
+    if (!dataBR || dataBR.length !== 10) return null;
+
+    const [day, month, year] = dataBR.split('/');
+    return `${year}-${month}-${day}`;
+  };
+
+  // Função para converter data ISO para formato BR (DD/MM/AAAA)
+  const convertISOToBR = (dataISO) => {
+    if (!dataISO) return '';
+
+    const [year, month, day] = dataISO.split('-');
+    return `${day}/${month}/${year}`;
+  };
+
+  // Função para abrir o calendário
+  const handleOpenCalendar = () => {
+    setShowDatePicker(true);
+  };
+
+  // Função para lidar com a seleção de data no calendário
+  const handleDateChange = (event, selectedDate) => {
+    setShowDatePicker(false);
+
+    if (selectedDate) {
+      // Formata a data selecionada para o formato brasileiro
+      const day = String(selectedDate.getDate()).padStart(2, '0');
+      const month = String(selectedDate.getMonth() + 1).padStart(2, '0');
+      const year = selectedDate.getFullYear();
+
+      const formattedDate = `${day}/${month}/${year}`;
+      updateField("dataAdmissao", formattedDate);
+    }
   };
 
   const validateCPF = (cpf) => {
     if (!cpf) return true;
-    
+
     const cleanCPF = cpf.replace(/\D/g, '');
-    
+
     if (cleanCPF.length !== 11) {
       return false;
     }
-    
+
     if (/^(\d)\1+$/.test(cleanCPF)) {
       return false;
     }
-    
+
     return true;
   };
-
 
   const validateEmail = (email) => {
     if (!email) return true;
     return /\S+@\S+\.\S+/.test(email);
   };
 
+  // Validação de data no formato brasileiro
+  const validateDataBR = (data) => {
+    if (!data) return true;
+
+    if (data.length !== 10) return false;
+
+    const [day, month, year] = data.split('/');
+    const date = new Date(`${year}-${month}-${day}`);
+
+    return !isNaN(date.getTime());
+  };
 
   const handleSalvar = async () => {
     const newErrors = {};
@@ -137,13 +190,16 @@ export default function FuncNovoScreen({ navigation }) {
     if (!formData.cargo.trim()) newErrors.cargo = "Cargo é obrigatório";
     if (!formData.setor.trim()) newErrors.setor = "Setor é obrigatório";
 
-
     if (formData.cpf.trim() && !validateCPF(formData.cpf)) {
       newErrors.cpf = "CPF inválido";
     }
 
     if (formData.email.trim() && !validateEmail(formData.email)) {
       newErrors.email = "Email inválido";
+    }
+
+    if (formData.dataAdmissao.trim() && !validateDataBR(formData.dataAdmissao)) {
+      newErrors.dataAdmissao = "Data inválida";
     }
 
     if (Object.keys(newErrors).length > 0) {
@@ -157,7 +213,7 @@ export default function FuncNovoScreen({ navigation }) {
 
     const parseDate = (value) => {
       if (!value || value.length !== 10) return null;
-      const [year, month, day] = value.split("-");
+      const [day, month, year] = value.split("/");
       const date = new Date(`${year}-${month}-${day}T00:00:00`);
       return isNaN(date.getTime()) ? null : date;
     };
@@ -218,7 +274,8 @@ export default function FuncNovoScreen({ navigation }) {
     formData.cargo.trim() &&
     formData.setor.trim() &&
     (!formData.cpf.trim() || validateCPF(formData.cpf)) &&
-    (!formData.email.trim() || validateEmail(formData.email));
+    (!formData.email.trim() || validateEmail(formData.email)) &&
+    (!formData.dataAdmissao.trim() || validateDataBR(formData.dataAdmissao));
 
   return (
     <>
@@ -228,7 +285,7 @@ export default function FuncNovoScreen({ navigation }) {
         keyboardVerticalOffset={Platform.OS === "ios" ? 90 : 0}
       >
         <StatusBar barStyle="dark-content" backgroundColor="#F7FAFC" />
-        
+
         <ScrollView
           style={styles.scrollView}
           showsVerticalScrollIndicator={false}
@@ -237,7 +294,6 @@ export default function FuncNovoScreen({ navigation }) {
         >
 
           <View style={styles.form}>
-
 
             <View style={styles.section}>
               <Text style={styles.sectionTitle}>Informações Pessoais</Text>
@@ -302,19 +358,27 @@ export default function FuncNovoScreen({ navigation }) {
 
               <View style={styles.inputGroup}>
                 <Text style={styles.inputLabel}>Data de Admissão</Text>
-                <TextInput
-                  placeholder="AAAA-MM-DD"
-                  placeholderTextColor="#A0AEC0"
-                  value={formData.dataAdmissao}
-                  onChangeText={handleDataChange}
-                  style={styles.textInput}
-                  keyboardType="numeric"
-                  maxLength={10}
-                  returnKeyType="next"
-                />
+                <View style={styles.dateInputContainer}>
+                  <TextInput
+                    placeholder="DD/MM/AAAA"
+                    placeholderTextColor="#A0AEC0"
+                    value={formData.dataAdmissao}
+                    onChangeText={handleDataChange}
+                    style={[styles.textInput, styles.dateInput, errors.dataAdmissao && styles.inputError]}
+                    keyboardType="numeric"
+                    maxLength={10}
+                    returnKeyType="done"
+                  />
+                  <TouchableOpacity
+                    style={styles.calendarButton}
+                    onPress={handleOpenCalendar}
+                  >
+                    <Ionicons name="calendar" size={24} color="#0051ffff" />
+                  </TouchableOpacity>
+                </View>
+                {errors.dataAdmissao && <Text style={styles.errorText}>{errors.dataAdmissao}</Text>}
               </View>
 
-   
               <View style={styles.inputGroup}>
                 <Text style={styles.inputLabel}>Situação *</Text>
                 <View style={styles.pickerContainer}>
@@ -396,13 +460,23 @@ export default function FuncNovoScreen({ navigation }) {
         </ScrollView>
       </KeyboardAvoidingView>
 
+      {/* DatePicker Modal */}
+      {showDatePicker && (
+        <DateTimePicker
+          value={new Date()}
+          mode="date"
+          display={Platform.OS === 'ios' ? 'spinner' : 'default'}
+          onChange={handleDateChange}
+          style={styles.datePicker}
+        />
+      )}
+
       <MessageModal
         visible={modalVisible}
         message={modalMessage}
         type={modalType}
         onClose={handleModalClose}
       />
-
 
       {modalType === "warning" && modalMessage.includes("cancelar") && (
         <MessageModal

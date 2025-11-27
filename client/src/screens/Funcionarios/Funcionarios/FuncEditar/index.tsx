@@ -11,9 +11,11 @@ import {
 } from "react-native";
 import { Picker } from '@react-native-picker/picker';
 import { useNavigation, useRoute } from "@react-navigation/native";
+import { Ionicons } from '@expo/vector-icons';
 import { styles } from "./styles";
 import { atualizarFuncionario } from "../../../../services/funcionario.service";
 import MessageModal from "../../../../components/MessageContext/MessageContext";
+import DateTimePicker from '@react-native-community/datetimepicker';
 
 export default function FuncEditarScreen() {
   const navigation = useNavigation();
@@ -21,6 +23,35 @@ export default function FuncEditarScreen() {
 
   // NORMALIZAÇÃO DOS DADOS RECEBIDOS
   const funcionarioRaw = route.params.funcionario;
+
+  // Função para converter data ISO para formato BR
+  const convertISOToBR = (dataISO) => {
+    if (!dataISO) return '';
+    
+    if (typeof dataISO === 'string') {
+      // Se já for string, verificar se está no formato ISO ou BR
+      if (dataISO.includes('/')) {
+        return dataISO; // Já está no formato BR
+      } else if (dataISO.includes('-')) {
+        const [year, month, day] = dataISO.split('-');
+        return `${day}/${month}/${year}`;
+      }
+    } else if (dataISO && dataISO.toDate) {
+      // Se for Timestamp do Firestore
+      try {
+        const date = dataISO.toDate();
+        const day = String(date.getDate()).padStart(2, '0');
+        const month = String(date.getMonth() + 1).padStart(2, '0');
+        const year = date.getFullYear();
+        return `${day}/${month}/${year}`;
+      } catch (error) {
+        console.log("Erro ao converter timestamp:", error);
+        return '';
+      }
+    }
+    
+    return '';
+  };
 
   const funcionario = {
     id: funcionarioRaw.id ?? funcionarioRaw.idFuncionario,
@@ -33,13 +64,14 @@ export default function FuncEditarScreen() {
     email: funcionarioRaw.email ?? "",
     tel: funcionarioRaw.tel ?? funcionarioRaw.telefone ?? "",
     cpf: funcionarioRaw.cpf ?? "",
-    dataAdmissao: funcionarioRaw.dataAdmissao ?? ""
+    dataAdmissao: convertISOToBR(funcionarioRaw.dataAdmissao)
   };
 
   const [loading, setLoading] = useState(false);
   const [modalVisible, setModalVisible] = useState(false);
   const [modalMessage, setModalMessage] = useState("");
   const [modalType, setModalType] = useState("info");
+  const [showDatePicker, setShowDatePicker] = useState(false);
 
   const [formData, setFormData] = useState({
     nome: funcionario.nomeCompleto,
@@ -99,15 +131,41 @@ export default function FuncEditarScreen() {
     updateField("telefone", formatTelefone(text));
   };
 
-  const formatData = (text) => {
-    const numbers = text.replace(/\D/g, "");
-    if (numbers.length <= 4) return numbers;
-    if (numbers.length <= 6) return numbers.replace(/(\d{4})(\d{0,2})/, "$1-$2");
-    return numbers.replace(/(\d{4})(\d{2})(\d{0,2})/, "$1-$2-$3");
+  // NOVA FORMATAÇÃO PARA DATA BR (DD/MM/AAAA)
+  const formatDataBR = (text) => {
+    const numbers = text.replace(/\D/g, '');
+    
+    if (numbers.length <= 2) {
+      return numbers;
+    } else if (numbers.length <= 4) {
+      return numbers.replace(/(\d{2})(\d{0,2})/, '$1/$2');
+    } else {
+      return numbers.replace(/(\d{2})(\d{2})(\d{0,4})/, '$1/$2/$3');
+    }
   };
 
   const handleDataChange = (text) => {
-    updateField("dataAdmissao", formatData(text));
+    updateField("dataAdmissao", formatDataBR(text));
+  };
+
+  // Função para abrir o calendário
+  const handleOpenCalendar = () => {
+    setShowDatePicker(true);
+  };
+
+  // Função para lidar com a seleção de data no calendário
+  const handleDateChange = (event, selectedDate) => {
+    setShowDatePicker(false);
+    
+    if (selectedDate) {
+      // Formata a data selecionada para o formato brasileiro
+      const day = String(selectedDate.getDate()).padStart(2, '0');
+      const month = String(selectedDate.getMonth() + 1).padStart(2, '0');
+      const year = selectedDate.getFullYear();
+      
+      const formattedDate = `${day}/${month}/${year}`;
+      updateField("dataAdmissao", formattedDate);
+    }
   };
 
   // ========================
@@ -127,6 +185,28 @@ export default function FuncEditarScreen() {
     return /\S+@\S+\.\S+/.test(email);
   };
 
+  // Validação de data no formato brasileiro
+  const validateDataBR = (data) => {
+    if (!data) return true;
+    
+    // Verificar formato DD/MM/AAAA
+    if (!/^\d{2}\/\d{2}\/\d{4}$/.test(data)) {
+      return false;
+    }
+    
+    const [day, month, year] = data.split('/').map(Number);
+    
+    // Verificar se é uma data válida
+    const date = new Date(year, month - 1, day);
+    
+    return (
+      date.getFullYear() === year &&
+      date.getMonth() === month - 1 &&
+      date.getDate() === day &&
+      !isNaN(date.getTime())
+    );
+  };
+
   const validateForm = () => {
     const newErrors = {};
 
@@ -139,6 +219,9 @@ export default function FuncEditarScreen() {
 
     if (formData.email.trim() && !validateEmail(formData.email))
       newErrors.email = "Email inválido";
+
+    if (formData.dataAdmissao.trim() && !validateDataBR(formData.dataAdmissao))
+      newErrors.dataAdmissao = "Data inválida (use DD/MM/AAAA)";
 
     setErrors(newErrors);
     return Object.keys(newErrors).length === 0;
@@ -157,25 +240,18 @@ export default function FuncEditarScreen() {
     setLoading(true);
 
     try {
-      const parseDate = (value) => {
-        if (!value || value.length !== 10) return null;
-        const [year, month, day] = value.split("-");
-        const date = new Date(parseInt(year), parseInt(month) - 1, parseInt(day));
-        return isNaN(date.getTime()) ? null : date;
-      };
-
       const dataToSend = {
         nomeCompleto: formData.nome.trim(),
         cargo: formData.cargo.trim(),
         setor: formData.setor.trim(),
-        situacao: [formData.situacao],
+        situacao: formData.situacao, // Agora é string, não array
         email: formData.email.trim(),
         tel: formData.telefone,
         cpf: formData.cpf,
-        dataAdmissao: formData.dataAdmissao
-          ? parseDate(formData.dataAdmissao)
-          : null,
+        dataAdmissao: formData.dataAdmissao // Já está no formato BR
       };
+
+      console.log("📤 Enviando dados para atualização:", dataToSend);
 
       const funcionarioId = funcionario.id;
 
@@ -184,10 +260,11 @@ export default function FuncEditarScreen() {
       if (result.success) {
         showModal("Funcionário atualizado com sucesso!", "success");
       } else {
-        showModal("Não foi possível atualizar o funcionário.", "error");
+        showModal("Não foi possível atualizar o funcionário: " + (result.error || ""), "error");
       }
     } catch (error) {
-      showModal("Ocorreu um erro ao atualizar o funcionário.", "error");
+      console.log("Erro ao atualizar funcionário:", error);
+      showModal("Ocorreu um erro ao atualizar o funcionário: " + error.message, "error");
     } finally {
       setLoading(false);
     }
@@ -223,12 +300,20 @@ export default function FuncEditarScreen() {
     navigation.goBack();
   };
 
+  const handleModalClose = () => {
+    hideModal();
+    if (modalType === "success") {
+      navigation.goBack();
+    }
+  };
+
   const isFormValid =
     formData.nome.trim() &&
     formData.cargo.trim() &&
     formData.setor.trim() &&
     (!formData.cpf.trim() || validateCPF(formData.cpf)) &&
-    (!formData.email.trim() || validateEmail(formData.email));
+    (!formData.email.trim() || validateEmail(formData.email)) &&
+    (!formData.dataAdmissao.trim() || validateDataBR(formData.dataAdmissao));
 
   // ========================
   // UI
@@ -312,15 +397,24 @@ export default function FuncEditarScreen() {
 
               <View style={styles.inputGroup}>
                 <Text style={styles.inputLabel}>Data de Admissão</Text>
-                <TextInput
-                  placeholder="AAAA-MM-DD"
-                  placeholderTextColor="#A0AEC0"
-                  value={formData.dataAdmissao}
-                  onChangeText={handleDataChange}
-                  style={styles.textInput}
-                  keyboardType="numeric"
-                  maxLength={10}
-                />
+                <View style={styles.dateInputContainer}>
+                  <TextInput
+                    placeholder="DD/MM/AAAA"
+                    placeholderTextColor="#A0AEC0"
+                    value={formData.dataAdmissao}
+                    onChangeText={handleDataChange}
+                    style={[styles.textInput, styles.dateInput, errors.dataAdmissao && styles.inputError]}
+                    keyboardType="numeric"
+                    maxLength={10}
+                  />
+                  <TouchableOpacity 
+                    style={styles.calendarButton}
+                    onPress={handleOpenCalendar}
+                  >
+                    <Ionicons name="calendar" size={24} color="#FFFFFF" />
+                  </TouchableOpacity>
+                </View>
+                {errors.dataAdmissao && <Text style={styles.errorText}>{errors.dataAdmissao}</Text>}
               </View>
 
               {/* SITUAÇÃO */}
@@ -405,12 +499,22 @@ export default function FuncEditarScreen() {
         </ScrollView>
       </KeyboardAvoidingView>
 
-      {/* ÚNICO MODAL — AGORA CORRETO */}
+      {/* DatePicker Modal */}
+      {showDatePicker && (
+        <DateTimePicker
+          value={new Date()}
+          mode="date"
+          display={Platform.OS === 'ios' ? 'spinner' : 'default'}
+          onChange={handleDateChange}
+          style={styles.datePicker}
+        />
+      )}
+
       <MessageModal
         visible={modalVisible}
         message={modalMessage}
         type={modalType}
-        onClose={hideModal}
+        onClose={handleModalClose}
         showConfirmButton={
           modalType === "warning" &&
           modalMessage.includes("cancelar")

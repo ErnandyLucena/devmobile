@@ -70,6 +70,31 @@ export const styles = StyleSheet.create({
     color: "#2D3748",
     backgroundColor: "#FFFFFF",
   },
+  // Novos estilos para o campo de data
+  dateInputContainer: {
+    flexDirection: 'row',
+    alignItems: 'center',
+  },
+  dateInput: {
+    flex: 1,
+    marginRight: 8,
+  },
+  calendarButton: {
+    width: 50,
+    height: 50,
+    borderRadius: 8,
+    backgroundColor: '#F7FAFC',
+    borderWidth: 1,
+    borderColor: '#E2E8F0',
+    justifyContent: 'center',
+    alignItems: 'center',
+  },
+  calendarButtonText: {
+    fontSize: 18,
+  },
+  datePicker: {
+    backgroundColor: 'white',
+  },
   inputError: {
     borderColor: "#E53E3E",
     backgroundColor: "#FED7D7",
