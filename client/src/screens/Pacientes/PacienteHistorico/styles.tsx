@@ -359,4 +359,9 @@ additionalInfoText: {
   color: '#6B7280',
   fontWeight: '400',
 },
+doctorSpecialty: {
+  fontSize: 13,
+  color: "#6B7280",
+  marginTop: 2,
+},
 });

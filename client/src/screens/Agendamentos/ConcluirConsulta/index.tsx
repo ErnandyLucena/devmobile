@@ -12,10 +12,12 @@ import { useNavigation, useRoute } from "@react-navigation/native";
 import { consultaService } from "../../../services/consulta.service";
 import { styles } from "./styles";
 import { atualizarAgendamento } from "../../../services/agendamentos.service";
+import { useAuth } from "../../../context/auth/AuthContext";
 
 export default function ConcluirConsultaScreen() {
   const navigation = useNavigation();
   const route = useRoute();
+  const { user } = useAuth();
 
   const { consulta } = route.params || {};
 
@@ -38,70 +40,81 @@ export default function ConcluirConsultaScreen() {
     console.log("CONSULTA RECEBIDA:", consulta);
   }, []);
 
-async function handleConcluir() {
-  if (!diagnostico.trim()) {
-    Alert.alert("Atenção", "Insira o diagnóstico antes de concluir.");
-    return;
-  }
+  async function handleConcluir() {
+    if (!diagnostico.trim()) {
+      Alert.alert("Atenção", "Insira o diagnóstico antes de concluir.");
+      return;
+    }
 
-  if (!cpfPaciente) {
-    Alert.alert("Erro", "CPF do paciente não encontrado!");
-    return;
-  }
+    if (!cpfPaciente) {
+      Alert.alert("Erro", "CPF do paciente não encontrado!");
+      return;
+    }
 
-  setLoading(true);
+    setLoading(true);
 
-  const data = {
-    tipo: "Consulta",
-    status: "Concluido",
+    const data = {
+      tipo: "Consulta",
+      status: "Concluido",
 
-    diagnostico,
-    procedimentoRealizado: procedimento,
-    medicacaoPrescrita: medicacao,
-    examesSolicitados: exames,
-    observacoesMedicas: observacoes,
+      diagnostico,
+      procedimentoRealizado: procedimento,
+      medicacaoPrescrita: medicacao,
+      examesSolicitados: exames,
+      observacoesMedicas: observacoes,
 
-    agendamentoId: consulta?.id,
-    pacienteId,
-    nomePaciente,
-    cpfPaciente: cpfPaciente.replace(/\D/g, ""),
+      agendamentoId: consulta?.id,
+      pacienteId,
+      nomePaciente,
+      cpfPaciente: cpfPaciente.replace(/\D/g, ""),
 
-    medicoId,
-    nomeMedico,
+      medicoId: user.uid,
+      nomeMedico: user.nomeCompleto,
+      especialidadeMedico: user.especialidade || "Não informada",
 
-    dataConsulta: consulta?.data || null,
-    horaInicio: consulta?.horaInicio || null,
-    horaFim: consulta?.horaFim || null,
+      dataConsulta: consulta?.data || null,
+      horaInicio: consulta?.horaInicio || null,
+      horaFim: consulta?.horaFim || null,
 
-    criadoEm: new Date().toISOString(),
-    dataConclusao: new Date().toISOString(),
-  };
+      criadoEm: new Date().toISOString(),
+      dataConclusao: new Date().toISOString(),
+    };
 
-  // 1️⃣ Salva consulta
-  const result = await consultaService.concluirConsulta(data);
 
-  if (!result.success) {
+    // 1️⃣ Salva consulta
+    const result = await consultaService.concluirConsulta(data);
+
+    if (!result.success) {
+      setLoading(false);
+      Alert.alert("Erro", "Não foi possível salvar a consulta.");
+      return;
+    }
+
+    // 2️⃣ Atualiza agendamento
+    await atualizarAgendamento(consulta.id, {
+      status: "Concluido",
+    });
+
     setLoading(false);
-    Alert.alert("Erro", "Não foi possível salvar a consulta.");
-    return;
+
+    Alert.alert("Sucesso", "Consulta concluída com sucesso!", [
+      { text: "OK", onPress: () => navigation.goBack() }
+    ]);
   }
 
-  // 2️⃣ Atualiza agendamento
-  await atualizarAgendamento(consulta.id, {
-    status: "Concluido",
-  });
-
-  setLoading(false);
-
-  Alert.alert("Sucesso", "Consulta concluída com sucesso!", [
-    { text: "OK", onPress: () => navigation.goBack() }
-  ]);
-}
-
+  if (user?.tipo !== "medico") {
+    return (
+      <View style={{ flex: 1, justifyContent: "center", alignItems: "center" }}>
+        <Text style={{ fontSize: 18, color: "#555", textAlign: "center" }}>
+          Apenas médicos podem concluir consultas.
+        </Text>
+      </View>
+    );
+  }
 
   return (
     <ScrollView style={styles.container} contentContainerStyle={styles.scrollContent}>
-      
+
       {/* ---------- CARD DO PACIENTE ---------- */}
       <View style={styles.patientCard}>
         <Text style={styles.patientName}>{nomePaciente}</Text>

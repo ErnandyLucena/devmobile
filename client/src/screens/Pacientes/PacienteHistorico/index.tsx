@@ -24,7 +24,7 @@ export default function HistoricoPacienteScreen() {
   useEffect(() => {
     async function load() {
       const result = await consultaService.getHistoricoByPacienteCpf(paciente.cpf);
-      
+
       // Ordenar por data mais recente
       result.sort((a, b) => new Date(b.dataConclusao) - new Date(a.dataConclusao));
 
@@ -41,10 +41,10 @@ export default function HistoricoPacienteScreen() {
 
   const formatarTelefone = (telefone) => {
     if (!telefone) return "Não informado";
-    
+
     // Remove todos os caracteres não numéricos
     const numeros = telefone.replace(/\D/g, '');
-    
+
     // Formata conforme o tamanho
     if (numeros.length === 11) {
       return `(${numeros.slice(0, 2)}) ${numeros.slice(2, 7)}-${numeros.slice(7)}`;
@@ -83,27 +83,27 @@ export default function HistoricoPacienteScreen() {
           <Text style={styles.patientId}>CPF: {paciente.cpf}</Text>
         </View>
       </View>
-      
+
       <View style={styles.divider} />
-      
+
       <View style={styles.infoGrid}>
         <View style={styles.infoItem}>
           <Text style={styles.infoLabel}>Telefone</Text>
           <Text style={styles.infoValue}>
             {formatarTelefone(paciente.telefone)}
           </Text>
-          
+
           {paciente.telefone && (
             <View style={styles.contactButtons}>
-              <TouchableOpacity 
-                style={styles.contactButton} 
+              <TouchableOpacity
+                style={styles.contactButton}
                 onPress={fazerLigacao}
               >
                 <Ionicons name="call-outline" size={16} color="#6366F1" />
               </TouchableOpacity>
-              
-              <TouchableOpacity 
-                style={styles.contactButton} 
+
+              <TouchableOpacity
+                style={styles.contactButton}
                 onPress={enviarWhatsApp}
               >
                 <Ionicons name="logo-whatsapp" size={16} color="#25D366" />
@@ -111,7 +111,7 @@ export default function HistoricoPacienteScreen() {
             </View>
           )}
         </View>
-        
+
         <View style={styles.infoItem}>
           <Text style={styles.infoLabel}>Consultas</Text>
           <Text style={styles.infoValue}>{historico.length}</Text>
@@ -120,7 +120,7 @@ export default function HistoricoPacienteScreen() {
           </Text>
         </View>
       </View>
-      
+
       {/* Informações adicionais se disponíveis */}
       {(paciente.email || paciente.dataNascimento) && (
         <>
@@ -132,7 +132,7 @@ export default function HistoricoPacienteScreen() {
                 <Text style={styles.additionalInfoText}>{paciente.email}</Text>
               </View>
             )}
-            
+
             {paciente.dataNascimento && (
               <View style={styles.additionalInfoItem}>
                 <Ionicons name="calendar-outline" size={14} color="#6B7280" />
@@ -230,6 +230,13 @@ export default function HistoricoPacienteScreen() {
                 <Text style={styles.doctorName}>
                   {item.nomeMedico || "Médico não especificado"}
                 </Text>
+
+                {item.especialidadeMedico && (
+                  <Text style={styles.doctorSpecialty}>
+                    {item.especialidadeMedico}
+                  </Text>
+                )}
+
               </View>
             </View>
           </View>
