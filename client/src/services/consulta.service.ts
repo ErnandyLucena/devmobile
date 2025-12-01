@@ -1,16 +1,21 @@
+// consulta.service.js
 import { db } from "./firebase";
-import { 
-  addDoc, 
-  collection, 
-  query, 
-  where, 
-  orderBy, 
-  getDocs 
+import {
+  addDoc,
+  collection,
+  query,
+  where,
+  getDocs
 } from "firebase/firestore";
 
 // Salvar consulta concluída
 async function concluirConsulta(data) {
   try {
+    // Sempre garantir CPF somente números
+    if (data.cpfPaciente) {
+      data.cpfPaciente = data.cpfPaciente.replace(/\D/g, "");
+    }
+
     await addDoc(collection(db, "consultas"), data);
     return { success: true };
   } catch (error) {
@@ -20,21 +25,28 @@ async function concluirConsulta(data) {
 }
 
 // Buscar histórico pelo CPF do paciente
-export async function getHistoricoByPacienteId(pacienteId: string) {
+export async function getHistoricoByPacienteCpf(cpfPaciente) {
   try {
+    const cpfFormatado = cpfPaciente.replace(/\D/g, "");
+
     const q = query(
       collection(db, "consultas"),
-      where("pacienteId", "==", pacienteId)
+      where("cpfPaciente", "==", cpfFormatado)
     );
 
     const snapshot = await getDocs(q);
 
-    const lista = snapshot.docs.map(doc => ({
-      id: doc.id,
-      ...doc.data()
-    }));
+    return snapshot.docs.map(doc => {
+      const data = doc.data();
 
-    return lista;
+      return {
+        id: doc.id,
+        ...data,
+        dataConclusao: data.dataConclusao
+          ? new Date(data.dataConclusao)
+          : null
+      };
+    });
 
   } catch (error) {
     console.log("Erro ao buscar histórico:", error);
@@ -42,9 +54,7 @@ export async function getHistoricoByPacienteId(pacienteId: string) {
   }
 }
 
-
-// Exportando no objeto service
 export const consultaService = {
   concluirConsulta,
-  getHistoricoByPacienteId
+  getHistoricoByPacienteCpf
 };
