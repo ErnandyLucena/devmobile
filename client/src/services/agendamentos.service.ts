@@ -1,5 +1,3 @@
-// ------------- agendamentos.service.js CORRIGIDO -------------
-
 import { db } from "./firebase";
 import { 
   addDoc,
@@ -11,8 +9,7 @@ import {
   orderBy, 
   serverTimestamp, 
   updateDoc,
-  deleteDoc,
-  where
+  deleteDoc
 } from "firebase/firestore";
 
 // Cadastrar agendamento
@@ -26,7 +23,10 @@ export async function cadastrarAgendamento(data) {
       horaFim: data.horaFim,         // ISO completo
       observacoes: data.observacoes || "",
       status: data.status || "Confirmado",
+
+      // Continua salvando como hoje
       tipoAgendamento: data.tipoAgendamento || "Consulta",
+
       criadoEm: serverTimestamp(),
     };
 
@@ -80,32 +80,40 @@ export async function excluirAgendamento(id) {
   }
 }
 
+// Painéis do dashboard
 export async function getInfoPanels() {
   try {
     const today = new Date();
     const firstDayOfMonth = new Date(today.getFullYear(), today.getMonth(), 1);
     const lastDayOfMonth = new Date(today.getFullYear(), today.getMonth() + 1, 0);
 
-    // Agendamentos deste mês
+    // Agendamentos
     const agendamentosSnapshot = await getDocs(collection(db, "agendamentos"));
     const agendamentos = agendamentosSnapshot.docs.map(doc => doc.data());
 
+    // Agendamentos do mês
     const agendamentosEsteMes = agendamentos.filter(a => {
       const data = new Date(a.data);
       return data >= firstDayOfMonth && data <= lastDayOfMonth;
     });
 
-    // Pacientes atendidos
+    // Consultas concluídas
     const consultasSnapshot = await getDocs(collection(db, "consultas"));
     const consultas = consultasSnapshot.docs.map(doc => doc.data());
-    const pacientesAtendidos = consultas.filter(c => c.status === "Concluido");
+    const consultasConcluidas = consultas.filter(c => c.status === "Concluido");
 
-    // Reconsultas agendadas
-    const reconsultas = agendamentos.filter(a => a.tipoAgendamento === "Reconsulta");
+    // Reconsulta = paciente que tem mais de 1 consulta concluída
+    const reconsultas = consultasConcluidas.filter(c => {
+      const total = consultasConcluidas.filter(
+        o => o.cpfPaciente === c.cpfPaciente
+      ).length;
+
+      return total > 1; // tem histórico anterior
+    });
 
     return [
       { label: "Agendamento\neste mês", value: agendamentosEsteMes.length.toString() },
-      { label: "Pacientes\natendidos", value: pacientesAtendidos.length.toString() },
+      { label: "Pacientes\natendidos", value: consultasConcluidas.length.toString() },
       { label: "Reconsultas\nagendadas", value: reconsultas.length.toString() },
     ];
 
@@ -114,4 +122,3 @@ export async function getInfoPanels() {
     return [];
   }
 }
-
