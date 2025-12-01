@@ -1,6 +1,10 @@
+// screens/Medicos/styles.js
 import { StyleSheet } from "react-native";
 
 export const styles = StyleSheet.create({
+  // ========================
+  // LAYOUT PRINCIPAL
+  // ========================
   container: {
     flex: 1,
     backgroundColor: "#F7FAFC",
@@ -11,26 +15,15 @@ export const styles = StyleSheet.create({
   scrollContent: {
     flexGrow: 1,
     padding: 16,
-    paddingBottom: 110
-  },
-  header: {
-    marginBottom: 24,
-    paddingHorizontal: 4,
-  },
-  title: {
-    fontSize: 28,
-    fontWeight: "700",
-    color: "#2D3748",
-    marginBottom: 8,
-  },
-  subtitle: {
-    fontSize: 16,
-    color: "#718096",
-    lineHeight: 22,
+    paddingBottom: 110,
   },
   form: {
     flex: 1,
   },
+
+  // ========================
+  // SEÇÕES
+  // ========================
   section: {
     backgroundColor: "#FFFFFF",
     borderRadius: 12,
@@ -51,6 +44,10 @@ export const styles = StyleSheet.create({
     color: "#2D3748",
     marginBottom: 16,
   },
+
+  // ========================
+  // INPUTS
+  // ========================
   inputGroup: {
     marginBottom: 16,
   },
@@ -70,6 +67,55 @@ export const styles = StyleSheet.create({
     color: "#2D3748",
     backgroundColor: "#FFFFFF",
   },
+  
+  // ========================
+  // CAMPO DE DATA
+  // ========================
+  dateInputContainer: {
+    flexDirection: 'row',
+    alignItems: 'center',
+  },
+  dateInput: {
+    flex: 1,
+    marginRight: 8,
+  },
+  calendarButton: {
+    width: 50,
+    height: 50,
+    borderRadius: 8,
+    backgroundColor: '#2B5BFF',
+    borderWidth: 1,
+    borderColor: '#2B5BFF',
+    justifyContent: 'center',
+    alignItems: 'center',
+    shadowColor: '#2B5BFF',
+    shadowOffset: {
+      width: 0,
+      height: 2,
+    },
+    shadowOpacity: 0.2,
+    shadowRadius: 3,
+    elevation: 3,
+  },
+
+  // ========================
+  // PICKER
+  // ========================
+  pickerContainer: {
+    borderWidth: 1,
+    borderColor: '#E2E8F0',
+    borderRadius: 8,
+    backgroundColor: '#FFFFFF',
+    marginTop: 4,
+    overflow: 'hidden',
+  },
+  picker: {
+    height: 50,
+  },
+
+  // ========================
+  // VALIDAÇÃO E ERROS
+  // ========================
   inputError: {
     borderColor: "#E53E3E",
     backgroundColor: "#FEF5F5",
@@ -81,6 +127,10 @@ export const styles = StyleSheet.create({
     marginLeft: 4,
     fontWeight: "500",
   },
+
+  // ========================
+  // BOTÕES
+  // ========================
   actionsContainer: {
     flexDirection: "row",
     gap: 12,
@@ -95,10 +145,10 @@ export const styles = StyleSheet.create({
     justifyContent: "center",
     backgroundColor: "#F7FAFC",
     borderWidth: 1,
-    borderColor: "#ff0000ff",
+    borderColor: "#E53E3E",
   },
   cancelButtonText: {
-    color: "#ff0000ff",
+    color: "#E53E3E",
     fontSize: 16,
     fontWeight: "600",
   },
@@ -129,14 +179,7 @@ export const styles = StyleSheet.create({
     fontWeight: "600",
     textAlign: "center",
   },
-  pickerContainer: {
-    borderWidth: 1,
-    borderColor: '#E2E8F0',
-    borderRadius: 8,
-    backgroundColor: '#FFFFFF',
-    marginTop: 4,
-  },
-  picker: {
-    height: 50,
+  buttonDisabled: {
+    opacity: 0.6,
   },
 });

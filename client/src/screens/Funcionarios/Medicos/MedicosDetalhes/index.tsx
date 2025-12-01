@@ -150,14 +150,16 @@ export default function MedicosDetalhesScreen() {
       >
 
         <View style={styles.mainCard}>
+          
+          {/* Avatar + Nome + Situação */}
           <View style={styles.avatarSection}>
             <View style={styles.avatar}>
               <Text style={styles.avatarText}>
-                {medicoData.nmPrestador
-                  ?.split(' ')
+                {medicoData?.nmPrestador
+                  ?.split(" ")
                   .map(n => n[0])
-                  .join('')
-                  .substring(0, 2)
+                  .join("")
+                  .substring(0,2)
                   .toUpperCase()}
               </Text>
             </View>
@@ -181,116 +183,76 @@ export default function MedicosDetalhesScreen() {
             </View>
           </View>
 
+          {/* Informações Pessoais */}
           <View style={styles.infoSection}>
             <Text style={styles.sectionTitle}>Informações Pessoais</Text>
 
-            <View style={styles.infoRow}>
-              <View style={styles.infoLabelContainer}>
-                <Text style={styles.infoLabel}>Nome Completo</Text>
-              </View>
-              <Text style={styles.infoValue}>
-                {medicoData.nmPrestador || "Não informado"}
-              </Text>
-            </View>
+            <Info label="Nome Completo" value={medicoData.nmPrestador} />
+            <Info label="CPF" value={medicoData.cpf} />
+            <Info label="Nome Mnemônico" value={medicoData.nmMnemonico} />
 
-            <View style={styles.infoRow}>
-              <View style={styles.infoLabelContainer}>
-                <Text style={styles.infoLabel}>CPF</Text>
-              </View>
-              <Text style={styles.infoValue}>
-                {medicoData.cpf || "Não informado"}
-              </Text>
-            </View>
-
-            <View style={styles.infoRow}>
-              <View style={styles.infoLabelContainer}>
-                <Text style={styles.infoLabel}>Nome Mnemônico</Text>
-              </View>
-              <Text style={styles.infoValue}>
-                {medicoData.nmMnemonico || "Não informado"}
-              </Text>
-            </View>
+            {/* Data de Admissão */}
+            <Info 
+              label="Data de Admissão" 
+              value={
+                medicoData.dataAdmissao
+                  ? new Date(medicoData.dataAdmissao).toLocaleDateString('pt-BR')
+                  : "Não informado"
+              }
+            />
           </View>
 
+          {/* Registro Profissional */}
           <View style={styles.infoSection}>
             <Text style={styles.sectionTitle}>Registro Profissional</Text>
 
-            <View style={styles.infoRow}>
-              <View style={styles.infoLabelContainer}>
-                <Text style={styles.infoLabel}>CRM</Text>
-              </View>
-              <Text style={styles.infoValue}>
-                {medicoData.dsCRM || "Não informado"}
-              </Text>
-            </View>
-
-            <View style={styles.infoRow}>
-              <View style={styles.infoLabelContainer}>
-                <Text style={styles.infoLabel}>Especialidade</Text>
-              </View>
-              <Text style={styles.infoValue}>
-                {medicoData.especialidade || "Não informada"}
-              </Text>
-            </View>
+            <Info label="CRM" value={medicoData.dsCRM} />
+            <Info label="Especialidade" value={medicoData.especialidade} />
           </View>
 
+          {/* Contato */}
           <View style={styles.infoSection}>
             <Text style={styles.sectionTitle}>Contato</Text>
-
-            <View style={styles.infoRow}>
-              <View style={styles.infoLabelContainer}>
-                <Text style={styles.infoLabel}>Email</Text>
-              </View>
-              <Text style={styles.infoValue}>
-                {medicoData.dsEmail || "Não informado"}
-              </Text>
-            </View>
+            <Info label="Email" value={medicoData.dsEmail} />
+            
+            {/* 🔥 NOVO CAMPO – Telefone */}
+            <Info label="Telefone" value={medicoData.tel} />
           </View>
 
+          {/* Sistema */}
           <View style={styles.infoSection}>
             <Text style={styles.sectionTitle}>Informações do Sistema</Text>
 
-            <View style={styles.infoRow}>
-              <View style={styles.infoLabelContainer}>
-                <Text style={styles.infoLabel}>ID</Text>
-              </View>
-              <Text style={[styles.infoValue, styles.idText]}>{medicoData.id}</Text>
-            </View>
+            <Info label="ID" value={medicoData.id} />
 
-            <View style={styles.infoRow}>
-              <View style={styles.infoLabelContainer}>
-                <Text style={styles.infoLabel}>Cadastrado em</Text>
-              </View>
-              <Text style={styles.infoValue}>
-                {medicoData.criadoEm ? 
-                  new Date(medicoData.criadoEm.seconds * 1000).toLocaleDateString('pt-BR') 
-                  : "Data não disponível"
-                }
-              </Text>
-            </View>
+            <Info
+              label="Cadastrado em"
+              value={
+                medicoData.criadoEm 
+                  ? new Date(medicoData.criadoEm.seconds * 1000).toLocaleDateString("pt-BR")
+                  : "Não disponível"
+              }
+            />
 
             {medicoData.atualizadoEm && (
-              <View style={styles.infoRow}>
-                <View style={styles.infoLabelContainer}>
-                  <Text style={styles.infoLabel}>Atualizado em</Text>
-                </View>
-                <Text style={styles.infoValue}>
-                  {new Date(medicoData.atualizadoEm.seconds * 1000).toLocaleDateString('pt-BR')}
-                </Text>
-              </View>
+              <Info
+                label="Atualizado em"
+                value={
+                  new Date(medicoData.atualizadoEm.seconds * 1000).toLocaleDateString("pt-BR")
+                }
+              />
             )}
           </View>
+
         </View>
 
+        {/* Ações */}
         <View style={styles.actionsContainer}>
           <TouchableOpacity
             style={styles.editButton}
             onPress={handleEditar}
-            disabled={deleting}
           >
-            <Text style={styles.editButtonText}>
-              {deleting ? "Processando..." : "Editar Médico"}
-            </Text>
+            <Text style={styles.editButtonText}>Editar Médico</Text>
           </TouchableOpacity>
 
           <TouchableOpacity
@@ -309,7 +271,7 @@ export default function MedicosDetalhesScreen() {
       <ConfirmationModal
         visible={confirmationModalVisible}
         title="Excluir Médico"
-        message={`Tem certeza que deseja excluir o médico ${medicoData.nmPrestador}? Esta ação não pode ser desfeita.`}
+        message={`Tem certeza que deseja excluir o médico ${medicoData.nmPrestador}?`}
         confirmText="Sim, Excluir"
         cancelText="Cancelar"
         type="error"
@@ -324,6 +286,18 @@ export default function MedicosDetalhesScreen() {
         onClose={handleCloseModal}
       />
 
+    </View>
+  );
+}
+
+/* COMPONENTE DE INFO REUTILIZÁVEL */
+function Info({ label, value }) {
+  return (
+    <View style={styles.infoRow}>
+      <View style={styles.infoLabelContainer}>
+        <Text style={styles.infoLabel}>{label}</Text>
+      </View>
+      <Text style={styles.infoValue}>{value || "Não informado"}</Text>
     </View>
   );
 }

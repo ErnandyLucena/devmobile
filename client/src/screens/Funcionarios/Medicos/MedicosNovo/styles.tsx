@@ -70,6 +70,33 @@ export const styles = StyleSheet.create({
     color: "#2D3748",
     backgroundColor: "#FFFFFF",
   },
+  // NOVOS ESTILOS PARA CAMPO DE DATA
+  dateInputContainer: {
+    flexDirection: 'row',
+    alignItems: 'center',
+  },
+  dateInput: {
+    flex: 1,
+    marginRight: 8,
+  },
+  calendarButton: {
+    width: 50,
+    height: 50,
+    borderRadius: 8,
+    backgroundColor: '#2B5BFF',
+    borderWidth: 1,
+    borderColor: '#2B5BFF',
+    justifyContent: 'center',
+    alignItems: 'center',
+    shadowColor: '#2B5BFF',
+    shadowOffset: {
+      width: 0,
+      height: 2,
+    },
+    shadowOpacity: 0.2,
+    shadowRadius: 3,
+    elevation: 3,
+  },
   inputError: {
     borderColor: "#E53E3E",
     backgroundColor: "#FEF5F5",
@@ -135,8 +162,12 @@ export const styles = StyleSheet.create({
     borderRadius: 8,
     backgroundColor: '#FFFFFF',
     marginTop: 4,
+    overflow: 'hidden',
   },
   picker: {
     height: 50,
+  },
+  buttonDisabled: {
+    opacity: 0.6,
   },
 });
