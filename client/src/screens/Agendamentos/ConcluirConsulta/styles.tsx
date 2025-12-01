@@ -5,34 +5,6 @@ export const styles = StyleSheet.create({
     flex: 1,
     backgroundColor: "#f8f9fa",
   },
-  // HEADER ADICIONADO
-  header: {
-    flexDirection: "row",
-    justifyContent: "space-between",
-    alignItems: "center",
-    paddingHorizontal: 20,
-    paddingTop: 60,
-    paddingBottom: 20,
-    backgroundColor: "#fff",
-    borderBottomWidth: 1,
-    borderBottomColor: "#e0e0e0",
-  },
-  backButton: {
-    padding: 8,
-  },
-  backButtonText: {
-    fontSize: 20,
-    fontWeight: "bold",
-    color: "#2B5BFF",
-  },
-  headerTitle: {
-    fontSize: 20,
-    fontWeight: "700",
-    color: "#2B5BFF",
-  },
-  headerRight: {
-    width: 40,
-  },
   scrollView: {
     flex: 1,
   },
@@ -55,15 +27,41 @@ export const styles = StyleSheet.create({
     elevation: 5,
   },
   patientName: {
-    fontSize: 18,
+    fontSize: 20,
     fontWeight: "700",
     color: "#2D3748",
     marginBottom: 4,
   },
-  consultInfo: {
+  dateTimeContainer: {
+    marginTop: 8,
+  },
+  dateTimeRow: {
+    flexDirection: "row",
+    alignItems: "center",
+    justifyContent: "space-between",
+  },
+  dateTimeLabel: {
     fontSize: 14,
     color: "#718096",
-    marginBottom: 2,
+    fontWeight: "500",
+  },
+  dateTimeValue: {
+    fontSize: 12,
+    color: "#4A5568",
+    fontWeight: "600",
+    textAlign: "right",
+    flexShrink: 1,
+  },
+  typeContainer: {
+    flexDirection: "row",
+    alignItems: "center",
+    justifyContent: "space-between",
+    marginTop: 8,
+  },
+  typeLabel: {
+    fontSize: 14,
+    color: "#718096",
+    fontWeight: "500",
   },
   consultType: {
     fontSize: 14,
@@ -111,8 +109,15 @@ export const styles = StyleSheet.create({
   autoInfoRow: {
     flexDirection: "row",
     justifyContent: "space-between",
-    alignItems: "center",
+    alignItems: "flex-start",
     paddingVertical: 6,
+  },
+  autoInfoLabelContainer: {
+    flex: 1,
+  },
+  autoInfoValueContainer: {
+    flex: 1,
+    alignItems: "flex-end",
   },
   autoInfoLabel: {
     fontSize: 14,
@@ -123,6 +128,13 @@ export const styles = StyleSheet.create({
     fontSize: 14,
     color: "#4A5568",
     fontWeight: "600",
+    textAlign: "right",
+  },
+  autoInfoSubValue: {
+    fontSize: 12,
+    color: "#A0AEC0",
+    fontWeight: "400",
+    marginTop: 2,
   },
   saveButton: {
     backgroundColor: "#38A169",

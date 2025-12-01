@@ -1,3 +1,5 @@
+// ------------- agendamentos.service.js CORRIGIDO -------------
+
 import { db } from "./firebase";
 import { 
   addDoc,
@@ -13,165 +15,70 @@ import {
   where
 } from "firebase/firestore";
 
-// Função para cadastrar agendamentos
+// Cadastrar agendamento
 export async function cadastrarAgendamento(data) { 
   try {
-    console.log("Dados recebidos para agendamento:", data);
-    
-    const agendamentoData = {
-      cpfPaciente: data.cpfPaciente || "",
-      nomePaciente: data.nomePaciente || "",
-      data: data.data || "",
-      horaInicio: data.horaInicio || "",
-      horaFim: data.horaFim || "",
+    const payload = {
+      cpfPaciente: data.cpfPaciente,
+      nomePaciente: data.nomePaciente,
+      data: data.data,               // YYYY-MM-DD
+      horaInicio: data.horaInicio,   // ISO completo
+      horaFim: data.horaFim,         // ISO completo
       observacoes: data.observacoes || "",
       status: data.status || "Confirmado",
       tipoAgendamento: data.tipoAgendamento || "Consulta",
       criadoEm: serverTimestamp(),
     };
 
-    const ref = await addDoc(collection(db, "agendamentos"), agendamentoData);
+    const ref = await addDoc(collection(db, "agendamentos"), payload);
+
     return { success: true, id: ref.id };
   } catch (error) {
-    console.log("Erro ao cadastrar agendamento:", error);
     return { success: false, error };
   }
 }
 
+// Buscar todos
 export async function getAllAgendamentos() {
   try {
     const q = query(collection(db, "agendamentos"), orderBy("criadoEm", "desc"));
-    const snapshot = await getDocs(q);
-    const lista = snapshot.docs.map(doc => {
-      const data = doc.data();
-      return { 
-        id: doc.id, 
-        ...data,
-        cpfPaciente: data.cpfPaciente || "",
-        nomePaciente: data.nomePaciente || "",
-        data: data.data || "",
-        horaInicio: data.horaInicio || "",
-        horaFim: data.horaFim || "",
-        observacoes: data.observacoes || "",
-        status: data.status || "Confirmado",
-        tipoAgendamento: data.tipoAgendamento || "Consulta",
-      };
-    });
-    return lista;
+    const snap = await getDocs(q);
+
+    return snap.docs.map(doc => ({ id: doc.id, ...doc.data() }));
   } catch (error) {
-    console.log("Erro ao buscar agendamentos:", error);
     throw error;
   }
 }
 
+// Buscar por ID
 export async function getAgendamentoById(id) {
-  try {
-    const docRef = doc(db, "agendamentos", id);
-    const docSnap = await getDoc(docRef);
-    
-    if (docSnap.exists()) {
-      return { id: docSnap.id, ...docSnap.data() };
-    } else {
-      console.log("Agendamento não encontrado");
-      return null;
-    }
-  } catch (error) {
-    console.log("Erro ao buscar agendamento:", error);
-    throw error;
-  }
+  const snap = await getDoc(doc(db, "agendamentos", id));
+  if (!snap.exists()) return null;
+  return { id: snap.id, ...snap.data() };
 }
 
-export async function getAgendamentosByPaciente(cpfPaciente) {
-  try {
-    const q = query(
-      collection(db, "agendamentos"), 
-      where("cpfPaciente", "==", cpfPaciente),
-      orderBy("data", "desc")
-    );
-    const snapshot = await getDocs(q);
-    const lista = snapshot.docs.map(doc => {
-      const data = doc.data();
-      return { id: doc.id, ...data };
-    });
-    return lista;
-  } catch (error) {
-    console.log("Erro ao buscar agendamentos:", error);
-    throw error;
-  }
-}
-
-export async function excluirAgendamento(id) {
-  try {
-    await deleteDoc(doc(db, "agendamentos", id));
-    return { success: true };
-  } catch (error) {
-    console.log("Erro ao excluir agendamento:", error);
-    return { success: false, error };
-  }
-}
-
+// Atualizar
 export async function atualizarAgendamento(id, data) {
   try {
-    const docRef = doc(db, "agendamentos", id);
-    await updateDoc(docRef, {
+    await updateDoc(doc(db, "agendamentos", id), {
       ...data,
       atualizadoEm: serverTimestamp()
     });
     return { success: true };
   } catch (error) {
-    console.log("Erro ao atualizar agendamento:", error);
     return { success: false, error };
   }
 }
 
-export async function getAgendamentosByStatus(status) {
+// Excluir
+export async function excluirAgendamento(id) {
   try {
-    const q = query(
-      collection(db, "agendamentos"), 
-      where("status", "==", status),
-      orderBy("data", "asc")
-    );
-    const snapshot = await getDocs(q);
-    const lista = snapshot.docs.map(doc => {
-      const data = doc.data();
-      return { id: doc.id, ...data };
-    });
-    return lista;
-  } catch (error) {
-    console.log("Erro ao buscar agendamentos por status:", error);
-    throw error;
-  }
-}
-
-export async function concluirAgendamento(id) {
-  try {
-    const ref = doc(db, "agendamentos", id);
-    await updateDoc(ref, {
-      status: "Concluido",
-      atualizadoEm: serverTimestamp()
-    });
+    await deleteDoc(doc(db, "agendamentos", id));
     return { success: true };
   } catch (error) {
-    console.log("Erro ao concluir agendamento:", error);
     return { success: false, error };
   }
 }
-
-export async function getAgendamentosByDate(date: string) {
-  try {
-    const q = query(
-      collection(db, "agendamentos"),
-      where("data", "==", date),
-      orderBy("horaInicio", "asc")
-    );
-    const snapshot = await getDocs(q);
-    return snapshot.docs.map(doc => ({ id: doc.id, ...doc.data() }));
-  } catch (error) {
-    console.log("Erro ao buscar agendamentos por data:", error);
-    return [];
-  }
-}
-
 
 export async function getInfoPanels() {
   try {
@@ -207,3 +114,4 @@ export async function getInfoPanels() {
     return [];
   }
 }
+
