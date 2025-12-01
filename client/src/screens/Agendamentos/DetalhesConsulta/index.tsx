@@ -1,22 +1,49 @@
-import { View, Text, TouchableOpacity, ScrollView, ActivityIndicator, Alert } from "react-native";
+import { View, Text, TouchableOpacity, ScrollView, ActivityIndicator } from "react-native";
 import { useNavigation, useRoute } from "@react-navigation/native";
 import { styles } from "./styles";
 import React, { useState, useEffect } from "react";
 import { Ionicons } from '@expo/vector-icons';
 import MessageModal from "../../../components/MessageContext/MessageContext";
+import ConfirmationModal from "../../../components/ConfirmationModal"; 
 import { getAgendamentoById, excluirAgendamento, atualizarAgendamento } from "../../../services/agendamentos.service";
 import { getPacienteByCpf } from "../../../services/pacientes.service";
 
 export function DetalhesConsultaScreen() {
   const navigation = useNavigation();
   const route = useRoute();
-  const [modalVisible, setModalVisible] = useState(false);
+  const [messageModalVisible, setMessageModalVisible] = useState(false);
+  const [confirmationModalVisible, setConfirmationModalVisible] = useState(false);
   const [loading, setLoading] = useState(true);
   const [excluindo, setExcluindo] = useState(false);
   const [consulta, setConsulta] = useState(null);
   const [paciente, setPaciente] = useState(null);
+  const [modalMessage, setModalMessage] = useState("");
+  const [modalType, setModalType] = useState<"success" | "error" | "warning" | "info">("info");
+  const [modalAction, setModalAction] = useState<"cancelar" | "excluir" | null>(null);
 
   const { consultaId } = route.params;
+
+  // Função para exibir mensagens
+  const showMessage = (message: string, type: "success" | "error" | "warning" | "info") => {
+    setModalMessage(message);
+    setModalType(type);
+    setMessageModalVisible(true);
+  };
+
+  const handleCloseMessageModal = () => {
+    setMessageModalVisible(false);
+  };
+
+  // Função para exibir confirmação
+  const showConfirmation = (action: "cancelar" | "excluir") => {
+    setModalAction(action);
+    setConfirmationModalVisible(true);
+  };
+
+  const handleCancelConfirmation = () => {
+    setConfirmationModalVisible(false);
+    setModalAction(null);
+  };
 
   // Carrega os dados da consulta
   useEffect(() => {
@@ -37,15 +64,29 @@ export function DetalhesConsultaScreen() {
           setPaciente(pacienteData);
         }
       } else {
-        Alert.alert("Erro", "Consulta não encontrada");
-        navigation.goBack();
+        showMessage("Consulta não encontrada", "error");
+        setTimeout(() => {
+          navigation.goBack();
+        }, 1500);
       }
     } catch (error) {
       console.log("Erro ao carregar consulta:", error);
-      Alert.alert("Erro", "Não foi possível carregar os dados da consulta");
+      showMessage("Não foi possível carregar os dados da consulta", "error");
     } finally {
       setLoading(false);
     }
+  };
+
+  const handleConfirmAction = async () => {
+    setConfirmationModalVisible(false);
+    
+    if (modalAction === "cancelar") {
+      await handleCancelarConsulta();
+    } else if (modalAction === "excluir") {
+      await handleExcluirConsulta();
+    }
+    
+    setModalAction(null);
   };
 
   const handleCancelarConsulta = async () => {
@@ -56,48 +97,42 @@ export function DetalhesConsultaScreen() {
       });
 
       if (resultado.success) {
-        setModalVisible(true);
+        showMessage("Consulta cancelada com sucesso!", "success");
+        // Recarrega os dados para atualizar o status
+        setTimeout(() => {
+          carregarConsulta();
+        }, 1000);
       } else {
         throw new Error(resultado.error);
       }
     } catch (error) {
       console.log("Erro ao cancelar consulta:", error);
-      Alert.alert("Erro", "Não foi possível cancelar a consulta");
+      showMessage("Não foi possível cancelar a consulta", "error");
     } finally {
       setExcluindo(false);
     }
   };
 
   const handleExcluirConsulta = async () => {
-    Alert.alert(
-      "Confirmar Exclusão",
-      "Tem certeza que deseja excluir esta consulta? Esta ação não pode ser desfeita.",
-      [
-        { text: "Cancelar", style: "cancel" },
-        {
-          text: "Excluir",
-          style: "destructive",
-          onPress: async () => {
-            try {
-              setExcluindo(true);
-              const resultado = await excluirAgendamento(consultaId);
+    try {
+      setExcluindo(true);
+      const resultado = await excluirAgendamento(consultaId);
 
-              if (resultado.success) {
-                Alert.alert("Sucesso", "Consulta excluída com sucesso!");
-                navigation.goBack();
-              } else {
-                throw new Error(resultado.error);
-              }
-            } catch (error) {
-              console.log("Erro ao excluir consulta:", error);
-              Alert.alert("Erro", "Não foi possível excluir a consulta");
-            } finally {
-              setExcluindo(false);
-            }
-          }
-        }
-      ]
-    );
+      if (resultado.success) {
+        showMessage("Consulta excluída com sucesso!", "success");
+        // Navega de volta após sucesso
+        setTimeout(() => {
+          navigation.goBack();
+        }, 1500);
+      } else {
+        throw new Error(resultado.error);
+      }
+    } catch (error) {
+      console.log("Erro ao excluir consulta:", error);
+      showMessage("Não foi possível excluir a consulta", "error");
+    } finally {
+      setExcluindo(false);
+    }
   };
 
   const formatarData = (dataString) => {
@@ -184,142 +219,156 @@ export function DetalhesConsultaScreen() {
   }
 
   return (
-    <View style={styles.container}>
-      <ScrollView
-        style={styles.scrollView}
-        showsVerticalScrollIndicator={false}
-        contentContainerStyle={styles.scrollContent}
-      >
-        {/* Card de Informações */}
-        <View style={styles.card}>
-          <View style={styles.cardHeader}>
-            <Text style={styles.patientName}>
-              {paciente?.nome || consulta.nomePaciente || "Paciente não encontrado"}
-            </Text>
-            <View style={[
-              styles.statusBadge,
-              getStatusColor(consulta.status)
-            ]}>
-              <Text style={styles.statusText}>{getStatusText(consulta.status)}</Text>
-            </View>
-          </View>
-
-          <View style={styles.infoSection}>
-            <View style={styles.infoRow}>
-              <Text style={styles.infoLabel}>Data</Text>
-              <Text style={styles.infoValue}>{formatarData(consulta.data)}</Text>
+    <>
+      <View style={styles.container}>
+        <ScrollView
+          style={styles.scrollView}
+          showsVerticalScrollIndicator={false}
+          contentContainerStyle={styles.scrollContent}
+        >
+          {/* Card de Informações */}
+          <View style={styles.card}>
+            <View style={styles.cardHeader}>
+              <Text style={styles.patientName}>
+                {paciente?.nome || consulta.nomePaciente || "Paciente não encontrado"}
+              </Text>
+              <View style={[
+                styles.statusBadge,
+                getStatusColor(consulta.status)
+              ]}>
+                <Text style={styles.statusText}>{getStatusText(consulta.status)}</Text>
+              </View>
             </View>
 
-            <View style={styles.infoRow}>
-              <Text style={styles.infoLabel}>Horário</Text>
-              <Text style={styles.infoValue}>
-                {formatarHora(consulta.horaInicio)} - {formatarHora(consulta.horaFim)}
+            <View style={styles.infoSection}>
+              <View style={styles.infoRow}>
+                <Text style={styles.infoLabel}>Data</Text>
+                <Text style={styles.infoValue}>{formatarData(consulta.data)}</Text>
+              </View>
+
+              <View style={styles.infoRow}>
+                <Text style={styles.infoLabel}>Horário</Text>
+                <Text style={styles.infoValue}>
+                  {formatarHora(consulta.horaInicio)} - {formatarHora(consulta.horaFim)}
+                </Text>
+              </View>
+
+              <View style={styles.infoRow}>
+                <Text style={styles.infoLabel}>Tipo</Text>
+                <Text style={styles.infoValue}>{consulta.tipoAgendamento}</Text>
+              </View>
+
+              <View style={styles.infoRow}>
+                <Text style={styles.infoLabel}>CPF do Paciente</Text>
+                <Text style={styles.infoValue}>{formatarCPF(consulta.cpfPaciente)}</Text>
+              </View>
+
+              {paciente && (
+                <>
+                  <View style={styles.infoRow}>
+                    <Text style={styles.infoLabel}>Telefone</Text>
+                    <Text style={styles.infoValue}>{paciente.telefone || "Não informado"}</Text>
+                  </View>
+                  <View style={styles.infoRow}>
+                    <Text style={styles.infoLabel}>Email</Text>
+                    <Text style={styles.infoValue}>{paciente.email || "Não informado"}</Text>
+                  </View>
+                </>
+              )}
+            </View>
+
+            {/* Observações */}
+            <View style={styles.observationsSection}>
+              <Text style={styles.observationsLabel}>Observações</Text>
+              <Text style={styles.observationsText}>
+                {consulta.observacoes || "Nenhuma observação registrada."}
               </Text>
             </View>
-
-            <View style={styles.infoRow}>
-              <Text style={styles.infoLabel}>Tipo</Text>
-              <Text style={styles.infoValue}>{consulta.tipoAgendamento}</Text>
-            </View>
-
-            <View style={styles.infoRow}>
-              <Text style={styles.infoLabel}>CPF do Paciente</Text>
-              <Text style={styles.infoValue}>{formatarCPF(consulta.cpfPaciente)}</Text>
-            </View>
-
-            {paciente && (
-              <>
-                <View style={styles.infoRow}>
-                  <Text style={styles.infoLabel}>Telefone</Text>
-                  <Text style={styles.infoValue}>{paciente.telefone || "Não informado"}</Text>
-                </View>
-                <View style={styles.infoRow}>
-                  <Text style={styles.infoLabel}>Email</Text>
-                  <Text style={styles.infoValue}>{paciente.email || "Não informado"}</Text>
-                </View>
-              </>
-            )}
           </View>
 
-          {/* Observações */}
-          <View style={styles.observationsSection}>
-            <Text style={styles.observationsLabel}>Observações</Text>
-            <Text style={styles.observationsText}>
-              {consulta.observacoes || "Nenhuma observação registrada."}
-            </Text>
-          </View>
-        </View>
+          {/* Ações (Cancelar e Reagendar) */}
+          {consulta.status !== 'Cancelado' && consulta.status !== 'Concluído' && (
+            <View style={styles.actionsSection}>
+              <TouchableOpacity
+                style={[styles.cancelButton, excluindo && styles.buttonDisabled]}
+                onPress={() => showConfirmation("cancelar")}
+                disabled={excluindo}
+              >
+                {excluindo ? (
+                  <ActivityIndicator size="small" color="#E53E3E" />
+                ) : (
+                  <Text style={styles.cancelButtonText}>Cancelar</Text>
+                )}
+              </TouchableOpacity>
 
-        {/* Ações (Cancelar e Reagendar) */}
-        {consulta.status !== 'Cancelado' && consulta.status !== 'Concluído' && (
-          <View style={styles.actionsSection}>
+              <TouchableOpacity
+                style={styles.rescheduleButton}
+                onPress={() => navigation.navigate("ReagendarConsulta", { consulta })}
+                disabled={excluindo}
+              >
+                <Text style={styles.rescheduleButtonText}>Reagendar Consulta</Text>
+              </TouchableOpacity>
+            </View>
+          )}
+
+          {/* Botão Concluir Consulta */}
+          {consulta.status === 'Confirmado' && (
+            <View style={styles.concludeSection}>
+              <TouchableOpacity
+                style={styles.concludeButton}
+                onPress={() => navigation.navigate("ConcluirConsulta", {
+                  consulta,
+                  pacienteId: paciente?.id
+                })}
+              >
+                <Text style={styles.concludeButtonText}>Concluir Consulta</Text>
+              </TouchableOpacity>
+            </View>
+          )}
+
+          {/* Botão Excluir (apenas para admin) */}
+          <View style={styles.dangerSection}>
             <TouchableOpacity
-              style={[styles.cancelButton, excluindo && styles.buttonDisabled]}
-              onPress={handleCancelarConsulta}
+              style={[styles.deleteButton, excluindo && styles.buttonDisabled]}
+              onPress={() => showConfirmation("excluir")}
               disabled={excluindo}
             >
               {excluindo ? (
-                <ActivityIndicator size="small" color="#E53E3E" />
+                <ActivityIndicator size="small" color="#FFFFFF" />
               ) : (
-                <Text style={styles.cancelButtonText}>Cancelar</Text>
+                <>
+                  <Ionicons name="trash-outline" size={16} color="#FFFFFF" />
+                  <Text style={styles.deleteButtonText}>Excluir Consulta</Text>
+                </>
               )}
             </TouchableOpacity>
-
-            <TouchableOpacity
-              style={styles.rescheduleButton}
-              onPress={() => navigation.navigate("ReagendarConsulta", { consulta })}
-              disabled={excluindo}
-            >
-              <Text style={styles.rescheduleButtonText}>Reagendar Consulta</Text>
-            </TouchableOpacity>
           </View>
-        )}
+        </ScrollView>
+      </View>
 
-        {/* Botão Concluir Consulta */}
-        {consulta.status === 'Confirmado' && (
-          <View style={styles.concludeSection}>
-            <TouchableOpacity
-              style={styles.concludeButton}
-              onPress={() => navigation.navigate("ConcluirConsulta", {
-                consulta,
-                 pacienteId: paciente.id
-              })}
-
-            >
-              <Text style={styles.concludeButtonText}>Concluir Consulta</Text>
-            </TouchableOpacity>
-          </View>
-        )}
-
-        {/* Botão Excluir (apenas para admin) */}
-        <View style={styles.dangerSection}>
-          <TouchableOpacity
-            style={[styles.deleteButton, excluindo && styles.buttonDisabled]}
-            onPress={handleExcluirConsulta}
-            disabled={excluindo}
-          >
-            {excluindo ? (
-              <ActivityIndicator size="small" color="#FFFFFF" />
-            ) : (
-              <>
-                <Ionicons name="trash-outline" size={16} color="#FFFFFF" />
-                <Text style={styles.deleteButtonText}>Excluir Consulta</Text>
-              </>
-            )}
-          </TouchableOpacity>
-        </View>
-      </ScrollView>
-
-      {/* Modal de mensagem */}
+      {/* Modal de Mensagem */}
       <MessageModal
-        visible={modalVisible}
-        message="Consulta cancelada com sucesso!"
-        type="success"
-        onClose={() => {
-          setModalVisible(false);
-          carregarConsulta(); 
-        }}
+        visible={messageModalVisible}
+        message={modalMessage}
+        type={modalType}
+        onClose={handleCloseMessageModal}
       />
-    </View>
+
+      {/* Modal de Confirmação */}
+      <ConfirmationModal
+        visible={confirmationModalVisible}
+        title={modalAction === "excluir" ? "Confirmar Exclusão" : "Confirmar Cancelamento"}
+        message={
+          modalAction === "excluir" 
+            ? "Tem certeza que deseja excluir esta consulta? Esta ação não pode ser desfeita."
+            : "Tem certeza que deseja cancelar esta consulta?"
+        }
+        confirmText={modalAction === "excluir" ? "Sim, Excluir" : "Sim, Cancelar"}
+        cancelText="Não, Cancelar"
+        type={modalAction === "excluir" ? "danger" : "warning"}
+        onConfirm={handleConfirmAction}
+        onCancel={handleCancelConfirmation}
+      />
+    </>
   );
 }
