@@ -11,12 +11,12 @@ import MedicosListScreen from "../screens/Funcionarios/Medicos/MedicosList";
 import { MedicoNovoScreen } from "../screens/Funcionarios/Medicos/MedicosNovo";
 import MedicosDetalhesScreen from "../screens/Funcionarios/Medicos/MedicosDetalhes";
 import MedicosEditarScreen from "../screens/Funcionarios/Medicos/MedicosEditar";
-import { ConcluirConsultaScreen } from "../screens/Agendamentos/ConcluirConsulta";
 import PacientesListScreen from "../screens/Pacientes/PacienteList";
 import PacientesNovoScreen from "../screens/Pacientes/PacienteNovo";
 import DetalhesPacienteScreen from "../screens/Pacientes/PacientesDetalhes";
 import EditarPacienteScreen from "../screens/Pacientes/PacienteEdit";
 import HistoricoPacienteScreen from "../screens/Pacientes/PacienteHistorico";
+import ConcluirConsultaScreen from "../screens/Agendamentos/ConcluirConsulta";
 
 
 const Stack = createNativeStackNavigator();

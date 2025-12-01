@@ -3,219 +3,185 @@ import { StyleSheet } from "react-native";
 export const styles = StyleSheet.create({
   container: {
     flex: 1,
-    backgroundColor: "#f8f9fa",
+    backgroundColor: "#F5F7FA",
   },
+
   scrollView: {
     flex: 1,
-  },
-  scrollContent: {
-    paddingBottom: 100,
-  },
-  form: {
     padding: 20,
-    gap: 20,
   },
+
   inputGroup: {
-    gap: 8,
+    marginBottom: 18,
   },
+
   inputLabel: {
-    fontSize: 14,
+    fontSize: 15,
     fontWeight: "600",
     color: "#2D3748",
+    marginBottom: 6,
   },
+
   textInput: {
-    backgroundColor: "#fff",
-    borderRadius: 8,
+    backgroundColor: "#FFFFFF",
+    borderRadius: 10,
     paddingHorizontal: 16,
-    paddingVertical: 12,
-    fontSize: 14,
-    color: "#4A5568",
+    paddingVertical: 14,
+    fontSize: 16,
+    color: "#2D3748",
     borderWidth: 1,
-    borderColor: "#e0e0e0",
+    borderColor: "#E2E8F0",
+
     shadowColor: "#000",
-    shadowOffset: {
-      width: 0,
-      height: 1,
-    },
-    shadowOpacity: 0.1,
+    shadowOffset: { width: 0, height: 1 },
+    shadowOpacity: 0.08,
     shadowRadius: 2,
     elevation: 2,
   },
+
   textArea: {
-    minHeight: 100,
+    minHeight: 110,
     textAlignVertical: "top",
   },
-  
-  // Seletor de Paciente
+
+  /* ================================
+       SELETOR DE PACIENTE
+  ================================= */
   pacienteSelector: {
-    backgroundColor: "#fff",
-    borderRadius: 8,
+    backgroundColor: "#FFFFFF",
+    borderRadius: 10,
     paddingHorizontal: 16,
-    paddingVertical: 12,
+    paddingVertical: 14,
     borderWidth: 1,
-    borderColor: "#e0e0e0",
-    flexDirection: 'row',
-    justifyContent: 'space-between',
-    alignItems: 'center',
+    borderColor: "#E2E8F0",
+
+    flexDirection: "row",
+    alignItems: "center",
+    justifyContent: "space-between",
+
     shadowColor: "#000",
-    shadowOffset: {
-      width: 0,
-      height: 1,
-    },
-    shadowOpacity: 0.1,
+    shadowOffset: { width: 0, height: 1 },
+    shadowOpacity: 0.08,
     shadowRadius: 2,
     elevation: 2,
   },
-  pacientePlaceholder: {
-    fontSize: 14,
-    color: "#A0AEC0",
-  },
+
   pacienteSelecionadoNome: {
-    fontSize: 14,
-    color: "#2D3748",
+    fontSize: 16,
     fontWeight: "600",
-    marginBottom: 2,
+    color: "#2D3748",
   },
+
   pacienteSelecionadoCpf: {
-    fontSize: 12,
+    fontSize: 13,
     color: "#718096",
   },
 
-  // Modal
+  /* ================================
+       MODAL
+  ================================= */
   modalContainer: {
     flex: 1,
-    backgroundColor: "#fff",
-    paddingTop: 60,
-  },
-  modalHeader: {
-    flexDirection: 'row',
-    justifyContent: 'space-between',
-    alignItems: 'center',
-    paddingHorizontal: 20,
-    paddingVertical: 16,
-    borderBottomWidth: 1,
-    borderBottomColor: "#e0e0e0",
-  },
-  modalTitle: {
-    fontSize: 18,
-    fontWeight: "600",
-    color: "#2D3748",
-  },
-  modalCloseButton: {
-    padding: 4,
-  },
-  searchContainer: {
-    flexDirection: 'row',
-    alignItems: 'center',
-    paddingHorizontal: 20,
-    paddingVertical: 12,
-    borderBottomWidth: 1,
-    borderBottomColor: "#e0e0e0",
-  },
-  searchInput: {
-    flex: 1,
-    backgroundColor: "#f8f9fa",
-    borderRadius: 8,
-    paddingHorizontal: 16,
-    paddingVertical: 12,
-    fontSize: 14,
-    color: "#4A5568",
-    marginRight: 12,
+    backgroundColor: "#FFFFFF",
+    paddingTop: 50,
   },
 
-  // Item da lista de pacientes
-  pacienteItem: {
-    flexDirection: 'row',
-    alignItems: 'center',
-    justifyContent: 'space-between',
+  modalHeader: {
+    flexDirection: "row",
+    alignItems: "center",
+    justifyContent: "space-between",
     paddingHorizontal: 20,
-    paddingVertical: 16,
+    paddingBottom: 16,
     borderBottomWidth: 1,
-    borderBottomColor: "#f1f5f9",
+    borderBottomColor: "#E2E8F0",
   },
-  pacienteInfo: {
-    flex: 1,
+
+  modalTitle: {
+    fontSize: 20,
+    fontWeight: "700",
+    color: "#2D3748",
   },
+
+  searchInput: {
+    backgroundColor: "#F5F7FA",
+    borderRadius: 10,
+    paddingHorizontal: 16,
+    paddingVertical: 12,
+    fontSize: 15,
+    color: "#2D3748",
+    marginHorizontal: 20,
+    marginTop: 16,
+    marginBottom: 8,
+    borderWidth: 1,
+    borderColor: "#E2E8F0",
+  },
+
+  pacienteItem: {
+    flexDirection: "row",
+    alignItems: "center",
+    justifyContent: "space-between",
+    paddingVertical: 16,
+    paddingHorizontal: 20,
+    borderBottomWidth: 1,
+    borderBottomColor: "#F1F5F9",
+  },
+
   pacienteNome: {
     fontSize: 16,
     fontWeight: "600",
     color: "#2D3748",
-    marginBottom: 4,
   },
+
   pacienteCpf: {
     fontSize: 14,
     color: "#718096",
-    marginBottom: 2,
-  },
-  pacienteTelefone: {
-    fontSize: 12,
-    color: "#A0AEC0",
+    marginTop: 2,
   },
 
-  // Estados
-  loadingContainer: {
-    flex: 1,
-    justifyContent: 'center',
-    alignItems: 'center',
-    padding: 40,
-  },
-  loadingText: {
-    marginTop: 12,
-    fontSize: 14,
-    color: "#718096",
-  },
-  emptyState: {
-    alignItems: 'center',
-    padding: 40,
-  },
-  emptyStateText: {
-    fontSize: 14,
-    color: "#A0AEC0",
-    textAlign: 'center',
-  },
-
-  // Botões
-  buttonsContainer: {
-    flexDirection: "row",
-    gap: 12,
-    marginTop: 20,
-  },
-  cancelButton: {
-    flex: 1,
-    paddingVertical: 16,
-    borderRadius: 8,
-    borderWidth: 1,
-    borderColor: "#E53E3E",
-    alignItems: "center",
-    backgroundColor: "#fff",
-  },
-  cancelButtonText: {
-    color: "#E53E3E",
-    fontSize: 14,
-    fontWeight: "600",
-  },
+  /* ================================
+        BOTÃO SALVAR
+  ================================= */
   saveButton: {
-    flex: 2,
-    paddingVertical: 16,
-    borderRadius: 8,
+    marginTop: 26,
     backgroundColor: "#2B5BFF",
+    paddingVertical: 16,
+    borderRadius: 10,
     alignItems: "center",
+
     shadowColor: "#2B5BFF",
-    shadowOffset: {
-      width: 0,
-      height: 2,
-    },
-    shadowOpacity: 0.2,
+    shadowOffset: { width: 0, height: 2 },
+    shadowOpacity: 0.25,
     shadowRadius: 4,
     elevation: 3,
   },
+
+  saveButtonText: {
+    color: "#FFFFFF",
+    fontWeight: "700",
+    fontSize: 16,
+  },
+
   saveButtonDisabled: {
     backgroundColor: "#A0AEC0",
-    shadowColor: "#A0AEC0",
+    shadowColor: "#ff0000ff",
   },
-  saveButtonText: {
-    color: "#fff",
-    fontSize: 14,
-    fontWeight: "600",
+   cancelButton: {
+    marginTop: 12,
+    backgroundColor: "#ffffffff",
+    paddingVertical: 16,
+    borderRadius: 10,
+    alignItems: "center",
+
+    shadowColor: "#c0a0a0ff",
+    shadowOffset: { width: 0, height: 1 },
+    shadowOpacity: 0.2,
+    shadowRadius: 2,
+    elevation: 2,
+  },
+
+  cancelButtonText: {
+    color: "#ff0000ff",
+    fontWeight: "700",
+    fontSize: 16,
   },
 });
