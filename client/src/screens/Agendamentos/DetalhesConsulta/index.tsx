@@ -4,7 +4,7 @@ import { styles } from "./styles";
 import React, { useState, useEffect } from "react";
 import { Ionicons } from '@expo/vector-icons';
 import MessageModal from "../../../components/MessageContext/MessageContext";
-import ConfirmationModal from "../../../components/ConfirmationModal"; 
+import ConfirmationModal from "../../../components/ConfirmationModal";
 import { getAgendamentoById, excluirAgendamento, atualizarAgendamento } from "../../../services/agendamentos.service";
 import { getPacienteByCpf } from "../../../services/pacientes.service";
 
@@ -23,7 +23,6 @@ export function DetalhesConsultaScreen() {
 
   const { consultaId } = route.params;
 
-  // Função para exibir mensagens
   const showMessage = (message: string, type: "success" | "error" | "warning" | "info") => {
     setModalMessage(message);
     setModalType(type);
@@ -34,7 +33,6 @@ export function DetalhesConsultaScreen() {
     setMessageModalVisible(false);
   };
 
-  // Função para exibir confirmação
   const showConfirmation = (action: "cancelar" | "excluir") => {
     setModalAction(action);
     setConfirmationModalVisible(true);
@@ -45,7 +43,6 @@ export function DetalhesConsultaScreen() {
     setModalAction(null);
   };
 
-  // Carrega os dados da consulta
   useEffect(() => {
     carregarConsulta();
   }, [consultaId]);
@@ -58,7 +55,6 @@ export function DetalhesConsultaScreen() {
       if (consultaData) {
         setConsulta(consultaData);
 
-        // Busca dados completos do paciente
         if (consultaData.cpfPaciente) {
           const pacienteData = await getPacienteByCpf(consultaData.cpfPaciente);
           setPaciente(pacienteData);
@@ -79,13 +75,13 @@ export function DetalhesConsultaScreen() {
 
   const handleConfirmAction = async () => {
     setConfirmationModalVisible(false);
-    
+
     if (modalAction === "cancelar") {
       await handleCancelarConsulta();
     } else if (modalAction === "excluir") {
       await handleExcluirConsulta();
     }
-    
+
     setModalAction(null);
   };
 
@@ -98,7 +94,6 @@ export function DetalhesConsultaScreen() {
 
       if (resultado.success) {
         showMessage("Consulta cancelada com sucesso!", "success");
-        // Recarrega os dados para atualizar o status
         setTimeout(() => {
           carregarConsulta();
         }, 1000);
@@ -120,7 +115,6 @@ export function DetalhesConsultaScreen() {
 
       if (resultado.success) {
         showMessage("Consulta excluída com sucesso!", "success");
-        // Navega de volta após sucesso
         setTimeout(() => {
           navigation.goBack();
         }, 1500);
@@ -226,7 +220,6 @@ export function DetalhesConsultaScreen() {
           showsVerticalScrollIndicator={false}
           contentContainerStyle={styles.scrollContent}
         >
-          {/* Card de Informações */}
           <View style={styles.card}>
             <View style={styles.cardHeader}>
               <Text style={styles.patientName}>
@@ -277,7 +270,6 @@ export function DetalhesConsultaScreen() {
               )}
             </View>
 
-            {/* Observações */}
             <View style={styles.observationsSection}>
               <Text style={styles.observationsLabel}>Observações</Text>
               <Text style={styles.observationsText}>
@@ -286,7 +278,6 @@ export function DetalhesConsultaScreen() {
             </View>
           </View>
 
-          {/* Ações (Cancelar e Reagendar) */}
           {consulta.status !== 'Cancelado' && consulta.status !== 'Concluído' && (
             <View style={styles.actionsSection}>
               <TouchableOpacity
@@ -297,7 +288,10 @@ export function DetalhesConsultaScreen() {
                 {excluindo ? (
                   <ActivityIndicator size="small" color="#E53E3E" />
                 ) : (
-                  <Text style={styles.cancelButtonText}>Cancelar</Text>
+                  <>
+                    <Text style={styles.cancelButtonText}>Cancelar</Text>
+                    <Ionicons name="close-circle-outline" size={18} color="#E53E3E" />
+                  </>
                 )}
               </TouchableOpacity>
 
@@ -306,27 +300,34 @@ export function DetalhesConsultaScreen() {
                 onPress={() => navigation.navigate("ReagendarConsulta", { consulta })}
                 disabled={excluindo}
               >
-                <Text style={styles.rescheduleButtonText}>Reagendar Consulta</Text>
+                <View style={{ flexDirection: "row", alignItems: "center", gap: 8 }}>
+                  <Text style={styles.rescheduleButtonText}>Reagendar Consulta</Text>
+                  <Ionicons name="calendar-outline" size={18} color="#fff" />
+                </View>
               </TouchableOpacity>
             </View>
           )}
 
-          {/* Botão Concluir Consulta */}
           {consulta.status === 'Confirmado' && (
             <View style={styles.concludeSection}>
               <TouchableOpacity
                 style={styles.concludeButton}
-                onPress={() => navigation.navigate("ConcluirConsulta", {
-                  consulta,
-                  pacienteId: paciente?.id
-                })}
+                onPress={() =>
+                  navigation.navigate("ConcluirConsulta", {
+                    consulta,
+                    pacienteId: paciente?.id
+                  })
+                }
               >
-                <Text style={styles.concludeButtonText}>Concluir Consulta</Text>
+                <View style={{ flexDirection: "row", alignItems: "center", gap: 8 }}>
+                  <Text style={styles.concludeButtonText}>Concluir Consulta</Text>
+                  <Ionicons name="checkmark-circle-outline" size={20} color="#fff" />
+                </View>
               </TouchableOpacity>
+
             </View>
           )}
 
-          {/* Botão Excluir (apenas para admin) */}
           <View style={styles.dangerSection}>
             <TouchableOpacity
               style={[styles.deleteButton, excluindo && styles.buttonDisabled]}
@@ -337,8 +338,8 @@ export function DetalhesConsultaScreen() {
                 <ActivityIndicator size="small" color="#FFFFFF" />
               ) : (
                 <>
-                  <Ionicons name="trash-outline" size={16} color="#FFFFFF" />
                   <Text style={styles.deleteButtonText}>Excluir Consulta</Text>
+                  <Ionicons name="trash-outline" size={16} color="#FFFFFF" />
                 </>
               )}
             </TouchableOpacity>
@@ -359,7 +360,7 @@ export function DetalhesConsultaScreen() {
         visible={confirmationModalVisible}
         title={modalAction === "excluir" ? "Confirmar Exclusão" : "Confirmar Cancelamento"}
         message={
-          modalAction === "excluir" 
+          modalAction === "excluir"
             ? "Tem certeza que deseja excluir esta consulta? Esta ação não pode ser desfeita."
             : "Tem certeza que deseja cancelar esta consulta?"
         }

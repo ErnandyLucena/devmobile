@@ -13,21 +13,6 @@ export const styles = StyleSheet.create({
     padding: 16,
     paddingBottom: 110,
   },
-  header: {
-    marginBottom: 24,
-    paddingHorizontal: 4,
-  },
-  title: {
-    fontSize: 28,
-    fontWeight: "700",
-    color: "#2D3748",
-    marginBottom: 8,
-  },
-  subtitle: {
-    fontSize: 16,
-    color: "#718096",
-    lineHeight: 22,
-  },
   form: {
     flex: 1,
   },
@@ -37,10 +22,7 @@ export const styles = StyleSheet.create({
     padding: 20,
     marginBottom: 16,
     shadowColor: "#000",
-    shadowOffset: {
-      width: 0,
-      height: 1,
-    },
+    shadowOffset: { width: 0, height: 1 },
     shadowOpacity: 0.1,
     shadowRadius: 3,
     elevation: 2,
@@ -51,9 +33,7 @@ export const styles = StyleSheet.create({
     color: "#2D3748",
     marginBottom: 16,
   },
-  inputGroup: {
-    marginBottom: 16,
-  },
+  inputGroup: { marginBottom: 16 },
   inputLabel: {
     fontSize: 14,
     fontWeight: "600",
@@ -70,10 +50,10 @@ export const styles = StyleSheet.create({
     color: "#2D3748",
     backgroundColor: "#FFFFFF",
   },
-  // Novos estilos para o campo de data
+
   dateInputContainer: {
-    flexDirection: 'row',
-    alignItems: 'center',
+    flexDirection: "row",
+    alignItems: "center",
   },
   dateInput: {
     flex: 1,
@@ -83,27 +63,38 @@ export const styles = StyleSheet.create({
     width: 50,
     height: 50,
     borderRadius: 8,
-    backgroundColor: '#F7FAFC',
+    backgroundColor: "#ffffffff",
     borderWidth: 1,
-    borderColor: '#E2E8F0',
-    justifyContent: 'center',
-    alignItems: 'center',
+    borderColor: "#2B5BFF",
+    justifyContent: "center",
+    alignItems: "center",
+    shadowColor: "#2B5BFF",
+    shadowOffset: { width: 0, height: 2 },
+    shadowOpacity: 0.2,
+    shadowRadius: 3,
+    elevation: 3,
   },
-  calendarButtonText: {
-    fontSize: 18,
+  pickerContainer: {
+    borderWidth: 1,
+    borderColor: "#E2E8F0",
+    borderRadius: 8,
+    backgroundColor: "#FFFFFF",
+    marginTop: 4,
+    overflow: "hidden",
   },
-  datePicker: {
-    backgroundColor: 'white',
+  picker: {
+    height: 50,
   },
   inputError: {
     borderColor: "#E53E3E",
-    backgroundColor: "#FED7D7",
+    backgroundColor: "#FEF5F5",
   },
   errorText: {
     color: "#E53E3E",
     fontSize: 12,
     marginTop: 4,
     marginLeft: 4,
+    fontWeight: "500",
   },
   actionsContainer: {
     flexDirection: "row",
@@ -111,6 +102,7 @@ export const styles = StyleSheet.create({
     marginTop: 8,
     marginBottom: 24,
   },
+
   cancelButton: {
     flex: 1,
     paddingVertical: 14,
@@ -119,13 +111,17 @@ export const styles = StyleSheet.create({
     justifyContent: "center",
     backgroundColor: "#F7FAFC",
     borderWidth: 1,
-    borderColor: "#ff0000ff",
+    borderColor: "#E53E3E",
+    flexDirection: "row",
   },
+
   cancelButtonText: {
-    color: "#ff0000ff",
+    color: "#E53E3E",
     fontSize: 16,
     fontWeight: "600",
+    marginLeft: 6,
   },
+
   saveButton: {
     flex: 2,
     paddingVertical: 14,
@@ -133,37 +129,27 @@ export const styles = StyleSheet.create({
     alignItems: "center",
     justifyContent: "center",
     backgroundColor: "#2B5BFF",
-    shadowColor: "#000",
-    shadowOffset: {
-      width: 0,
-      height: 2,
-    },
-    shadowOpacity: 0.1,
-    shadowRadius: 4,
-    elevation: 3,
+    shadowColor: "#2B5BFF",
+    shadowOffset: { width: 0, height: 4 },
+    shadowOpacity: 0.3,
+    shadowRadius: 8,
+    elevation: 6,
+    flexDirection: "row",
   },
+
   saveButtonDisabled: {
     backgroundColor: "#CBD5E0",
     shadowOpacity: 0,
     elevation: 0,
   },
+
   saveButtonText: {
     color: "#FFFFFF",
     fontSize: 16,
     fontWeight: "600",
-    textAlign: "center",
+    marginLeft: 6,
   },
-  pickerContainer: {
-    borderWidth: 1,
-    borderColor: '#E2E8F0',
-    borderRadius: 8,
-    backgroundColor: '#FFFFFF',
-    overflow: 'hidden',
-    marginTop: 4,
-  },
-  picker: {
-    height: 50,
-  },
+
   buttonDisabled: {
     opacity: 0.6,
   },

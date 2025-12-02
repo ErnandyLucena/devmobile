@@ -134,7 +134,7 @@ export const styles = StyleSheet.create({
     color: "#2B5BFF",
   },
   historyButtonText: {
-    color: "#718096",
+    color: "#718096ff",
   },
   emptyState: {
     alignItems: "center",

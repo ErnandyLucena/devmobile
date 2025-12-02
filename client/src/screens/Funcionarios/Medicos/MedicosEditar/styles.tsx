@@ -1,29 +1,25 @@
-// screens/Medicos/styles.js
 import { StyleSheet } from "react-native";
 
 export const styles = StyleSheet.create({
-  // ========================
-  // LAYOUT PRINCIPAL
-  // ========================
   container: {
     flex: 1,
     backgroundColor: "#F7FAFC",
   },
+
   scrollView: {
     flex: 1,
   },
+
   scrollContent: {
     flexGrow: 1,
     padding: 16,
     paddingBottom: 110,
   },
+
   form: {
     flex: 1,
   },
 
-  // ========================
-  // SEÇÕES
-  // ========================
   section: {
     backgroundColor: "#FFFFFF",
     borderRadius: 12,
@@ -38,6 +34,7 @@ export const styles = StyleSheet.create({
     shadowRadius: 3,
     elevation: 2,
   },
+
   sectionTitle: {
     fontSize: 18,
     fontWeight: "700",
@@ -45,18 +42,17 @@ export const styles = StyleSheet.create({
     marginBottom: 16,
   },
 
-  // ========================
-  // INPUTS
-  // ========================
   inputGroup: {
     marginBottom: 16,
   },
+
   inputLabel: {
     fontSize: 14,
     fontWeight: "600",
     color: "#4A5568",
     marginBottom: 6,
   },
+
   textInput: {
     borderWidth: 1,
     borderColor: "#E2E8F0",
@@ -67,18 +63,17 @@ export const styles = StyleSheet.create({
     color: "#2D3748",
     backgroundColor: "#FFFFFF",
   },
-  
-  // ========================
-  // CAMPO DE DATA
-  // ========================
+
   dateInputContainer: {
     flexDirection: 'row',
     alignItems: 'center',
   },
+
   dateInput: {
     flex: 1,
     marginRight: 8,
   },
+
   calendarButton: {
     width: 50,
     height: 50,
@@ -98,9 +93,6 @@ export const styles = StyleSheet.create({
     elevation: 3,
   },
 
-  // ========================
-  // PICKER
-  // ========================
   pickerContainer: {
     borderWidth: 1,
     borderColor: '#E2E8F0',
@@ -109,17 +101,16 @@ export const styles = StyleSheet.create({
     marginTop: 4,
     overflow: 'hidden',
   },
+
   picker: {
     height: 50,
   },
 
-  // ========================
-  // VALIDAÇÃO E ERROS
-  // ========================
   inputError: {
     borderColor: "#E53E3E",
     backgroundColor: "#FEF5F5",
   },
+
   errorText: {
     color: "#E53E3E",
     fontSize: 12,
@@ -128,9 +119,6 @@ export const styles = StyleSheet.create({
     fontWeight: "500",
   },
 
-  // ========================
-  // BOTÕES
-  // ========================
   actionsContainer: {
     flexDirection: "row",
     gap: 12,
@@ -139,14 +127,17 @@ export const styles = StyleSheet.create({
   },
   cancelButton: {
     flex: 1,
-    paddingVertical: 14,
-    borderRadius: 8,
+    flexDirection: "row",       
     alignItems: "center",
     justifyContent: "center",
+    gap: 6,                      
+    paddingVertical: 14,
+    borderRadius: 8,
     backgroundColor: "#F7FAFC",
     borderWidth: 1,
     borderColor: "#E53E3E",
   },
+
   cancelButtonText: {
     color: "#E53E3E",
     fontSize: 16,
@@ -154,10 +145,12 @@ export const styles = StyleSheet.create({
   },
   saveButton: {
     flex: 2,
-    paddingVertical: 14,
-    borderRadius: 8,
+    flexDirection: "row",       
     alignItems: "center",
     justifyContent: "center",
+    gap: 6,                       
+    paddingVertical: 14,
+    borderRadius: 8,
     backgroundColor: "#2B5BFF",
     shadowColor: "#2B5BFF",
     shadowOffset: {
@@ -168,17 +161,20 @@ export const styles = StyleSheet.create({
     shadowRadius: 8,
     elevation: 6,
   },
+
   saveButtonDisabled: {
     backgroundColor: "#CBD5E0",
     shadowOpacity: 0,
     elevation: 0,
   },
+
   saveButtonText: {
     color: "#FFFFFF",
     fontSize: 16,
     fontWeight: "600",
     textAlign: "center",
   },
+
   buttonDisabled: {
     opacity: 0.6,
   },

@@ -21,23 +21,18 @@ export default function FuncEditarScreen() {
   const navigation = useNavigation();
   const route = useRoute();
 
-  // NORMALIZAÇÃO DOS DADOS RECEBIDOS
   const funcionarioRaw = route.params.funcionario;
-
-  // Função para converter data ISO para formato BR
   const convertISOToBR = (dataISO) => {
     if (!dataISO) return '';
     
     if (typeof dataISO === 'string') {
-      // Se já for string, verificar se está no formato ISO ou BR
       if (dataISO.includes('/')) {
-        return dataISO; // Já está no formato BR
+        return dataISO; 
       } else if (dataISO.includes('-')) {
         const [year, month, day] = dataISO.split('-');
         return `${day}/${month}/${year}`;
       }
     } else if (dataISO && dataISO.toDate) {
-      // Se for Timestamp do Firestore
       try {
         const date = dataISO.toDate();
         const day = String(date.getDate()).padStart(2, '0');
@@ -103,10 +98,6 @@ export default function FuncEditarScreen() {
     }
   };
 
-  // ========================
-  // FORMATADORES
-  // ========================
-
   const formatCPF = (text) => {
     const numbers = text.replace(/\D/g, '');
     if (numbers.length <= 3) return numbers;
@@ -131,7 +122,6 @@ export default function FuncEditarScreen() {
     updateField("telefone", formatTelefone(text));
   };
 
-  // NOVA FORMATAÇÃO PARA DATA BR (DD/MM/AAAA)
   const formatDataBR = (text) => {
     const numbers = text.replace(/\D/g, '');
     
@@ -148,17 +138,14 @@ export default function FuncEditarScreen() {
     updateField("dataAdmissao", formatDataBR(text));
   };
 
-  // Função para abrir o calendário
   const handleOpenCalendar = () => {
     setShowDatePicker(true);
   };
 
-  // Função para lidar com a seleção de data no calendário
   const handleDateChange = (event, selectedDate) => {
     setShowDatePicker(false);
     
     if (selectedDate) {
-      // Formata a data selecionada para o formato brasileiro
       const day = String(selectedDate.getDate()).padStart(2, '0');
       const month = String(selectedDate.getMonth() + 1).padStart(2, '0');
       const year = selectedDate.getFullYear();
@@ -167,10 +154,6 @@ export default function FuncEditarScreen() {
       updateField("dataAdmissao", formattedDate);
     }
   };
-
-  // ========================
-  // VALIDAÇÕES
-  // ========================
 
   const validateCPF = (cpf) => {
     if (!cpf) return true;
@@ -185,18 +168,16 @@ export default function FuncEditarScreen() {
     return /\S+@\S+\.\S+/.test(email);
   };
 
-  // Validação de data no formato brasileiro
+
   const validateDataBR = (data) => {
     if (!data) return true;
     
-    // Verificar formato DD/MM/AAAA
     if (!/^\d{2}\/\d{2}\/\d{4}$/.test(data)) {
       return false;
     }
     
     const [day, month, year] = data.split('/').map(Number);
-    
-    // Verificar se é uma data válida
+
     const date = new Date(year, month - 1, day);
     
     return (
@@ -227,9 +208,6 @@ export default function FuncEditarScreen() {
     return Object.keys(newErrors).length === 0;
   };
 
-  // ========================
-  // SALVAR
-  // ========================
 
   const handleSalvar = async () => {
     if (!validateForm()) {
@@ -244,11 +222,11 @@ export default function FuncEditarScreen() {
         nomeCompleto: formData.nome.trim(),
         cargo: formData.cargo.trim(),
         setor: formData.setor.trim(),
-        situacao: formData.situacao, // Agora é string, não array
+        situacao: formData.situacao, 
         email: formData.email.trim(),
         tel: formData.telefone,
         cpf: formData.cpf,
-        dataAdmissao: formData.dataAdmissao // Já está no formato BR
+        dataAdmissao: formData.dataAdmissao 
       };
 
       console.log("📤 Enviando dados para atualização:", dataToSend);
@@ -269,10 +247,6 @@ export default function FuncEditarScreen() {
       setLoading(false);
     }
   };
-
-  // ========================
-  // CANCELAR
-  // ========================
 
   const handleCancelar = () => {
     const hasChanges =
@@ -315,10 +289,6 @@ export default function FuncEditarScreen() {
     (!formData.email.trim() || validateEmail(formData.email)) &&
     (!formData.dataAdmissao.trim() || validateDataBR(formData.dataAdmissao));
 
-  // ========================
-  // UI
-  // ========================
-
   return (
     <>
       <KeyboardAvoidingView
@@ -336,7 +306,6 @@ export default function FuncEditarScreen() {
         >
 
           <View style={styles.form}>
-            {/* INFORMAÇÕES PESSOAIS */}
             <View style={styles.section}>
               <Text style={styles.sectionTitle}>Informações Pessoais</Text>
 
@@ -366,8 +335,6 @@ export default function FuncEditarScreen() {
                 {errors.cpf && <Text style={styles.errorText}>{errors.cpf}</Text>}
               </View>
             </View>
-
-            {/* DADOS PROFISSIONAIS */}
             <View style={styles.section}>
               <Text style={styles.sectionTitle}>Dados Profissionais</Text>
 
@@ -417,7 +384,6 @@ export default function FuncEditarScreen() {
                 {errors.dataAdmissao && <Text style={styles.errorText}>{errors.dataAdmissao}</Text>}
               </View>
 
-              {/* SITUAÇÃO */}
               <View style={styles.inputGroup}>
                 <Text style={styles.inputLabel}>Situação *</Text>
                 <View style={styles.pickerContainer}>
@@ -432,8 +398,6 @@ export default function FuncEditarScreen() {
                 </View>
               </View>
             </View>
-
-            {/* CONTATO */}
             <View style={styles.section}>
               <Text style={styles.sectionTitle}>Informações de Contato</Text>
 
@@ -466,7 +430,6 @@ export default function FuncEditarScreen() {
               </View>
             </View>
 
-            {/* AÇÕES */}
             <View style={styles.actionsContainer}>
 
               <TouchableOpacity
@@ -491,15 +454,11 @@ export default function FuncEditarScreen() {
                   {loading ? "Salvando..." : "Salvar Alterações"}
                 </Text>
               </TouchableOpacity>
-
             </View>
-
           </View>
-
         </ScrollView>
       </KeyboardAvoidingView>
 
-      {/* DatePicker Modal */}
       {showDatePicker && (
         <DateTimePicker
           value={new Date()}

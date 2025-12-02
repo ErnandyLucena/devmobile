@@ -1,26 +1,9 @@
-import { StyleSheet, Platform } from "react-native";
+import { StyleSheet } from "react-native";
 
 export const styles = StyleSheet.create({
   container: {
     flex: 1,
     backgroundColor: "#f8f9fa",
-  },
-
-  header: {
-    flexDirection: "row",
-    alignItems: "center",
-    justifyContent: "space-between",
-    paddingVertical: 16,
-    paddingHorizontal: 20,
-    backgroundColor: "#fff",
-    borderBottomWidth: 1,
-    borderBottomColor: "#eee",
-  },
-
-  headerTitle: {
-    fontSize: 18,
-    fontWeight: "600",
-    color: "#222",
   },
 
   scrollContent: {
@@ -41,7 +24,6 @@ export const styles = StyleSheet.create({
     fontSize: 16,
   },
 
-  /* CARD PRINCIPAL */
   mainCard: {
     backgroundColor: "#fff",
     padding: 20,
@@ -54,7 +36,6 @@ export const styles = StyleSheet.create({
     elevation: 4,
   },
 
-  /* AVATAR + NOME */
   avatarSection: {
     flexDirection: "row",
     alignItems: "center",
@@ -101,7 +82,6 @@ export const styles = StyleSheet.create({
     color: "#555",
   },
 
-  /* SEÇÃO DE INFORMAÇÕES */
   infoSection: {
     marginTop: 10,
   },
@@ -135,17 +115,21 @@ export const styles = StyleSheet.create({
     flex: 1,
   },
 
-  /* BOTÕES */
+  /* AÇÕES */
   actionsSection: {
     marginTop: 10,
     gap: 14,
   },
 
+  /* BOTÃO EDITAR COM ÍCONE */
   editButton: {
     backgroundColor: "#2B5BFF",
     paddingVertical: 16,
     borderRadius: 12,
+    flexDirection: "row",
     alignItems: "center",
+    justifyContent: "center",
+    gap: 10,
   },
 
   editButtonText: {
@@ -154,13 +138,14 @@ export const styles = StyleSheet.create({
     fontWeight: "700",
   },
 
+  /* BOTÃO EXCLUIR COM ÍCONE */
   archiveButton: {
     backgroundColor: "#fff",
     paddingVertical: 16,
     borderRadius: 12,
     alignItems: "center",
-    flexDirection: "row",
     justifyContent: "center",
+    flexDirection: "row",
     gap: 10,
     borderWidth: 1,
     borderColor: "#E53E3E",
@@ -171,73 +156,72 @@ export const styles = StyleSheet.create({
     fontSize: 16,
     fontWeight: "600",
   },
-  // 🔽 Cole abaixo dos estilos já existentes:
 
-modalOverlay: {
-  flex: 1,
-  backgroundColor: "rgba(0, 0, 0, 0.5)",
-  justifyContent: "center",
-  alignItems: "center",
-},
+  modalOverlay: {
+    flex: 1,
+    backgroundColor: "rgba(0, 0, 0, 0.5)",
+    justifyContent: "center",
+    alignItems: "center",
+  },
 
-modalContainer: {
-  width: "85%",
-  backgroundColor: "#fff",
-  borderRadius: 12,
-  padding: 20,
-  elevation: 10,
-  shadowColor: "#000",
-  shadowOpacity: 0.25,
-  shadowRadius: 4,
-},
+  modalContainer: {
+    width: "85%",
+    backgroundColor: "#fff",
+    borderRadius: 12,
+    padding: 20,
+    elevation: 10,
+    shadowColor: "#000",
+    shadowOpacity: 0.25,
+    shadowRadius: 4,
+  },
 
-modalTitle: {
-  fontSize: 20,
-  fontWeight: "bold",
-  color: "#333",
-  textAlign: "center",
-  marginBottom: 10,
-},
+  modalTitle: {
+    fontSize: 20,
+    fontWeight: "bold",
+    color: "#333",
+    textAlign: "center",
+    marginBottom: 10,
+  },
 
-modalMessage: {
-  fontSize: 16,
-  color: "#555",
-  textAlign: "center",
-  marginBottom: 25,
-},
+  modalMessage: {
+    fontSize: 16,
+    color: "#555",
+    textAlign: "center",
+    marginBottom: 25,
+  },
 
-modalButtons: {
-  flexDirection: "row",
-  justifyContent: "space-between",
-},
+  modalButtons: {
+    flexDirection: "row",
+    justifyContent: "space-between",
+  },
 
-modalCancelButton: {
-  flex: 1,
-  paddingVertical: 12,
-  marginRight: 10,
-  borderRadius: 8,
-  backgroundColor: "#E0E0E0",
-  alignItems: "center",
-},
+  modalCancelButton: {
+    flex: 1,
+    paddingVertical: 12,
+    marginRight: 10,
+    borderRadius: 8,
+    backgroundColor: "#E0E0E0",
+    alignItems: "center",
+  },
 
-modalCancelText: {
-  color: "#333",
-  fontSize: 16,
-  fontWeight: "bold",
-},
+  modalCancelText: {
+    color: "#333",
+    fontSize: 16,
+    fontWeight: "bold",
+  },
 
-modalDeleteButton: {
-  flex: 1,
-  paddingVertical: 12,
-  marginLeft: 10,
-  borderRadius: 8,
-  backgroundColor: "#E53E3E",
-  alignItems: "center",
-},
+  modalDeleteButton: {
+    flex: 1,
+    paddingVertical: 12,
+    marginLeft: 10,
+    borderRadius: 8,
+    backgroundColor: "#E53E3E",
+    alignItems: "center",
+  },
 
-modalDeleteText: {
-  color: "#fff",
-  fontSize: 16,
-  fontWeight: "bold",
-},
+  modalDeleteText: {
+    color: "#fff",
+    fontSize: 16,
+    fontWeight: "bold",
+  },
 });

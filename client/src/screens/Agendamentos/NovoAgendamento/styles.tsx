@@ -171,7 +171,6 @@ export const styles = StyleSheet.create({
     paddingVertical: 16,
     borderRadius: 10,
     alignItems: "center",
-
     shadowColor: "#c0a0a0ff",
     shadowOffset: { width: 0, height: 1 },
     shadowOpacity: 0.2,

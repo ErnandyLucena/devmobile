@@ -1,7 +1,6 @@
 import { StyleSheet, Platform } from "react-native";
 
 export const styles = StyleSheet.create({
-  // Layout principal
   container: {
     flex: 1,
     backgroundColor: "#F7FAFC",
@@ -14,8 +13,6 @@ export const styles = StyleSheet.create({
     padding: 16,
     paddingBottom: 60,
   },
-
-  // Estados de carregamento
   loadingContainer: {
     flex: 1,
     justifyContent: 'center',
@@ -30,8 +27,6 @@ export const styles = StyleSheet.create({
   buttonDisabled: {
     opacity: 0.6,
   },
-
-  // Card principal
   mainCard: {
     backgroundColor: "#FFFFFF",
     borderRadius: 12,
@@ -46,7 +41,6 @@ export const styles = StyleSheet.create({
     borderColor: "#F1F5F9",
   },
 
-  // Seção do avatar e nome
   avatarSection: {
     flexDirection: "row",
     alignItems: "center",
@@ -84,7 +78,6 @@ export const styles = StyleSheet.create({
     marginBottom: 8,
   },
 
-  // Status badge
   statusBadge: {
     alignSelf: "flex-start",
     paddingHorizontal: 12,
@@ -96,8 +89,6 @@ export const styles = StyleSheet.create({
     fontWeight: "600",
     textTransform: "uppercase",
   },
-
-  // Seções de informações
   infoSection: {
     marginBottom: 24,
   },
@@ -107,8 +98,6 @@ export const styles = StyleSheet.create({
     color: "#2D3748",
     marginBottom: 16,
   },
-
-  // Linhas de informação
   infoRow: {
     flexDirection: "row",
     justifyContent: "space-between",
@@ -137,8 +126,6 @@ export const styles = StyleSheet.create({
     fontSize: 12,
     fontFamily: Platform.OS === 'ios' ? 'Menlo' : 'monospace',
   },
-
-  // Botões de ação
   actionsContainer: {
     marginTop: 8,
   },
@@ -154,6 +141,8 @@ export const styles = StyleSheet.create({
     shadowOpacity: 0.3,
     shadowRadius: 8,
     elevation: 6,
+    flexDirection: "row",
+    gap: 8,
   },
   editButtonText: {
     color: "#FFFFFF",
@@ -173,6 +162,8 @@ export const styles = StyleSheet.create({
     shadowOpacity: 0.1,
     shadowRadius: 4,
     elevation: 2,
+    flexDirection: "row",
+    gap: 8,
   },
   deleteButtonText: {
     color: "#E53E3E",

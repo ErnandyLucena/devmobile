@@ -150,8 +150,6 @@ export default function MedicosDetalhesScreen() {
       >
 
         <View style={styles.mainCard}>
-          
-          {/* Avatar + Nome + Situação */}
           <View style={styles.avatarSection}>
             <View style={styles.avatar}>
               <Text style={styles.avatarText}>
@@ -182,8 +180,6 @@ export default function MedicosDetalhesScreen() {
               </View>
             </View>
           </View>
-
-          {/* Informações Pessoais */}
           <View style={styles.infoSection}>
             <Text style={styles.sectionTitle}>Informações Pessoais</Text>
 
@@ -191,7 +187,6 @@ export default function MedicosDetalhesScreen() {
             <Info label="CPF" value={medicoData.cpf} />
             <Info label="Nome Mnemônico" value={medicoData.nmMnemonico} />
 
-            {/* Data de Admissão */}
             <Info 
               label="Data de Admissão" 
               value={
@@ -202,7 +197,6 @@ export default function MedicosDetalhesScreen() {
             />
           </View>
 
-          {/* Registro Profissional */}
           <View style={styles.infoSection}>
             <Text style={styles.sectionTitle}>Registro Profissional</Text>
 
@@ -210,16 +204,13 @@ export default function MedicosDetalhesScreen() {
             <Info label="Especialidade" value={medicoData.especialidade} />
           </View>
 
-          {/* Contato */}
           <View style={styles.infoSection}>
             <Text style={styles.sectionTitle}>Contato</Text>
             <Info label="Email" value={medicoData.dsEmail} />
             
-            {/* 🔥 NOVO CAMPO – Telefone */}
             <Info label="Telefone" value={medicoData.tel} />
           </View>
 
-          {/* Sistema */}
           <View style={styles.infoSection}>
             <Text style={styles.sectionTitle}>Informações do Sistema</Text>
 
@@ -246,13 +237,13 @@ export default function MedicosDetalhesScreen() {
 
         </View>
 
-        {/* Ações */}
         <View style={styles.actionsContainer}>
           <TouchableOpacity
             style={styles.editButton}
             onPress={handleEditar}
           >
             <Text style={styles.editButtonText}>Editar Médico</Text>
+            <Ionicons name="create-outline" size={20} color="#FFFFFF" />
           </TouchableOpacity>
 
           <TouchableOpacity
@@ -263,6 +254,7 @@ export default function MedicosDetalhesScreen() {
             <Text style={styles.deleteButtonText}>
               {deleting ? "Excluindo..." : "Excluir Médico"}
             </Text>
+            <Ionicons name="trash-outline" size={20} color="#E53E3E" />
           </TouchableOpacity>
         </View>
 
@@ -290,7 +282,6 @@ export default function MedicosDetalhesScreen() {
   );
 }
 
-/* COMPONENTE DE INFO REUTILIZÁVEL */
 function Info({ label, value }) {
   return (
     <View style={styles.infoRow}>

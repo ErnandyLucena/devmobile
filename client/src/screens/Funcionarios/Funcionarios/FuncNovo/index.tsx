@@ -438,6 +438,7 @@ export default function FuncNovoScreen({ navigation }) {
                 <Text style={styles.cancelButtonText}>
                   {loading ? "Cancelando..." : "Cancelar"}
                 </Text>
+                <Ionicons name="close-circle" size={22} color="#E53E3E" />
               </TouchableOpacity>
 
               <TouchableOpacity
@@ -451,6 +452,7 @@ export default function FuncNovoScreen({ navigation }) {
                 <Text style={styles.saveButtonText}>
                   {loading ? "Salvando..." : (!isFormValid ? "Preencha os campos" : "Cadastrar Funcionário")}
                 </Text>
+                <Ionicons name="checkmark-circle" size={22} color="#FFFFFF" />
               </TouchableOpacity>
 
             </View>
@@ -460,7 +462,6 @@ export default function FuncNovoScreen({ navigation }) {
         </ScrollView>
       </KeyboardAvoidingView>
 
-      {/* DatePicker Modal */}
       {showDatePicker && (
         <DateTimePicker
           value={new Date()}

@@ -6,11 +6,12 @@ import {
   ScrollView,
   StatusBar,
   ActivityIndicator,
-  Modal
+  Modal,
+  Alert
 } from "react-native";
 import { Ionicons } from "@expo/vector-icons";
 import { useFocusEffect, useNavigation, useRoute } from "@react-navigation/native";
-import { getFuncionarioById, excluirFuncionario  } from "../../../../services/funcionario.service";
+import { getFuncionarioById, excluirFuncionario } from "../../../../services/funcionario.service";
 import { styles } from "./styles";
 
 export default function FuncDetalhesScreen() {
@@ -22,37 +23,35 @@ export default function FuncDetalhesScreen() {
   const [funcionario, setFuncionario] = useState(null);
   const [loading, setLoading] = useState(true);
 
-  // Modal de confirmação de exclusão
   const [modalVisible, setModalVisible] = useState(false);
 
-useFocusEffect(
-  useCallback(() => {
-    let ativo = true;
+  useFocusEffect(
+    useCallback(() => {
+      let ativo = true;
 
-    async function loadFuncionario() {
-      setLoading(true);
+      async function loadFuncionario() {
+        setLoading(true);
 
-      try {
-        const data = await getFuncionarioById(funcionarioId);
+        try {
+          const data = await getFuncionarioById(funcionarioId);
 
-        if (ativo) {
-          setFuncionario(data);
+          if (ativo) {
+            setFuncionario(data);
+          }
+        } catch (error) {
+          Alert.alert("Erro", "Não foi possível carregar os dados.");
+        } finally {
+          if (ativo) setLoading(false);
         }
-      } catch (error) {
-        Alert.alert("Erro", "Não foi possível carregar os dados.");
-      } finally {
-        if (ativo) setLoading(false);
       }
-    }
 
-    loadFuncionario();
+      loadFuncionario();
 
-    return () => {
-      ativo = false; // para evitar chamada após desmontar
-    };
-  }, [funcionarioId])
-);
-
+      return () => {
+        ativo = false;
+      };
+    }, [funcionarioId])
+  );
 
   if (loading) {
     return (
@@ -82,8 +81,6 @@ useFocusEffect(
       <StatusBar backgroundColor="#fff" barStyle="dark-content" />
 
       <ScrollView contentContainerStyle={styles.scrollContent}>
-
-        {/* CARD PRINCIPAL */}
         <View style={styles.mainCard}>
           <View style={styles.avatarSection}>
             <View style={styles.avatar}>
@@ -101,7 +98,6 @@ useFocusEffect(
             </View>
           </View>
 
-          {/* SEÇÃO DE INFORMAÇÕES */}
           <View style={styles.infoSection}>
             <Text style={styles.sectionTitle}>Informações Gerais</Text>
 
@@ -141,7 +137,7 @@ useFocusEffect(
           </View>
         </View>
 
-        {/* BOTÕES DE AÇÃO */}
+        {/* BOTÕES AJUSTADOS COM ÍCONES */}
         <View style={styles.actionsSection}>
           <TouchableOpacity
             style={styles.editButton}
@@ -150,20 +146,19 @@ useFocusEffect(
             }
           >
             <Text style={styles.editButtonText}>Editar Funcionário</Text>
+            <Ionicons name="create-outline" size={20} color="#FFFFFF" />
           </TouchableOpacity>
 
           <TouchableOpacity
             style={styles.archiveButton}
             onPress={() => setModalVisible(true)}
           >
-            <Ionicons name="trash" size={20} color="#E53E3E" />
             <Text style={styles.archiveButtonText}>Excluir Funcionário</Text>
+            <Ionicons name="trash" size={20} color="#E53E3E" />
           </TouchableOpacity>
         </View>
       </ScrollView>
 
-
-      {/* MODAL DE CONFIRMAÇÃO */}
       <Modal
         animationType="fade"
         transparent
@@ -195,7 +190,6 @@ useFocusEffect(
           </View>
         </View>
       </Modal>
-
     </View>
   );
 }

@@ -117,7 +117,6 @@ export const styles = StyleSheet.create({
   cancelButtonText: {
     color: "#ff0000ff",
   },
-  // Adicionar ao styles.js
   overlay: {
     flex: 1,
     backgroundColor: 'rgba(0, 0, 0, 0.5)',

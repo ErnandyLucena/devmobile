@@ -236,7 +236,6 @@ export default function HistoricoPacienteScreen() {
                     {item.especialidadeMedico}
                   </Text>
                 )}
-
               </View>
             </View>
           </View>

@@ -13,7 +13,7 @@ import {
 import { useAuth } from "../../../context/auth/AuthContext";
 import { styles } from "./styles";
 import { Ionicons } from '@expo/vector-icons';
-import MessageModal from "../../../components/MessageContext/MessageContext"; 
+import MessageModal from "../../../components/MessageContext/MessageContext";
 
 export default function LoginScreen({ navigation }: any) {
   const { login } = useAuth();
@@ -22,7 +22,7 @@ export default function LoginScreen({ navigation }: any) {
   const [password, setPassword] = useState("");
   const [showPassword, setShowPassword] = useState(false);
 
-  const [loading, setLoading] = useState(false); // 🔵 CARREGANDO
+  const [loading, setLoading] = useState(false); 
 
   const [modalVisible, setModalVisible] = useState(false);
   const [modalMessage, setModalMessage] = useState("");
@@ -104,22 +104,48 @@ export default function LoginScreen({ navigation }: any) {
               onPress={handleLogin}
               disabled={loading}
             >
-              <View style={{ flexDirection: "row", gap: 10, alignItems: "center", justifyContent: "center" }}>
-                {loading && (
-                  <ActivityIndicator size="small" color="#fff" />
-                )}
+              <View
+                style={{
+                  flexDirection: "row",
+                  gap: 10,
+                  alignItems: "center",
+                  justifyContent: "center",
+                }}
+              >
                 <Text style={styles.loginButtonText}>
                   {loading ? "Entrando..." : "Entrar"}
                 </Text>
+                {loading ? (
+                  <ActivityIndicator size="small" color="#fff" />
+                ) : (
+                  <Ionicons
+                    name="log-in-outline"
+                    size={22}
+                    color="#fff"
+                    style={{ marginRight: 4 }} o
+                  />
+                )}
               </View>
             </TouchableHighlight>
 
+
             <View style={styles.registerContainer}>
               <Text style={styles.registerText}>Não tem uma conta? </Text>
-              <TouchableOpacity onPress={() => navigation.navigate("Register")}>
+
+              <TouchableOpacity
+                style={{ flexDirection: "row", alignItems: "center", gap: 6 }}
+                onPress={() => navigation.navigate("Register")}
+              >
                 <Text style={styles.registerLink}>Registre-se</Text>
+                <Ionicons
+                  name="person-add-outline"
+                  size={18}
+                  color="#2B5BFF"
+                  style={{ marginRight: 2 }}
+                />
               </TouchableOpacity>
             </View>
+
           </View>
         </ScrollView>
       </KeyboardAvoidingView>

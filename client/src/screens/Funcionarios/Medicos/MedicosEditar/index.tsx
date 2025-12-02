@@ -1,4 +1,3 @@
-// screens/Medicos/MedicosEditar.js 
 import React, { useState } from "react";
 import {
   View,
@@ -44,10 +43,6 @@ export default function MedicosEditarScreen() {
 
   const [errors, setErrors] = useState({});
 
-  // ========================
-  // FUNÇÕES DE MODAL
-  // ========================
-
   const showModal = (msg, type = "info") => {
     setModalMessage(msg);
     setModalType(type);
@@ -66,20 +61,12 @@ export default function MedicosEditarScreen() {
     }
   };
 
-  // ========================
-  // ATUALIZAÇÃO DE CAMPOS
-  // ========================
-
   const updateField = (field, value) => {
     setFormData((prev) => ({ ...prev, [field]: value }));
     if (errors[field]) {
       setErrors((prev) => ({ ...prev, [field]: "" }));
     }
   };
-
-  // ========================
-  // FORMATAÇÕES
-  // ========================
 
   const formatCPF = (value) => {
     const v = value.replace(/\D/g, "");
@@ -101,13 +88,12 @@ export default function MedicosEditarScreen() {
 
   const handleTel = (text) => updateField("tel", formatTel(text));
 
-  // ------ CRM CORRIGIDO ------
   const formatCRM = (value) => {
     const cleaned = value.replace(/[^\dA-Za-z]/g, "").toUpperCase();
 
-    const part1 = cleaned.substring(0, 3); // CRM
-    const part2 = cleaned.substring(3, 5); // UF
-    const number = cleaned.substring(5);   // números
+    const part1 = cleaned.substring(0, 3);
+    const part2 = cleaned.substring(3, 5); 
+    const number = cleaned.substring(5);   
 
     let formatted = part1;
     if (part2) formatted += `/${part2}`;
@@ -139,10 +125,6 @@ export default function MedicosEditarScreen() {
     }
   };
 
-  // ========================
-  // VALIDAÇÕES
-  // ========================
-
   const validateCPF = (cpf) => {
     if (!cpf) return true;
     const clean = cpf.replace(/\D/g, '');
@@ -157,7 +139,6 @@ export default function MedicosEditarScreen() {
     return date.getFullYear() === y && date.getMonth() === m - 1 && date.getDate() === d;
   };
 
-  // CRM VALIDADO CORRETAMENTE
   const validateCRM = (crm) => {
     if (!crm) return true;
     return /^[A-Za-z]{3}\/[A-Za-z]{2} \d{1,6}$/.test(crm);
@@ -198,10 +179,6 @@ export default function MedicosEditarScreen() {
     return Object.keys(newErrors).length === 0;
   };
 
-  // ========================
-  // SALVAR
-  // ========================
-
   const handleSalvar = async () => {
     if (!validateForm()) {
       showModal("Corrija os campos obrigatórios!", "warning");
@@ -236,10 +213,6 @@ export default function MedicosEditarScreen() {
     formData.dsEmail.trim() &&
     /\S+@\S+\.\S+/.test(formData.dsEmail);
 
-  // ========================
-  // RENDER
-  // ========================
-
   return (
     <>
       <KeyboardAvoidingView
@@ -256,8 +229,6 @@ export default function MedicosEditarScreen() {
           keyboardShouldPersistTaps="handled"
         >
           <View style={styles.form}>
-
-            {/* --- INFORMAÇÕES PESSOAIS --- */}
             <View style={styles.section}>
               <Text style={styles.sectionTitle}>Informações Pessoais</Text>
 
@@ -337,7 +308,6 @@ export default function MedicosEditarScreen() {
               </View>
             </View>
 
-            {/* --- REGISTRO PROFISSIONAL --- */}
             <View style={styles.section}>
               <Text style={styles.sectionTitle}>Registro Profissional</Text>
 
@@ -370,7 +340,6 @@ export default function MedicosEditarScreen() {
               </View>
             </View>
 
-            {/* --- CONTATO E STATUS --- */}
             <View style={styles.section}>
               <Text style={styles.sectionTitle}>Contato e Status</Text>
 
@@ -403,7 +372,6 @@ export default function MedicosEditarScreen() {
               </View>
             </View>
 
-            {/* --- BOTÕES --- */}
             <View style={styles.actionsContainer}>
               <TouchableOpacity
                 style={[styles.cancelButton, loading && styles.buttonDisabled]}
@@ -411,6 +379,7 @@ export default function MedicosEditarScreen() {
                 disabled={loading}
               >
                 <Text style={styles.cancelButtonText}>Cancelar</Text>
+                 <Ionicons name="close-circle-outline" size={22} color="#ff0000ff" style={{ marginRight: 6 }} />
               </TouchableOpacity>
 
               <TouchableOpacity
@@ -424,6 +393,7 @@ export default function MedicosEditarScreen() {
                 <Text style={styles.saveButtonText}>
                   {loading ? "Salvando..." : "Salvar Alterações"}
                 </Text>
+                 <Ionicons name="save-outline" size={22} color="#FFFFFF" style={{ marginRight: 6 }} />
               </TouchableOpacity>
             </View>
           </View>

@@ -70,7 +70,7 @@ export const styles = StyleSheet.create({
     color: "#2D3748",
     backgroundColor: "#FFFFFF",
   },
-  // NOVOS ESTILOS PARA CAMPO DE DATA
+
   dateInputContainer: {
     flexDirection: 'row',
     alignItems: 'center',
@@ -123,6 +123,9 @@ export const styles = StyleSheet.create({
     backgroundColor: "#F7FAFC",
     borderWidth: 1,
     borderColor: "#ff0000ff",
+
+    flexDirection: "row",
+    gap: 8,
   },
   cancelButtonText: {
     color: "#ff0000ff",
@@ -144,6 +147,8 @@ export const styles = StyleSheet.create({
     shadowOpacity: 0.3,
     shadowRadius: 8,
     elevation: 6,
+    flexDirection: "row",
+    gap: 8,
   },
   saveButtonDisabled: {
     backgroundColor: "#CBD5E0",

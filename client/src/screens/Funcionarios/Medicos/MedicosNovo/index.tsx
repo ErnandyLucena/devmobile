@@ -40,10 +40,6 @@ export function MedicoNovoScreen() {
 
   const [errors, setErrors] = useState({});
 
-  // ========================
-  // MODAL
-  // ========================
-
   const showModal = (message, type = "info") => {
     setModalMessage(message);
     setModalType(type);
@@ -57,10 +53,6 @@ export function MedicoNovoScreen() {
     if (modalType === "success") navigation.goBack();
   };
 
-  // ========================
-  // CAMPOS
-  // ========================
-
   const updateField = (field, value) => {
     setForm((prev) => ({ ...prev, [field]: value }));
 
@@ -68,9 +60,6 @@ export function MedicoNovoScreen() {
       setErrors((prev) => ({ ...prev, [field]: "" }));
   };
 
-  // ========================
-  // FORMATADORES
-  // ========================
 
   const formatCPF = (text) => {
     const numbers = text.replace(/\D/g, "");
@@ -87,13 +76,12 @@ export function MedicoNovoScreen() {
 
   const handleCPFChange = (t) => updateField("cpf", formatCPF(t));
 
-  // ---- CRM FINAL ----
   const formatCRM = (value) => {
     const cleaned = value.replace(/[^\dA-Za-z]/g, "").toUpperCase();
 
-    const part1 = cleaned.substring(0, 3); // CRM
-    const part2 = cleaned.substring(3, 5); // UF
-    const number = cleaned.substring(5);  // Número
+    const part1 = cleaned.substring(0, 3); 
+    const part2 = cleaned.substring(3, 5); 
+    const number = cleaned.substring(5);  
 
     let formatted = part1;
     if (part2) formatted += `/${part2}`;
@@ -150,10 +138,6 @@ export function MedicoNovoScreen() {
     updateField("dataAdmissao", `${d}/${m}/${y}`);
   };
 
-  // ========================
-  // VALIDAÇÕES
-  // ========================
-
   const validateCPF = (cpf) => {
     if (!cpf) return true;
     const clean = cpf.replace(/\D/g, "");
@@ -208,9 +192,6 @@ export function MedicoNovoScreen() {
     return Object.keys(e).length === 0;
   };
 
-  // ========================
-  // SALVAR
-  // ========================
 
   const handleSalvar = async () => {
     if (!validateForm()) {
@@ -253,10 +234,6 @@ export function MedicoNovoScreen() {
     form.dsEmail.trim() &&
     form.especialidade.trim();
 
-  // ========================
-  // RENDER
-  // ========================
-
   return (
     <>
       <KeyboardAvoidingView
@@ -272,7 +249,6 @@ export function MedicoNovoScreen() {
           contentContainerStyle={styles.scrollContent}
         >
           <View style={styles.form}>
-            {/* Informações Pessoais */}
             <View style={styles.section}>
               <Text style={styles.sectionTitle}>Informações Pessoais</Text>
 
@@ -317,7 +293,6 @@ export function MedicoNovoScreen() {
               </View>
             </View>
 
-            {/* Registro Profissional */}
             <View style={styles.section}>
               <Text style={styles.sectionTitle}>Registro Profissional</Text>
 
@@ -392,7 +367,6 @@ export function MedicoNovoScreen() {
               </View>
             </View>
 
-            {/* Contato e Status */}
             <View style={styles.section}>
               <Text style={styles.sectionTitle}>Contato e Status</Text>
 
@@ -441,7 +415,6 @@ export function MedicoNovoScreen() {
               </View>
             </View>
 
-            {/* Botões */}
             <View style={styles.actionsContainer}>
               <TouchableOpacity
                 style={[styles.cancelButton, loading && styles.buttonDisabled]}
@@ -449,6 +422,7 @@ export function MedicoNovoScreen() {
                 disabled={loading}
               >
                 <Text style={styles.cancelButtonText}>Cancelar</Text>
+                <Ionicons name="close-circle-outline" size={20} color="#E53E3E" />
               </TouchableOpacity>
 
               <TouchableOpacity
@@ -462,6 +436,7 @@ export function MedicoNovoScreen() {
                 <Text style={styles.saveButtonText}>
                   Cadastrar Médico
                 </Text>
+                <Ionicons name="person-add-outline" size={20} color="#FFF" />
               </TouchableOpacity>
             </View>
           </View>

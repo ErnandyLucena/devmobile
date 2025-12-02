@@ -22,12 +22,10 @@ export default function PacientesListScreen({ navigation }) {
   const [refreshing, setRefreshing] = useState(false);
   const [searchText, setSearchText] = useState("");
 
-  // Funções de carregamento e busca
   const loadPacientes = async () => {
     try {
       const data = await getAllPacientes();
       
-      // Ordenar por nome (ou por data de criação se preferir)
       const pacientesOrdenados = data.sort((a, b) => 
         (a.nome || "").localeCompare(b.nome || "")
       );
@@ -90,7 +88,6 @@ const handleVerDetalhes = (paciente) => {
   });
 };
 
-  // Componentes de renderização
   const renderPacienteCard = ({ item }) => (
     <View style={styles.card}>
       <View style={styles.cardHeader}>
@@ -175,7 +172,6 @@ const handleVerDetalhes = (paciente) => {
     <View style={styles.container}>
       <StatusBar barStyle="dark-content" backgroundColor="#F7FAFC" />
 
-      {/* Barra de Busca */}
       <View style={styles.searchContainer}>
         <View style={styles.searchInputContainer}>
           <TextInput
@@ -195,7 +191,6 @@ const handleVerDetalhes = (paciente) => {
         </View>
       </View>
 
-      {/* Header com Estatísticas */}
       <View style={styles.header}>
         <View style={styles.headerLeft}>
           <Text style={styles.subtitle}>
@@ -212,7 +207,6 @@ const handleVerDetalhes = (paciente) => {
         </TouchableOpacity>
       </View>
 
-      {/* Lista de Pacientes */}
       <FlatList
         data={pacientesFiltrados}
         keyExtractor={(item) => item.id}

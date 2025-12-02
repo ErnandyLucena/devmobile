@@ -11,9 +11,9 @@ import {
 } from "react-native";
 import { useNavigation } from "@react-navigation/native";
 import { Ionicons } from '@expo/vector-icons';
-import { styles } from "./styles"; 
+import { styles } from "./styles";
 import { cadastrarPaciente } from "../../../services/pacientes.service";
-import MessageModal from "../../../components/MessageContext/MessageContext"; 
+import MessageModal from "../../../components/MessageContext/MessageContext";
 
 export default function PacientesNovoScreen() {
   const navigation = useNavigation();
@@ -43,10 +43,7 @@ export default function PacientesNovoScreen() {
   };
 
   const formatarCPF = (cpf) => {
-    // Remove tudo que não é número
     const numbers = cpf.replace(/\D/g, '');
-
-    // Aplica a formatação
     if (numbers.length <= 3) return numbers;
     if (numbers.length <= 6) return numbers.replace(/(\d{3})(\d+)/, '$1.$2');
     if (numbers.length <= 9) return numbers.replace(/(\d{3})(\d{3})(\d+)/, '$1.$2.$3');
@@ -54,10 +51,8 @@ export default function PacientesNovoScreen() {
   };
 
   const formatarTelefone = (telefone) => {
-    // Remove tudo que não é número
     const numbers = telefone.replace(/\D/g, '');
 
-    // Aplica a formatação
     if (numbers.length <= 2) return numbers;
     if (numbers.length <= 6) return numbers.replace(/(\d{2})(\d+)/, '($1) $2');
     if (numbers.length <= 10) return numbers.replace(/(\d{2})(\d{4})(\d+)/, '($1) $2-$3');
@@ -85,20 +80,17 @@ export default function PacientesNovoScreen() {
       return false;
     }
 
-    // Validação básica de CPF (apenas formato)
     const cpfLimpo = formData.cpf.replace(/\D/g, '');
     if (cpfLimpo.length !== 11) {
       showModal("CPF deve ter 11 dígitos", "error");
       return false;
     }
 
-    // Validação básica de email
     if (formData.email && !formData.email.includes('@')) {
       showModal("Por favor, informe um email válido", "error");
       return false;
     }
 
-    // Validação básica de telefone
     if (formData.telefone) {
       const telefoneLimpo = formData.telefone.replace(/\D/g, '');
       if (telefoneLimpo.length < 10 || telefoneLimpo.length > 11) {
@@ -115,7 +107,6 @@ export default function PacientesNovoScreen() {
 
     setLoading(true);
     try {
-      // Remove formatação do CPF e telefone antes de salvar
       const dadosParaSalvar = {
         ...formData,
         cpf: formData.cpf.replace(/\D/g, ''),
@@ -126,7 +117,6 @@ export default function PacientesNovoScreen() {
 
       if (resultado.success) {
         showModal("Paciente cadastrado com sucesso!", "success");
-        // Não navega automaticamente, espera o usuário fechar o modal
       } else {
         throw new Error(resultado.error);
       }
@@ -140,7 +130,6 @@ export default function PacientesNovoScreen() {
 
   const handleModalClose = () => {
     setModalVisible(false);
-    // Se foi um sucesso, navega de volta para a lista
     if (modalType === "success") {
       navigation.goBack();
     }
@@ -159,11 +148,9 @@ export default function PacientesNovoScreen() {
         contentContainerStyle={styles.scrollContent}
         keyboardShouldPersistTaps="handled"
       >
-        {/* Formulário */}
         <View style={styles.formSection}>
           <Text style={styles.sectionTitle}>Dados Pessoais</Text>
 
-          {/* Campo Nome */}
           <View style={styles.inputGroup}>
             <Text style={styles.inputLabel}>Nome Completo *</Text>
             <TextInput
@@ -177,7 +164,6 @@ export default function PacientesNovoScreen() {
             />
           </View>
 
-          {/* Campo CPF */}
           <View style={styles.inputGroup}>
             <Text style={styles.inputLabel}>CPF *</Text>
             <TextInput
@@ -191,7 +177,6 @@ export default function PacientesNovoScreen() {
             />
           </View>
 
-          {/* Campo Email */}
           <View style={styles.inputGroup}>
             <Text style={styles.inputLabel}>Email</Text>
             <TextInput
@@ -206,7 +191,6 @@ export default function PacientesNovoScreen() {
             />
           </View>
 
-          {/* Campo Telefone */}
           <View style={styles.inputGroup}>
             <Text style={styles.inputLabel}>Telefone</Text>
             <TextInput
@@ -221,16 +205,18 @@ export default function PacientesNovoScreen() {
           </View>
         </View>
 
-        {/* Botões de Ação */}
         <View style={styles.actionsSection}>
           <TouchableOpacity
             style={[styles.actionButton, styles.cancelButton]}
             onPress={() => navigation.goBack()}
             disabled={loading}
           >
-            <Text style={[styles.actionButtonText, styles.cancelButtonText]}>
-              Cancelar
-            </Text>
+            <View style={{ flexDirection: "row", alignItems: "center", gap: 8 }}>
+              <Text style={[styles.actionButtonText, styles.cancelButtonText]}>
+              <Ionicons name="close-circle-outline" size={20} color="#ff0000ff" />
+                Cancelar
+              </Text>
+            </View>
           </TouchableOpacity>
 
           <TouchableOpacity
@@ -241,13 +227,16 @@ export default function PacientesNovoScreen() {
             {loading ? (
               <Text style={styles.actionButtonText}>Cadastrando...</Text>
             ) : (
-              <Text style={styles.actionButtonText}>Cadastrar Paciente</Text>
+              <View style={{ flexDirection: "row", alignItems: "center", gap: 8 }}>
+                <Text style={styles.actionButtonText}>Cadastrar Paciente</Text>
+                <Ionicons name="person-add-outline" size={20} color="#FFFFFF" />
+              </View>
             )}
           </TouchableOpacity>
+
         </View>
       </ScrollView>
 
-      {/* Modal Personalizado */}
       <MessageModal
         visible={modalVisible}
         message={modalMessage}

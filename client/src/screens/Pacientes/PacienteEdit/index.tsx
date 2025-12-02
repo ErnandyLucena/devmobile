@@ -12,9 +12,9 @@ import {
 } from "react-native";
 import { useNavigation, useRoute } from "@react-navigation/native";
 import { Ionicons } from '@expo/vector-icons';
-import { styles } from "./styles"; 
+import { styles } from "./styles";
 import { atualizarPaciente, getPacienteById } from "../../../services/pacientes.service";
-import MessageModal from "../../../components/MessageContext/MessageContext"; 
+import MessageModal from "../../../components/MessageContext/MessageContext";
 
 export default function EditarPacienteScreen() {
   const navigation = useNavigation();
@@ -34,7 +34,6 @@ export default function EditarPacienteScreen() {
     telefone: ""
   });
 
-  // Carrega os dados do paciente quando a tela abre
   useEffect(() => {
     if (paciente) {
       carregarDadosPaciente();
@@ -44,8 +43,7 @@ export default function EditarPacienteScreen() {
   const carregarDadosPaciente = async () => {
     try {
       setCarregandoDados(true);
-      
-      // Se já temos os dados completos do paciente, usa diretamente
+
       if (paciente.nome && paciente.cpf) {
         setFormData({
           nome: paciente.nome || "",
@@ -54,7 +52,6 @@ export default function EditarPacienteScreen() {
           telefone: formatarTelefone(paciente.telefone) || ""
         });
       } else {
-        // Se não, busca os dados completos pelo ID
         const pacienteCompleto = await getPacienteById(paciente.id);
         if (pacienteCompleto) {
           setFormData({
@@ -88,10 +85,8 @@ export default function EditarPacienteScreen() {
 
   const formatarCPF = (cpf) => {
     if (!cpf) return "";
-    // Remove tudo que não é número
     const numbers = cpf.replace(/\D/g, '');
 
-    // Aplica a formatação
     if (numbers.length <= 3) return numbers;
     if (numbers.length <= 6) return numbers.replace(/(\d{3})(\d+)/, '$1.$2');
     if (numbers.length <= 9) return numbers.replace(/(\d{3})(\d{3})(\d+)/, '$1.$2.$3');
@@ -100,10 +95,8 @@ export default function EditarPacienteScreen() {
 
   const formatarTelefone = (telefone) => {
     if (!telefone) return "";
-    // Remove tudo que não é número
     const numbers = telefone.replace(/\D/g, '');
 
-    // Aplica a formatação
     if (numbers.length <= 2) return numbers;
     if (numbers.length <= 6) return numbers.replace(/(\d{2})(\d+)/, '($1) $2');
     if (numbers.length <= 10) return numbers.replace(/(\d{2})(\d{4})(\d+)/, '($1) $2-$3');
@@ -131,20 +124,17 @@ export default function EditarPacienteScreen() {
       return false;
     }
 
-    // Validação básica de CPF (apenas formato)
     const cpfLimpo = formData.cpf.replace(/\D/g, '');
     if (cpfLimpo.length !== 11) {
       showModal("CPF deve ter 11 dígitos", "error");
       return false;
     }
 
-    // Validação básica de email
     if (formData.email && !formData.email.includes('@')) {
       showModal("Por favor, informe um email válido", "error");
       return false;
     }
 
-    // Validação básica de telefone
     if (formData.telefone) {
       const telefoneLimpo = formData.telefone.replace(/\D/g, '');
       if (telefoneLimpo.length < 10 || telefoneLimpo.length > 11) {
@@ -161,7 +151,6 @@ export default function EditarPacienteScreen() {
 
     setLoading(true);
     try {
-      // Remove formatação do CPF e telefone antes de salvar
       const dadosParaSalvar = {
         nome: formData.nome.trim(),
         cpf: formData.cpf.replace(/\D/g, ''),
@@ -173,7 +162,6 @@ export default function EditarPacienteScreen() {
 
       if (resultado.success) {
         showModal("Paciente atualizado com sucesso!", "success");
-        // Chama o callback para atualizar a lista/detalhes
         if (onPacienteAtualizado) {
           onPacienteAtualizado();
         }
@@ -190,7 +178,6 @@ export default function EditarPacienteScreen() {
 
   const handleModalClose = () => {
     setModalVisible(false);
-    // Se foi um sucesso, navega de volta
     if (modalType === "success") {
       navigation.goBack();
     }
@@ -222,11 +209,9 @@ export default function EditarPacienteScreen() {
         contentContainerStyle={styles.scrollContent}
         keyboardShouldPersistTaps="handled"
       >
-        {/* Formulário */}
         <View style={styles.formSection}>
           <Text style={styles.sectionTitle}>Dados Pessoais</Text>
 
-          {/* Campo Nome */}
           <View style={styles.inputGroup}>
             <Text style={styles.inputLabel}>Nome Completo *</Text>
             <TextInput
@@ -240,7 +225,6 @@ export default function EditarPacienteScreen() {
             />
           </View>
 
-          {/* Campo CPF */}
           <View style={styles.inputGroup}>
             <Text style={styles.inputLabel}>CPF *</Text>
             <TextInput
@@ -251,12 +235,11 @@ export default function EditarPacienteScreen() {
               onChangeText={handleCPFChange}
               keyboardType="numeric"
               maxLength={14}
-              editable={false} // CPF geralmente não é editável
+              editable={false} 
             />
             <Text style={styles.helperText}>CPF não pode ser alterado</Text>
           </View>
 
-          {/* Campo Email */}
           <View style={styles.inputGroup}>
             <Text style={styles.inputLabel}>Email</Text>
             <TextInput
@@ -271,7 +254,6 @@ export default function EditarPacienteScreen() {
             />
           </View>
 
-          {/* Campo Telefone */}
           <View style={styles.inputGroup}>
             <Text style={styles.inputLabel}>Telefone</Text>
             <TextInput
@@ -286,33 +268,42 @@ export default function EditarPacienteScreen() {
           </View>
         </View>
 
-        {/* Botões de Ação */}
         <View style={styles.actionsSection}>
           <TouchableOpacity
             style={[styles.actionButton, styles.cancelButton]}
             onPress={handleVoltar}
             disabled={loading}
           >
-            <Text style={[styles.actionButtonText, styles.cancelButtonText]}>
-              Cancelar
-            </Text>
+            <View style={{ flexDirection: "row", alignItems: "center", gap: 8 }}>
+              <Text style={[styles.actionButtonText, styles.cancelButtonText]}>
+              <Ionicons name="close-circle-outline" size={20} color="#E53E3E" />
+                Cancelar
+              </Text>
+            </View>
           </TouchableOpacity>
 
           <TouchableOpacity
-            style={[styles.actionButton, styles.saveButton, loading && styles.saveButtonDisabled]}
+            style={[
+              styles.actionButton,
+              styles.saveButton,
+              loading && styles.saveButtonDisabled
+            ]}
             onPress={handleSalvar}
             disabled={loading}
           >
             {loading ? (
               <Text style={styles.actionButtonText}>Salvando...</Text>
             ) : (
-              <Text style={styles.actionButtonText}>Salvar Alterações</Text>
+              <View style={{ flexDirection: "row", alignItems: "center", gap: 8 }}>
+                <Text style={styles.actionButtonText}>Salvar Alterações</Text>
+                <Ionicons name="save-outline" size={20} color="#FFFFFF" />
+              </View>
             )}
           </TouchableOpacity>
         </View>
+
       </ScrollView>
 
-      {/* Modal Personalizado */}
       <MessageModal
         visible={modalVisible}
         message={modalMessage}

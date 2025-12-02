@@ -17,7 +17,7 @@ export const styles = StyleSheet.create({
     fontFamily: "sans-serif-condensed"
   },
   formContainer: {
-    gap: 20,
+    gap: 15,
   },
   inputContainer: {
     gap: 8,
@@ -85,7 +85,6 @@ export const styles = StyleSheet.create({
   typeButtonText: {
     color: "#333",
   },
-
   typeButtonTextSelected: {
     color: "#fff",
     fontWeight: "bold",

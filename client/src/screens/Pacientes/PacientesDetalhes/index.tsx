@@ -74,7 +74,6 @@ export default function DetalhesPacienteScreen({ route, navigation }) {
 
   const formatarTelefone = (telefone) => {
     if (!telefone) return 'Não informado';
-    // Remove caracteres não numéricos
     const numeros = telefone.replace(/\D/g, '');
     
     if (numeros.length === 11) {
@@ -127,9 +126,7 @@ export default function DetalhesPacienteScreen({ route, navigation }) {
         contentContainerStyle={styles.scrollContent}
         showsVerticalScrollIndicator={false}
       >
-        {/* Card Principal */}
         <View style={styles.mainCard}>
-          {/* Seção do Avatar e Nome */}
           <View style={styles.avatarSection}>
             <View 
               style={[
@@ -154,7 +151,6 @@ export default function DetalhesPacienteScreen({ route, navigation }) {
             </View>
           </View>
 
-          {/* Seção de Informações Pessoais */}
           <View style={styles.infoSection}>
             <View style={styles.sectionHeader}>
               <Ionicons name="person-outline" size={20} color="#4A5568" />
@@ -192,7 +188,6 @@ export default function DetalhesPacienteScreen({ route, navigation }) {
             </View>
           </View>
 
-          {/* Seção de Identificação */}
           <View style={styles.infoSection}>
             <View style={styles.sectionHeader}>
               <Ionicons name="fingerprint-outline" size={20} color="#4A5568" />
@@ -234,14 +229,13 @@ export default function DetalhesPacienteScreen({ route, navigation }) {
         </View>
       </ScrollView>
 
-      {/* Botão de Ação */}
       <View style={styles.actionsContainer}>
         <TouchableOpacity 
           style={styles.editButton}
           onPress={handleEditar}
         >
-          <Ionicons name="create-outline" size={20} color="#FFFFFF" />
           <Text style={styles.editButtonText}>Editar Paciente</Text>
+          <Ionicons name="create-outline" size={20} color="#FFFFFF" />
         </TouchableOpacity>
       </View>
     </View>

@@ -1,9 +1,8 @@
-// ------------- NovoAgendamentoScreen.js 100% corrigido com MessageModal -------------
-import { 
-  View, 
-  Text, 
-  ScrollView, 
-  TouchableOpacity, 
+import {
+  View,
+  Text,
+  ScrollView,
+  TouchableOpacity,
   TextInput,
   KeyboardAvoidingView,
   Platform,
@@ -13,7 +12,9 @@ import {
 } from "react-native";
 import { useState, useEffect } from "react";
 import { useNavigation } from "@react-navigation/native";
-import { Ionicons } from '@expo/vector-icons';
+import { Ionicons } from "@expo/vector-icons";
+import DateTimePicker from "@react-native-community/datetimepicker";
+
 import { styles } from "./styles";
 import { cadastrarAgendamento } from "../../../services/agendamentos.service";
 import { getAllPacientes } from "../../../services/pacientes.service";
@@ -22,7 +23,6 @@ import MessageModal from "../../../components/MessageContext/MessageContext";
 export function NovoAgendamentoScreen() {
   const navigation = useNavigation();
 
-  // 🔵 Estado do modal de mensagens
   const [modalMsgVisible, setModalMsgVisible] = useState(false);
   const [modalMsgType, setModalMsgType] = useState("info");
   const [modalMsgText, setModalMsgText] = useState("");
@@ -33,8 +33,12 @@ export function NovoAgendamentoScreen() {
     setModalMsgVisible(true);
   };
 
+  const [showDatePicker, setShowDatePicker] = useState(false);
+  const [showHoraInicioPicker, setShowHoraInicioPicker] = useState(false);
+  const [showHoraFimPicker, setShowHoraFimPicker] = useState(false);
+
   const [formData, setFormData] = useState({
-    data: "",          
+    data: "",
     horaInicio: "",
     horaFim: "",
     status: "Confirmado",
@@ -51,7 +55,6 @@ export function NovoAgendamentoScreen() {
   const [loading, setLoading] = useState(false);
   const [carregandoPacientes, setCarregandoPacientes] = useState(false);
 
-  // Carregar pacientes
   useEffect(() => {
     carregarPacientes();
   }, []);
@@ -74,16 +77,17 @@ export function NovoAgendamentoScreen() {
     if (!texto) return setPacientesFiltrados(pacientes);
 
     const textoLower = texto.toLowerCase();
-    const filtrados = pacientes.filter(p =>
-      p.nome?.toLowerCase().includes(textoLower) ||
-      p.cpf?.includes(texto)
+    const filtrados = pacientes.filter(
+      (p) =>
+        p.nome?.toLowerCase().includes(textoLower) ||
+        p.cpf?.includes(texto)
     );
 
     setPacientesFiltrados(filtrados);
   };
 
   const selecionarPaciente = (paciente) => {
-    setFormData(prev => ({
+    setFormData((prev) => ({
       ...prev,
       cpfPaciente: paciente.cpf,
       nomePaciente: paciente.nome
@@ -91,26 +95,32 @@ export function NovoAgendamentoScreen() {
     setModalVisible(false);
   };
 
+  const updateField = (field, value) => {
+    setFormData((prev) => ({ ...prev, [field]: value }));
+  };
+
+  const formatarData = (date) => {
+    const dia = String(date.getDate()).padStart(2, "0");
+    const mes = String(date.getMonth() + 1).padStart(2, "0");
+    const ano = date.getFullYear();
+    return `${dia}/${mes}/${ano}`;
+  };
+
   const converterDataParaISO = (dataBR) => {
     if (!dataBR) return "";
-    const partes = dataBR.split("/");
-    if (partes.length !== 3) return "";
-    const [dia, mes, ano] = partes;
+    const [dia, mes, ano] = dataBR.split("/");
     return `${ano}-${mes}-${dia}`;
   };
 
-  // 🔵 Todas mensagens agora usam o modal
   const validarFormulario = () => {
     if (!formData.data) {
       openMessage("warning", "Preencha a data.");
       return false;
     }
-
     if (!formData.horaInicio || !formData.horaFim) {
       openMessage("warning", "Preencha os horários.");
       return false;
     }
-
     if (!formData.cpfPaciente) {
       openMessage("warning", "Selecione um paciente.");
       return false;
@@ -122,7 +132,7 @@ export function NovoAgendamentoScreen() {
     hoje.setHours(0, 0, 0, 0);
 
     if (dataAgendamento < hoje) {
-      openMessage("warning", "Não é possível agendar para datas passadas.");
+      openMessage("warning", "Não é possível agendar para uma data anterior a hoje.");
       return false;
     }
 
@@ -130,7 +140,6 @@ export function NovoAgendamentoScreen() {
       openMessage("warning", "Hora final deve ser maior que a inicial.");
       return false;
     }
-
     return true;
   };
 
@@ -146,7 +155,7 @@ export function NovoAgendamentoScreen() {
         ...formData,
         data: dataISO,
         horaInicio: `${dataISO}T${formData.horaInicio}:00`,
-        horaFim: `${dataISO}T${formData.horaFim}:00`,
+        horaFim: `${dataISO}T${formData.horaFim}:00`
       };
 
       const resultado = await cadastrarAgendamento(dadosParaSalvar);
@@ -159,18 +168,14 @@ export function NovoAgendamentoScreen() {
         }, 800);
       }
     } catch (error) {
-      openMessage("error", "Falha ao salvar agendamento.");
+      openMessage("error", "Erro ao salvar agendamento.");
     } finally {
       setLoading(false);
     }
   };
 
-  const updateField = (field, value) => {
-    setFormData(prev => ({ ...prev, [field]: value }));
-  };
-
   const renderPacienteItem = ({ item }) => (
-    <TouchableOpacity 
+    <TouchableOpacity
       style={styles.pacienteItem}
       onPress={() => selecionarPaciente(item)}
     >
@@ -183,13 +188,11 @@ export function NovoAgendamentoScreen() {
   );
 
   return (
-    <KeyboardAvoidingView 
+    <KeyboardAvoidingView
       style={styles.container}
       behavior={Platform.OS === "ios" ? "padding" : "height"}
     >
       <ScrollView style={styles.scrollView}>
-        
-        {/* Paciente */}
         <View style={styles.inputGroup}>
           <Text style={styles.inputLabel}>Paciente *</Text>
           <TouchableOpacity
@@ -199,63 +202,86 @@ export function NovoAgendamentoScreen() {
             <Text style={styles.pacienteSelecionadoNome}>
               {formData.nomePaciente || "Selecione um paciente"}
             </Text>
-            <Ionicons name="chevron-down" size={16} color="#A0AEC0" />
+            <Ionicons name="chevron-down" size={18} color="#006effff" />
           </TouchableOpacity>
         </View>
 
-        {/* Data */}
         <View style={styles.inputGroup}>
           <Text style={styles.inputLabel}>Data *</Text>
-          <TextInput
-            style={styles.textInput}
-            placeholder="DD/MM/YYYY"
-            value={formData.data}
-            onChangeText={text => updateField("data", text)}
-          />
+
+          <TouchableOpacity
+            style={[
+              styles.textInput,
+              {
+                flexDirection: "row",
+                alignItems: "center",
+                justifyContent: "space-between"
+              }
+            ]}
+            onPress={() => setShowDatePicker(true)}
+          >
+            <Text style={{ color: formData.data ? "#000000ff" : "#000000ff" }}>
+              {formData.data || "DD/MM/YYYY"}
+            </Text>
+
+            <Ionicons name="calendar-outline" size={22} color="#005effff" />
+          </TouchableOpacity>
         </View>
 
-        {/* Hora Início */}
         <View style={styles.inputGroup}>
           <Text style={styles.inputLabel}>Hora Início *</Text>
-          <TextInput
-            style={styles.textInput}
-            placeholder="HH:MM"
-            value={formData.horaInicio}
-            onChangeText={text => updateField("horaInicio", text)}
-          />
+
+          <TouchableOpacity
+            style={[
+              styles.textInput,
+              { flexDirection: "row", justifyContent: "space-between" }
+            ]}
+            onPress={() => setShowHoraInicioPicker(true)}
+          >
+            <Text style={{ color: formData.horaInicio ? "#000" : "#999" }}>
+              {formData.horaInicio || "HH:MM"}
+            </Text>
+
+            <Ionicons name="time-outline" size={22} color="#0077ffff" />
+          </TouchableOpacity>
         </View>
 
-        {/* Hora Fim */}
         <View style={styles.inputGroup}>
           <Text style={styles.inputLabel}>Hora Fim *</Text>
-          <TextInput
-            style={styles.textInput}
-            placeholder="HH:MM"
-            value={formData.horaFim}
-            onChangeText={text => updateField("horaFim", text)}
-          />
+
+          <TouchableOpacity
+            style={[
+              styles.textInput,
+              { flexDirection: "row", justifyContent: "space-between" }
+            ]}
+            onPress={() => setShowHoraFimPicker(true)}
+          >
+            <Text style={{ color: formData.horaFim ? "#000" : "#999" }}>
+              {formData.horaFim || "HH:MM"}
+            </Text>
+
+            <Ionicons name="time-outline" size={22} color="#0077ffff" />
+          </TouchableOpacity>
         </View>
 
-        {/* Observações */}
         <View style={styles.inputGroup}>
           <Text style={styles.inputLabel}>Observações</Text>
           <TextInput
             style={[styles.textInput, styles.textArea]}
             multiline
             value={formData.observacoes}
-            onChangeText={text => updateField("observacoes", text)}
+            onChangeText={(t) => updateField("observacoes", t)}
           />
         </View>
 
-        {/* Botão salvar */}
-        <TouchableOpacity 
-          style={styles.saveButton}
-          onPress={handleSalvar}
-        >
+        <TouchableOpacity style={styles.saveButton} onPress={handleSalvar}>
           {loading ? (
             <ActivityIndicator size="small" color="#FFF" />
           ) : (
-            <Text style={styles.saveButtonText}>Salvar</Text>
+            <View style={{ flexDirection: "row", alignItems: "center", gap: 8 }}>
+              <Text style={styles.saveButtonText}>Salvar</Text>
+              <Ionicons name="save-outline" size={20} color="#FFF" />
+            </View>
           )}
         </TouchableOpacity>
 
@@ -263,15 +289,15 @@ export function NovoAgendamentoScreen() {
           style={styles.cancelButton}
           onPress={() => navigation.goBack()}
         >
-          <Text style={styles.cancelButtonText}>Cancelar</Text>
+          <View style={{ flexDirection: "row", alignItems: "center", gap: 8 }}>
+            <Text style={styles.cancelButtonText}>Cancelar</Text>
+            <Ionicons name="close-circle-outline" size={20} color="#FF0000" />
+          </View>
         </TouchableOpacity>
-
       </ScrollView>
 
-      {/* Modal Pacientes */}
       <Modal visible={modalVisible} animationType="slide">
         <View style={styles.modalContainer}>
-
           <View style={styles.modalHeader}>
             <Text style={styles.modalTitle}>Selecionar Paciente</Text>
             <TouchableOpacity onPress={() => setModalVisible(false)}>
@@ -291,21 +317,63 @@ export function NovoAgendamentoScreen() {
           ) : (
             <FlatList
               data={pacientesFiltrados}
-              keyExtractor={item => item.id}
+              keyExtractor={(item) => item.id}
               renderItem={renderPacienteItem}
             />
           )}
-
         </View>
       </Modal>
 
-      {/* 🔵 Modal de Mensagens */}
       <MessageModal
         visible={modalMsgVisible}
         message={modalMsgText}
         type={modalMsgType}
         onClose={() => setModalMsgVisible(false)}
       />
+
+      {showDatePicker && (
+        <DateTimePicker
+          value={new Date()}
+          mode="date"
+          display="spinner"
+          onChange={(event, selectedDate) => {
+            setShowDatePicker(false);
+            if (selectedDate) updateField("data", formatarData(selectedDate));
+          }}
+        />
+      )}
+
+      {showHoraInicioPicker && (
+        <DateTimePicker
+          value={new Date()}
+          mode="time"
+          display="spinner"
+          onChange={(event, selectedDate) => {
+            setShowHoraInicioPicker(false);
+            if (selectedDate) {
+              const h = String(selectedDate.getHours()).padStart(2, "0");
+              const m = String(selectedDate.getMinutes()).padStart(2, "0");
+              updateField("horaInicio", `${h}:${m}`);
+            }
+          }}
+        />
+      )}
+      
+      {showHoraFimPicker && (
+        <DateTimePicker
+          value={new Date()}
+          mode="time"
+          display="spinner"
+          onChange={(event, selectedDate) => {
+            setShowHoraFimPicker(false);
+            if (selectedDate) {
+              const h = String(selectedDate.getHours()).padStart(2, "0");
+              const m = String(selectedDate.getMinutes()).padStart(2, "0");
+              updateField("horaFim", `${h}:${m}`);
+            }
+          }}
+        />
+      )}
     </KeyboardAvoidingView>
   );
 }

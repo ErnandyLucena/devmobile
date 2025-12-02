@@ -34,7 +34,6 @@ export default function RegisterScreen({ navigation }: any) {
 
   const [loading, setLoading] = useState(false);
 
-  // Função para formatar CPF
   const formatCPF = (text: string) => {
     const numbers = text.replace(/\D/g, '');
     if (numbers.length <= 11) {
@@ -46,20 +45,17 @@ export default function RegisterScreen({ navigation }: any) {
     return text;
   };
 
-  // Função para validar email
   const isValidEmail = (email: string) => {
     const emailRegex = /^[^\s@]+@[^\s@]+\.[^\s@]+$/;
     return emailRegex.test(email);
   };
 
-  // Função para validar CPF
   const isValidCPF = (cpf: string) => {
     const cleanedCPF = cpf.replace(/\D/g, '');
     return cleanedCPF.length === 11;
   };
 
   async function handleRegister() {
-    // Validações básicas
     if (!name || !email || !cpf || !password || !repeatPassword || !tipo) {
       setModalType("error");
       setModalMessage("Preencha todos os campos e selecione o tipo.");
@@ -67,7 +63,6 @@ export default function RegisterScreen({ navigation }: any) {
       return;
     }
 
-    // Validação de email
     if (!isValidEmail(email)) {
       setModalType("error");
       setModalMessage("Por favor, insira um email válido.");
@@ -75,7 +70,6 @@ export default function RegisterScreen({ navigation }: any) {
       return;
     }
 
-    // Validação de CPF
     if (!isValidCPF(cpf)) {
       setModalType("error");
       setModalMessage("Por favor, insira um CPF válido (11 dígitos).");
@@ -83,7 +77,6 @@ export default function RegisterScreen({ navigation }: any) {
       return;
     }
 
-    // Validação de senha
     if (password.length < 6) {
       setModalType("error");
       setModalMessage("A senha deve ter pelo menos 6 caracteres.");
@@ -101,32 +94,28 @@ export default function RegisterScreen({ navigation }: any) {
     try {
       setLoading(true);
 
-      // Registrar usuário
       await register({
         nome: name,
         email: email.toLowerCase(),
         senha: password,
-        cpf: cpf.replace(/\D/g, ''), // Remove formatação do CPF
+        cpf: cpf.replace(/\D/g, ''),
         tipo: tipo
       });
 
-      // Sucesso - mensagem diferente
       setModalType("success");
       setModalMessage("Conta criada com sucesso! Fazendo login automaticamente...");
       setModalVisible(true);
 
-      // Navega para a tela principal (login automático já aconteceu)
       setTimeout(() => {
         navigation.reset({
           index: 0,
-          routes: [{ name: "Home" }], // Altere para o nome da sua tela principal
+          routes: [{ name: "Home" }],
         });
       }, 2000);
 
     } catch (error: any) {
-      // Mensagens de erro específicas
       setModalType("error");
-      
+
       if (error.message.includes("CPF não cadastrado")) {
         setModalMessage("CPF não encontrado no sistema. Contate um funcionário para realizar seu cadastro prévio.");
       } else if (error.message.includes("Email já cadastrado")) {
@@ -140,7 +129,7 @@ export default function RegisterScreen({ navigation }: any) {
       } else {
         setModalMessage(error.message || "Erro ao criar conta. Verifique os dados e tente novamente.");
       }
-      
+
       setModalVisible(true);
     } finally {
       setLoading(false);
@@ -310,14 +299,22 @@ export default function RegisterScreen({ navigation }: any) {
               {loading ? (
                 <ActivityIndicator size="small" color="#fff" />
               ) : (
-                <Text style={styles.registerButtonText}>Criar Conta</Text>
+                <View style={{ flexDirection: "row", alignItems: "center", gap: 8 }}>
+                  <Text style={styles.registerButtonText}>Criar Conta</Text>
+                  <Ionicons name="person-add-outline" size={20} color="#fff" />
+                </View>
               )}
             </TouchableHighlight>
 
+
             <View style={styles.loginContainer}>
               <Text style={styles.loginText}>Já tem uma conta? </Text>
-              <TouchableOpacity onPress={() => navigation.navigate("Login")}>
+              <TouchableOpacity
+                onPress={() => navigation.navigate("Login")}
+                style={{ flexDirection: "row", alignItems: "center", gap: 6 }}
+              >
                 <Text style={styles.loginLink}>Fazer Login</Text>
+                <Ionicons name="log-in-outline" size={18} color="#2B5BFF" />
               </TouchableOpacity>
             </View>
 

@@ -24,29 +24,36 @@ export const styles = StyleSheet.create({
   buttonContainer: {
     gap: 12,
   },
-   loginButton: {
+
+  loginText: {
+    color: '#fff',
+    fontSize: 16,
+    fontWeight: '600',
+  },
+
+  registerText: {
+    color: '#2260FF',
+    fontSize: 16,
+    fontWeight: '600',
+  },
+  loginButton: {
     backgroundColor: '#2D6CDF',
     width: '70%',
     paddingVertical: 14,
     borderRadius: 25,
     alignItems: 'center',
+    justifyContent: 'center',
     marginBottom: 15,
-  },
-  loginText: {
-    color: '#fff',
-    fontSize: 16,
-    fontWeight: '600',
+    flexDirection: "row"
   },
   registerButton: {
     backgroundColor: '#E5EEFF',
     width: '70%',
     paddingVertical: 14,
     borderRadius: 25,
-    alignItems: 'center'
+    alignItems: 'center',
+    justifyContent: 'center',
+    flexDirection: "row"
   },
-  registerText: {
-    color: '#2260FF',
-    fontSize: 16,
-    fontWeight: '600',
-  },
+
 });
