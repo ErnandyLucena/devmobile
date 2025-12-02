@@ -12,7 +12,7 @@ export async function loginUser(
   setLoading(true);
 
   try {
-    const response = await signInWithEmailAndPassword(auth, email, password);
+    await signInWithEmailAndPassword(auth, email, password);
     const userData = await loadUserData(email, setUser);
     
     if (!userData) {

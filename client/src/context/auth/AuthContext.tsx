@@ -19,9 +19,7 @@ export function AuthProvider({ children }: any) {
   useEffect(() => {
     const unsub = onAuthStateChanged(auth, async (firebaseUser) => {
       if (firebaseUser && firebaseUser.email) {
-        if (!user) {
-          await loadUserData(firebaseUser.email, setUser);
-        }
+        await loadUserData(firebaseUser.email, setUser);
       } else {
         setUser(null);
         await AsyncStorage.removeItem("@user");

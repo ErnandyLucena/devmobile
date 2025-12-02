@@ -1,45 +1,35 @@
+import React from "react";
 import { View, Text } from "react-native";
-import { styles } from "./styles";
 import { useAuth } from "../../context/auth/AuthContext";
+import { styles } from "./styles";
 
 export function Header() {
   const { user } = useAuth();
 
-  // DEBUG - Verifique o que está vindo no user
-  console.log("🔍 Header - user data:", user);
-
   // Função para obter o nome de exibição
   const getDisplayName = () => {
-    if (!user) {
-      console.log("❌ Header: Nenhum usuário logado");
-      return "Usuário";
+    if (!user) return "Usuário";
+
+    if (user.tipo === "funcionario" && user.nomeCompleto) {
+      return user.nomeCompleto;
     }
 
-    if (user.tipo === "medico") {
-      return user.nomeAbreviado || user.nomeCompleto || user.nomeComplete || "Médico";
-    }
+    if (user.nmMnemonico) return user.nmMnemonico;
+    if (user.nmPrestador) return user.nmPrestador;
 
-    return user.nomeCompleto || user.nomeComplete || user.nomeAbreviado || "Funcionário";
+    return "Usuário";
   };
 
   // Função para gerar iniciais do avatar
   const getAvatarLetters = () => {
     const displayName = getDisplayName();
-    
-    if (!displayName || displayName === "Usuário" || displayName === "Médico" || displayName === "Funcionário") {
-      return "US";
-    }
+    if (!displayName || displayName === "Usuário") return "US";
 
-    try {
-      const words = displayName.split(' ').filter(word => word.length > 0);
-      
-      if (words.length === 0) return "US";
-      if (words.length === 1) return words[0].substring(0, 2).toUpperCase();
-      
-      return (words[0][0] + words[words.length - 1][0]).toUpperCase();
-    } catch (error) {
-      return "US";
-    }
+    const words = displayName.split(" ").filter(word => word.length > 0);
+    if (words.length === 0) return "US";
+    if (words.length === 1) return words[0].substring(0, 2).toUpperCase();
+
+    return (words[0][0] + words[words.length - 1][0]).toUpperCase();
   };
 
   const displayName = getDisplayName();
@@ -54,7 +44,7 @@ export function Header() {
             {displayName}
           </Text>
         </View>
-        
+
         <View style={styles.avatar}>
           <Text style={styles.avatarText}>{avatarLetters}</Text>
         </View>
